@@ -267,8 +267,8 @@ Class Reference
 
 import logging
 
-from psyneulink.globals.utilities import prune_unused_args
-from psyneulink.scheduling.time import TimeScale
+from psyneulink.core.globals.utilities import prune_unused_args
+from psyneulink.core.scheduling.time import TimeScale
 
 __all__ = [
     'AfterCall', 'AfterNCalls', 'AfterNCallsCombined', 'AfterNPasses', 'AfterNTimeSteps', 'AfterNTrials', 'AfterPass',

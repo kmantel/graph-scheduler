@@ -307,8 +307,8 @@ import uuid
 
 from toposort import toposort
 
-from psyneulink.scheduling.condition import AllHaveRun, Always, Condition, ConditionSet, Never
-from psyneulink.scheduling.time import Clock, TimeScale
+from psyneulink.core.scheduling.condition import AllHaveRun, Always, Condition, ConditionSet, Never
+from psyneulink.core.scheduling.time import Clock, TimeScale
 
 __all__ = [
     'Scheduler', 'SchedulerError',
