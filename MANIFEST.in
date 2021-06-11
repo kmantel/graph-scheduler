@@ -1,0 +1,7 @@
+include versioneer.py
+include src/graph_scheduler/_version.py
+
+# added by check-manifest
+include *.py
+include *.txt
+recursive-include tests *.py

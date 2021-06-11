@@ -1,0 +1,10 @@
+# below is the required psyneulink tag, but circular dependencies prevent inclusion
+# psyneulink @ git+https://github.com/PrincetonUniversity/PsyNeuLink@scheduler-extracted
+psyneulink
+pytest <6.3
+pytest-benchmark <3.4.2
+pytest-cov <2.12.2
+pytest-helpers-namespace <2021.4.30
+pytest-pycodestyle <=2.2.0
+pytest-pydocstyle <=2.2.0
+pytest-xdist <2.4.0
