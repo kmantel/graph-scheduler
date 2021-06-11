@@ -15,3 +15,6 @@ from .time import *
 __all__ = list(condition.__all__)
 __all__.extend(scheduler.__all__)
 __all__.extend(time.__all__)
+
+from . import _version
+__version__ = _version.get_versions()['version']
