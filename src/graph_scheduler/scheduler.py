@@ -129,8 +129,8 @@ as executing simultaneously.
           ↗ ↖
          A   B
 
-        scheduler.add_condition(B, pnl.EveryNCalls(A, 2))
-        scheduler.add_condition(C, pnl.EveryNCalls(B, 1))
+        scheduler.add_condition(B, graph_scheduler.EveryNCalls(A, 2))
+        scheduler.add_condition(C, graph_scheduler.EveryNCalls(B, 1))
 
         time steps: [{A}, {A, B}, {C}, ...]
 
@@ -195,6 +195,7 @@ the time specified. The simplest example of this situation involves a
 linear composition with two nodes::
 
     >>> import psyneulink as pnl
+    >>> import graph_scheduler
 
     >>> A = pnl.TransferMechanism()
     >>> B = pnl.TransferMechanism()
@@ -202,8 +203,8 @@ linear composition with two nodes::
     >>> comp = pnl.Composition()
     >>> pway = comp.add_linear_processing_pathway([A, B])
 
-    >>> comp.scheduler.add_condition(A, pnl.TimeInterval(start=10))
-    >>> comp.scheduler.add_condition(B, pnl.TimeInterval(start=10))
+    >>> comp.scheduler.add_condition(A, graph_scheduler.TimeInterval(start=10))
+    >>> comp.scheduler.add_condition(B, graph_scheduler.TimeInterval(start=10))
 
 In standard mode, **A** and **B** are in different consideration sets,
 and so can never execute at the same time. At most one of **A** and
@@ -253,6 +254,7 @@ Please see `Condition` for a list of all supported Conditions and their behavior
 * Basic phasing in a linear process::
 
     >>> import psyneulink as pnl
+    >>> import graph_scheduler
 
     >>> A = pnl.TransferMechanism(name='A')
     >>> B = pnl.TransferMechanism(name='B')
@@ -265,8 +267,8 @@ Please see `Condition` for a list of all supported Conditions and their behavior
     [(TransferMechanism A), (MappingProjection MappingProjection from A[RESULT] to B[InputPort-0]), (TransferMechanism B), (MappingProjection MappingProjection from B[RESULT] to C[InputPort-0]), (TransferMechanism C)]
 
     >>> # implicit condition of Always for A
-    >>> comp.scheduler.add_condition(B, pnl.EveryNCalls(A, 2))
-    >>> comp.scheduler.add_condition(C, pnl.EveryNCalls(B, 3))
+    >>> comp.scheduler.add_condition(B, graph_scheduler.EveryNCalls(A, 2))
+    >>> comp.scheduler.add_condition(C, graph_scheduler.EveryNCalls(B, 3))
 
     >>> # implicit AllHaveRun Termination condition
     >>> execution_sequence = list(comp.scheduler.run())
@@ -282,21 +284,21 @@ Please see `Condition` for a list of all supported Conditions and their behavior
 
     >>> comp.scheduler.add_condition(
     ...     A,
-    ...     pnl.Any(
-    ...         pnl.AtPass(0),
-    ...         pnl.EveryNCalls(B, 2)
+    ...     graph_scheduler.Any(
+    ...         graph_scheduler.AtPass(0),
+    ...         graph_scheduler.EveryNCalls(B, 2)
     ...     )
     ... )
 
     >>> comp.scheduler.add_condition(
     ...     B,
-    ...     pnl.Any(
-    ...         pnl.EveryNCalls(A, 1),
-    ...         pnl.EveryNCalls(B, 1)
+    ...     graph_scheduler.Any(
+    ...         graph_scheduler.EveryNCalls(A, 1),
+    ...         graph_scheduler.EveryNCalls(B, 1)
     ...     )
     ... )
     >>> termination_conds = {
-    ...     pnl.TimeScale.TRIAL: pnl.AfterNCalls(B, 4, time_scale=pnl.TimeScale.TRIAL)
+    ...     graph_scheduler.TimeScale.TRIAL: graph_scheduler.AfterNCalls(B, 4, time_scale=graph_scheduler.TimeScale.TRIAL)
     ... }
     >>> execution_sequence = list(comp.scheduler.run(termination_conds=termination_conds))
     >>> execution_sequence # doctest: +SKIP
@@ -313,17 +315,17 @@ Please see `Condition` for a list of all supported Conditions and their behavior
     >>> pway.pathway
     [(TransferMechanism B), (MappingProjection MappingProjection from B[RESULT] to C[InputPort-0]), (TransferMechanism C)]
 
-    >>> comp.scheduler.add_condition(A, pnl.EveryNPasses(1))
-    >>> comp.scheduler.add_condition(B, pnl.EveryNCalls(A, 2))
+    >>> comp.scheduler.add_condition(A, graph_scheduler.EveryNPasses(1))
+    >>> comp.scheduler.add_condition(B, graph_scheduler.EveryNCalls(A, 2))
     >>> comp.scheduler.add_condition(
     ...     C,
-    ...     pnl.Any(
-    ...         pnl.AfterNCalls(A, 3),
-    ...         pnl.AfterNCalls(B, 3)
+    ...     graph_scheduler.Any(
+    ...         graph_scheduler.AfterNCalls(A, 3),
+    ...         graph_scheduler.AfterNCalls(B, 3)
     ...     )
     ... )
     >>> termination_conds = {
-    ...     pnl.TimeScale.TRIAL: pnl.AfterNCalls(C, 4, time_scale=pnl.TimeScale.TRIAL)
+    ...     graph_scheduler.TimeScale.TRIAL: graph_scheduler.AfterNCalls(C, 4, time_scale=graph_scheduler.TimeScale.TRIAL)
     ... }
     >>> execution_sequence = list(comp.scheduler.run(termination_conds=termination_conds))
     >>> execution_sequence  # doctest: +SKIP
