@@ -16,7 +16,7 @@ import enum
 import functools
 import types
 
-import psyneulink as pnl
+from graph_scheduler import _unit_registry
 
 __all__ = [
     'Clock', 'TimeScale', 'Time', 'SimpleTime', 'TimeHistoryTree', 'TimeScaleError'
@@ -229,8 +229,8 @@ class Time(types.SimpleNamespace):
         trial=0,
         run=0,
         life=0,
-        absolute=0 * pnl._unit_registry.ms,
-        absolute_interval=1 * pnl._unit_registry.ms,
+        absolute=0 * _unit_registry.ms,
+        absolute_interval=1 * _unit_registry.ms,
         absolute_time_unit_scale=TimeScale.TIME_STEP,
         absolute_enabled=False,
     ):
@@ -240,8 +240,8 @@ class Time(types.SimpleNamespace):
             trial=trial,
             run=run,
             life=life,
-            absolute=0 * pnl._unit_registry.ms,
-            absolute_interval=1 * pnl._unit_registry.ms,
+            absolute=0 * _unit_registry.ms,
+            absolute_interval=1 * _unit_registry.ms,
             absolute_time_unit_scale=TimeScale.TIME_STEP,
             absolute_enabled=False,
         )
@@ -293,7 +293,7 @@ class Time(types.SimpleNamespace):
                 # only round for floating point interval increases,
                 # until pint fixes precision errors
                 # see https://github.com/hgrecco/pint/issues/1263
-                self.absolute = round(self.absolute, pnl._unit_registry.precision)
+                self.absolute = round(self.absolute, _unit_registry.precision)
 
     def _reset_by_time_scale(self, time_scale):
         """

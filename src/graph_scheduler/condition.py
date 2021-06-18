@@ -298,14 +298,14 @@ import typing
 import warnings
 
 import pint
-import psyneulink as pnl
 
 from psyneulink.core.globals.json import JSONDumpable
 from psyneulink.core.globals.keywords import MODEL_SPEC_ID_TYPE
 from psyneulink.core.globals.parameters import parse_context
-from psyneulink.core.globals.utilities import call_with_pruned_args
-from psyneulink.core.scheduling.time import TimeScale
 from psyneulink.core.globals.context import handle_external_context
+from graph_scheduler import _unit_registry
+from graph_scheduler.time import TimeScale
+from graph_scheduler.utilities import call_with_pruned_args
 
 __all__ = [
     'AfterCall', 'AfterNCalls', 'AfterNCallsCombined', 'AfterNPasses', 'AfterNTimeSteps', 'AfterNTrials', 'AfterPass',
@@ -321,15 +321,15 @@ logger = logging.getLogger(__name__)
 
 _pint_all_time_units = sorted(
     set([
-        getattr(pnl._unit_registry, f'{x}s')
-        for x in pnl._unit_registry._prefixes.keys()
+        getattr(_unit_registry, f'{x}s')
+        for x in _unit_registry._prefixes.keys()
     ]),
     reverse=True
 )
 
 
 def _quantity_as_integer(q):
-    rounded = round(q.m, pnl._unit_registry.precision)
+    rounded = round(q.m, _unit_registry.precision)
     if rounded == int(rounded):
         return int(rounded) * q.u
     else:
@@ -349,17 +349,17 @@ def _reduce_quantity_to_integer(q):
 
 def _parse_absolute_unit(n, unit=None):
     def _get_quantity(n, unit):
-        if isinstance(n, pnl._unit_registry.Quantity):
+        if isinstance(n, _unit_registry.Quantity):
             return n
 
         if isinstance(n, str):
             try:
-                full_quantity = pnl._unit_registry.Quantity(n)
+                full_quantity = _unit_registry.Quantity(n)
             except pint.errors.UndefinedUnitError:
                 pass
             else:
                 # n is an actual full quantity (e.g. '1ms') not just a number ('1')
-                if full_quantity.u != pnl._unit_registry.Unit('dimensionless'):
+                if full_quantity.u != _unit_registry.Unit('dimensionless'):
                     return full_quantity
                 else:
                     try:
@@ -369,11 +369,11 @@ def _parse_absolute_unit(n, unit=None):
 
         try:
             # handle string representation of a unit
-            unit = getattr(pnl._unit_registry, unit)
+            unit = getattr(_unit_registry, unit)
         except TypeError:
             pass
 
-        assert isinstance(unit, pnl._unit_registry.Unit)
+        assert isinstance(unit, _unit_registry.Unit)
         n = n * unit
 
         return n
@@ -945,7 +945,7 @@ class TimeInterval(AbsoluteCondition):
         repeat: typing.Union[int, str, pint.Quantity] = None,
         start: typing.Union[int, str, pint.Quantity] = None,
         end: typing.Union[int, str, pint.Quantity] = None,
-        unit: typing.Union[str, pint.Unit] = pnl._unit_registry.ms,
+        unit: typing.Union[str, pint.Unit] = _unit_registry.ms,
         start_inclusive: bool = True,
         end_inclusive: bool = True
     ):
@@ -975,7 +975,7 @@ class TimeInterval(AbsoluteCondition):
             if repeat is not None:
                 satisfied &= round(
                     (clock.time.absolute - offset) % repeat,
-                    pnl._unit_registry.precision
+                    _unit_registry.precision
                 ) == 0
 
             if start is not None:
@@ -1042,7 +1042,7 @@ class TimeTermination(AbsoluteCondition):
         self,
         t: typing.Union[int, str, pint.Quantity],
         inclusive: bool = True,
-        unit: typing.Union[str, pint.Unit] = pnl._unit_registry.ms,
+        unit: typing.Union[str, pint.Unit] = _unit_registry.ms,
     ):
         t = _parse_absolute_unit(t, unit)
 

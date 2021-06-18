@@ -345,14 +345,17 @@ import typing
 
 import numpy as np
 import pint
-import psyneulink as pnl
-
 from toposort import toposort
 
 from psyneulink.core.globals.context import Context, handle_external_context
 from psyneulink.core.globals.json import JSONDumpable
-from psyneulink.core.scheduling.condition import All, AllHaveRun, Always, Condition, ConditionSet, EveryNCalls, Never, _parse_absolute_unit, _quantity_as_integer
-from psyneulink.core.scheduling.time import Clock, TimeScale
+
+from graph_scheduler import _unit_registry
+from graph_scheduler.condition import (
+    All, AllHaveRun, Always, Condition, ConditionSet, EveryNCalls, Never,
+    _parse_absolute_unit, _quantity_as_integer,
+)
+from graph_scheduler.time import Clock, TimeScale
 
 __all__ = [
     'Scheduler', 'SchedulerError', 'SchedulingMode',
@@ -461,7 +464,7 @@ class Scheduler(JSONDumpable):
         termination_conds=None,
         default_execution_id=None,
         mode: SchedulingMode = SchedulingMode.STANDARD,
-        default_absolute_time_unit: typing.Union[str, pint.Quantity] = 1 * pnl._unit_registry.ms,
+        default_absolute_time_unit: typing.Union[str, pint.Quantity] = 1 * _unit_registry.ms,
         **kwargs
     ):
         """
