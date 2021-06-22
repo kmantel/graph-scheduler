@@ -349,8 +349,6 @@ import numpy as np
 import pint
 from toposort import toposort
 
-from psyneulink.core.globals.context import Context, handle_external_context
-
 from graph_scheduler import _unit_registry
 from graph_scheduler.condition import (
     All, AllHaveRun, Always, Condition, ConditionSet, EveryNCalls, Never,
@@ -740,12 +738,11 @@ class Scheduler:
     ################################################################################
     # Run methods
     ################################################################################
-    @handle_external_context(fallback_default=True)
     def run(
         self,
         termination_conds=None,
-        context=None,
-        base_context=Context(execution_id=None),
+        execution_id=None,
+        base_execution_id=None,
         skip_trial_time_increment=False,
     ):
         """
@@ -767,7 +764,7 @@ class Scheduler:
         else:
             termination_conds = self._combine_termination_conditions(termination_conds)
 
-        current_time = self.get_clock(context).time
+        current_time = self.get_clock(execution_id).time
 
         in_absolute_time_mode = len(self.get_absolute_conditions(termination_conds)) > 0
         if in_absolute_time_mode:
@@ -792,23 +789,23 @@ class Scheduler:
 
         current_time.absolute_enabled = in_absolute_time_mode
 
-        self._init_counts(context, base_context)
-        self._reset_counts_useable(context)
-        self._reset_counts_total(TimeScale.TRIAL, context)
+        self._init_counts(execution_id, base_execution_id)
+        self._reset_counts_useable(execution_id)
+        self._reset_counts_total(TimeScale.TRIAL, execution_id)
 
         while (
-            not termination_conds[TimeScale.TRIAL].is_satisfied(scheduler=self, context=context)
-            and not termination_conds[TimeScale.RUN].is_satisfied(scheduler=self, context=context)
+            not termination_conds[TimeScale.TRIAL].is_satisfied(scheduler=self, execution_id=execution_id)
+            and not termination_conds[TimeScale.RUN].is_satisfied(scheduler=self, execution_id=execution_id)
         ):
-            self._reset_counts_total(TimeScale.PASS, context)
+            self._reset_counts_total(TimeScale.PASS, execution_id)
 
             execution_list_has_changed = False
             cur_index_consideration_queue = 0
 
             while (
                 cur_index_consideration_queue < len(effective_consideration_queue)
-                and not termination_conds[TimeScale.TRIAL].is_satisfied(scheduler=self, context=context)
-                and not termination_conds[TimeScale.RUN].is_satisfied(scheduler=self, context=context)
+                and not termination_conds[TimeScale.TRIAL].is_satisfied(scheduler=self, execution_id=execution_id)
+                and not termination_conds[TimeScale.RUN].is_satisfied(scheduler=self, execution_id=execution_id)
             ):
                 # all nodes to be added during this time step
                 cur_time_step_exec = set()
@@ -829,57 +826,57 @@ class Scheduler:
                         # only add each node once during a single time step, this also serves
                         # to prevent infinitely cascading adds
                         if current_node not in cur_time_step_exec:
-                            if self.conditions.conditions[current_node].is_satisfied(scheduler=self, context=context):
+                            if self.conditions.conditions[current_node].is_satisfied(scheduler=self, execution_id=execution_id):
                                 cur_time_step_exec.add(current_node)
                                 execution_list_has_changed = True
                                 cur_consideration_set_has_changed = True
 
                                 for ts in TimeScale:
-                                    self.counts_total[context][ts][current_node] += 1
+                                    self.counts_total[execution_id][ts][current_node] += 1
                                 # current_node's node is added to the execution queue, so we now need to
                                 # reset all of the counts useable by current_node's node to 0
-                                for n in self.counts_useable[context]:
-                                    self.counts_useable[context][n][current_node] = 0
+                                for n in self.counts_useable[execution_id]:
+                                    self.counts_useable[execution_id][n][current_node] = 0
                                 # and increment all of the counts of current_node's node useable by other
                                 # nodes by 1
-                                for n in self.counts_useable[context]:
-                                    self.counts_useable[context][current_node][n] += 1
+                                for n in self.counts_useable[execution_id]:
+                                    self.counts_useable[execution_id][current_node][n] += 1
                     # do-while condition
                     if not cur_consideration_set_has_changed:
                         break
 
                 # add a new time step at each step in a pass, if the time step would not be empty
                 if len(cur_time_step_exec) >= 1 or in_absolute_time_mode:
-                    self.execution_list[context].append(cur_time_step_exec)
+                    self.execution_list[execution_id].append(cur_time_step_exec)
                     if in_absolute_time_mode:
-                        self.execution_timestamps[context].append(
+                        self.execution_timestamps[execution_id].append(
                             copy.copy(current_time)
                         )
-                    yield self.execution_list[context][-1]
+                    yield self.execution_list[execution_id][-1]
 
-                    self.get_clock(context)._increment_time(TimeScale.TIME_STEP)
+                    self.get_clock(execution_id)._increment_time(TimeScale.TIME_STEP)
 
                 cur_index_consideration_queue += 1
 
             # if an entire pass occurs with nothing running, add an empty time step
             if not execution_list_has_changed and not in_absolute_time_mode:
-                self.execution_list[context].append(set())
-                yield self.execution_list[context][-1]
+                self.execution_list[execution_id].append(set())
+                yield self.execution_list[execution_id][-1]
 
-                self.get_clock(context)._increment_time(TimeScale.TIME_STEP)
+                self.get_clock(execution_id)._increment_time(TimeScale.TIME_STEP)
 
-            self.get_clock(context)._increment_time(TimeScale.PASS)
+            self.get_clock(execution_id)._increment_time(TimeScale.PASS)
 
         if not skip_trial_time_increment:
-            self.get_clock(context)._increment_time(TimeScale.TRIAL)
+            self.get_clock(execution_id)._increment_time(TimeScale.TRIAL)
 
-        if termination_conds[TimeScale.RUN].is_satisfied(scheduler=self, context=context):
+        if termination_conds[TimeScale.RUN].is_satisfied(scheduler=self, execution_id=execution_id):
             self.date_last_run_end = datetime.datetime.now()
 
-        return self.execution_list[context]
+        return self.execution_list[execution_id]
 
-    def _increment_time(self, time_scale, context):
-        self.get_clock(context)._increment_time(time_scale)
+    def _increment_time(self, time_scale, execution_id):
+        self.get_clock(execution_id)._increment_time(time_scale)
 
     def _get_absolute_time_step_unit(self, termination_conds=None):
         """Computes the time length of the gap between two time steps
@@ -929,17 +926,17 @@ class Scheduler:
             if cond.is_absolute
         }
 
-    def get_clock(self, context):
+    def get_clock(self, execution_id):
         try:
-            return self.clocks[context.default_execution_id]
+            return self.clocks[execution_id.default_execution_id]
         except AttributeError:
             try:
-                return self.clocks[context]
+                return self.clocks[execution_id]
             except AttributeError:
-                if context not in self.clocks:
-                    self._init_clock(context)
+                if execution_id not in self.clocks:
+                    self._init_clock(execution_id)
 
-                return self.clocks[context]
+                return self.clocks[execution_id]
         except KeyError:
             raise
 

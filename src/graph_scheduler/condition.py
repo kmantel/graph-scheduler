@@ -297,8 +297,6 @@ import warnings
 
 import pint
 
-from psyneulink.core.globals.parameters import parse_context
-from psyneulink.core.globals.context import handle_external_context
 from graph_scheduler import _unit_registry
 from graph_scheduler.time import TimeScale
 from graph_scheduler.utilities import call_with_pruned_args
@@ -526,8 +524,7 @@ class Condition:
         logger.debug('Condition ({0}) setting owner to {1}'.format(type(self).__name__, value))
         self._owner = value
 
-    @handle_external_context()
-    def is_satisfied(self, *args, context=None, execution_id=None, **kwargs):
+    def is_satisfied(self, *args, execution_id=None, **kwargs):
         """
         the function called to determine satisfaction of this Condition.
 
@@ -546,12 +543,6 @@ class Condition:
             True - if the Condition is satisfied
             False - if the Condition is not satisfied
         """
-        if execution_id is None:
-            try:
-                execution_id = parse_context(context).execution_id
-            except AttributeError:
-                pass
-
         # update so that kwargs can override self.kwargs
         kwargs_to_pass = self.kwargs.copy()
         kwargs_to_pass.update(kwargs)
@@ -560,7 +551,6 @@ class Condition:
             self.func,
             *self.args,
             *args,
-            context=context,
             execution_id=execution_id,
             **kwargs_to_pass
         )
