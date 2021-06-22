@@ -350,7 +350,6 @@ import pint
 from toposort import toposort
 
 from psyneulink.core.globals.context import Context, handle_external_context
-from psyneulink.core.globals.json import JSONDumpable
 
 from graph_scheduler import _unit_registry
 from graph_scheduler.condition import (
@@ -393,7 +392,7 @@ class SchedulerError(Exception):
         return repr(self.error_value)
 
 
-class Scheduler(JSONDumpable):
+class Scheduler:
     """Generates an order of execution for `Components <Component>` in a `Composition <Composition>` or graph
     specification dictionary, possibly determined by a set of `Conditions <Condition>`.
 
@@ -928,19 +927,6 @@ class Scheduler(JSONDumpable):
             for owner, cond
             in [*self.conditions.conditions.items(), *termination_conds.items()]
             if cond.is_absolute
-        }
-
-    @property
-    def _dict_summary(self):
-        return {
-            'conditions': {
-                'termination': {
-                    str.lower(k.name): v._dict_summary for k, v in self.termination_conds.items()
-                },
-                'node_specific': {
-                    n.name: self.conditions[n]._dict_summary for n in self.nodes if n in self.conditions
-                }
-            }
         }
 
     def get_clock(self, context):
