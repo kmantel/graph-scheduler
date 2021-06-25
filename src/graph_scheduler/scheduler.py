@@ -739,6 +739,7 @@ class Scheduler:
         execution_id=None,
         base_execution_id=None,
         skip_trial_time_increment=False,
+        **kwargs,
     ):
         """
         run is a python generator, that when iterated over provides the next `TIME_STEP` of
@@ -760,6 +761,11 @@ class Scheduler:
             termination_conds = self._combine_termination_conditions(termination_conds)
 
         current_time = self.get_clock(execution_id).time
+        is_satisfied_kwargs = {
+            'scheduler': self,
+            'execution_id': execution_id,
+            **kwargs
+        }
 
         in_absolute_time_mode = len(self.get_absolute_conditions(termination_conds)) > 0
         if in_absolute_time_mode:
@@ -789,8 +795,8 @@ class Scheduler:
         self._reset_counts_total(TimeScale.TRIAL, execution_id)
 
         while (
-            not termination_conds[TimeScale.TRIAL].is_satisfied(scheduler=self, execution_id=execution_id)
-            and not termination_conds[TimeScale.RUN].is_satisfied(scheduler=self, execution_id=execution_id)
+            not termination_conds[TimeScale.TRIAL].is_satisfied(**is_satisfied_kwargs)
+            and not termination_conds[TimeScale.RUN].is_satisfied(**is_satisfied_kwargs)
         ):
             self._reset_counts_total(TimeScale.PASS, execution_id)
 
@@ -799,8 +805,8 @@ class Scheduler:
 
             while (
                 cur_index_consideration_queue < len(effective_consideration_queue)
-                and not termination_conds[TimeScale.TRIAL].is_satisfied(scheduler=self, execution_id=execution_id)
-                and not termination_conds[TimeScale.RUN].is_satisfied(scheduler=self, execution_id=execution_id)
+                and not termination_conds[TimeScale.TRIAL].is_satisfied(**is_satisfied_kwargs)
+                and not termination_conds[TimeScale.RUN].is_satisfied(**is_satisfied_kwargs)
             ):
                 # all nodes to be added during this time step
                 cur_time_step_exec = set()
@@ -821,7 +827,7 @@ class Scheduler:
                         # only add each node once during a single time step, this also serves
                         # to prevent infinitely cascading adds
                         if current_node not in cur_time_step_exec:
-                            if self.conditions.conditions[current_node].is_satisfied(scheduler=self, execution_id=execution_id):
+                            if self.conditions.conditions[current_node].is_satisfied(**is_satisfied_kwargs):
                                 cur_time_step_exec.add(current_node)
                                 execution_list_has_changed = True
                                 cur_consideration_set_has_changed = True
@@ -865,7 +871,7 @@ class Scheduler:
         if not skip_trial_time_increment:
             self.get_clock(execution_id)._increment_time(TimeScale.TRIAL)
 
-        if termination_conds[TimeScale.RUN].is_satisfied(scheduler=self, execution_id=execution_id):
+        if termination_conds[TimeScale.RUN].is_satisfied(**is_satisfied_kwargs):
             self.date_last_run_end = datetime.datetime.now()
 
         return self.execution_list[execution_id]
