@@ -15,13 +15,23 @@ import copy
 import enum
 import functools
 import keyword
+import re
 import types
+import typing
 
 from graph_scheduler import _unit_registry
 
 __all__ = [
-    'Clock', 'TimeScale', 'Time', 'SimpleTime', 'TimeHistoryTree', 'TimeScaleError'
+    'Clock', 'TimeScale', 'Time', 'SimpleTime', 'TimeHistoryTree', 'TimeScaleError', 'set_time_scale_alias', 'remove_time_scale_alias'
 ]
+
+
+_time_scale_aliases = {}
+_alias_docs_warning_str = """
+
+.. note:: This documentation was modified from the original due to environment-specific TimeScale renamings. If there is any confusion, please see the original documentation at https://www.github.com/kmantel/graph-scheduler
+
+"""
 
 
 class TimeScaleError(Exception):
@@ -226,13 +236,22 @@ class Time(types.SimpleNamespace):
         absolute_interval=1 * _unit_registry.ms,
         absolute_time_unit_scale=TimeScale.TIME_STEP,
         absolute_enabled=False,
+        **alias_time_values,
     ):
+        time_scale_values = {}
+        for ts in TimeScale:
+            time_scale_values[ts] = locals()[_time_scale_to_attr_str(ts)]
+
+        time_scale_values.update({
+            ts: alias_time_values[_time_scale_aliases[ts].lower()]
+            for ts in _time_scale_aliases
+            if _time_scale_aliases[ts].lower() in alias_time_values
+        })
+
         super().__init__(
-            time_step=time_step,
-            pass_=pass_,
-            trial=trial,
-            run=run,
-            life=life,
+            **{
+                _time_scale_to_attr_str(ts): v for ts, v in time_scale_values.items()
+            },
             absolute=0 * _unit_registry.ms,
             absolute_interval=1 * _unit_registry.ms,
             absolute_time_unit_scale=TimeScale.TIME_STEP,
@@ -241,7 +260,24 @@ class Time(types.SimpleNamespace):
 
     def __repr__(self):
         abs_str = f'{self.absolute}, ' if self.absolute_enabled else ''
-        return f'Time({abs_str}run: {self.run}, trial: {self.trial}, pass: {self.pass_}, time_step: {self.time_step})'
+        ts_str = self._time_repr(exclusions={TimeScale.LIFE})
+        return f'Time({abs_str}{ts_str})'
+
+    def _time_repr(self, exclusions=()):
+        ts_strs = []
+
+        for ts in sorted(TimeScale, reverse=True):
+            if ts not in exclusions:
+                if ts not in _time_scale_aliases:
+                    name = ts.name.lower()
+                else:
+                    name = _time_scale_aliases[ts].lower()
+
+                ts_strs.append(
+                    f'{name}: {getattr(self, _time_scale_to_attr_str(ts))}'
+                )
+
+        return ', '.join(ts_strs)
 
     def _get_by_time_scale(self, time_scale):
         """
@@ -314,7 +350,8 @@ class SimpleTime:
     # based on a Time object
     def __repr__(self):
         abs_str = f'{self.absolute}, ' if self._time_ref.absolute_enabled else ''
-        return f'Time({abs_str}run: {self.run}, trial: {self.trial}, time_step: {self.time_step})'
+        ts_str = self._time_ref._time_repr(exclusions={TimeScale.LIFE, TimeScale.PASS})
+        return f'Time({abs_str}{ts_str})'
 
     @property
     def absolute(self):
@@ -552,3 +589,152 @@ def _time_scale_to_attr_str(time_scale: TimeScale) -> str:
         return f'{attr}_'
     else:
         return attr
+
+
+@functools.lru_cache(maxsize=None)
+def _time_scale_to_class_str(time_scale: typing.Union[TimeScale, str]) -> str:
+    try:
+        name = time_scale.name
+    except AttributeError:
+        name = time_scale
+
+    return ''.join([f'{x[0].upper()}{x[1:].lower()}' for x in name.split('_')])
+
+
+def _attr_str_to_time_scale(attr_str):
+    return getattr(TimeScale, attr_str.rstrip('_'))
+
+
+def _multi_substitute_docstring(cls, subs: typing.Dict[str, str]):
+    new_docstring = cls.__doc__
+    try:
+        for prev, new in subs.items():
+            new_docstring = re.sub(prev, new, new_docstring)
+    except TypeError:
+        pass
+    else:
+        cls._old_docstring = cls.__doc__
+        cls.__doc__ = new_docstring
+
+
+def set_time_scale_alias(name: str, target: TimeScale):
+    """Sets an alias named **name** of TimeScale **target**
+
+    Args:
+        name (str): name of the alias
+        target (TimeScale): TimeScale that **name** will refer to
+    """
+    import graph_scheduler
+
+    name_aliased_time_scales = list(filter(
+        lambda e: _time_scale_aliases[e] == name,
+        _time_scale_aliases
+    ))
+    if len(name_aliased_time_scales) > 0:
+        raise ValueError(f"'{name}' is already aliased to {name_aliased_time_scales[0]}")
+
+    try:
+        target = getattr(TimeScale, target)
+    except TypeError:
+        pass
+    except AttributeError as e:
+        raise ValueError(f'Invalid TimeScale {target}') from e
+
+    _time_scale_aliases[target] = name
+    setattr(TimeScale, name, target)
+
+    def getter(self):
+        return getattr(self, _time_scale_to_attr_str(target))
+
+    def setter(self, value):
+        setattr(self, _time_scale_to_attr_str(target), value)
+
+    prop = property(getter).setter(setter)
+    setattr(Time, name.lower(), prop)
+    setattr(SimpleTime, name.lower(), prop)
+
+    # alias name in style of a class name
+    new_class_segment_name = _time_scale_to_class_str(name)
+    for cls_name, cls in graph_scheduler.__dict__.copy().items():
+        # make aliases of conditions that contain a TimeScale name (e.g. AtTrial)
+        target_class_segment_name = _time_scale_to_class_str(target)
+
+        if isinstance(cls, (type, types.ModuleType)):
+            if isinstance(cls, types.ModuleType):
+                try:
+                    if _alias_docs_warning_str not in cls.__doc__:
+                        cls.__doc__ = f'{_alias_docs_warning_str}{cls.__doc__}'
+                except TypeError:
+                    pass
+
+            _multi_substitute_docstring(
+                cls,
+                {
+                    target.name: name,
+                    target_class_segment_name: new_class_segment_name,
+                }
+            )
+
+        if target_class_segment_name in cls_name:
+            new_cls_name = cls_name.replace(
+                target_class_segment_name,
+                new_class_segment_name
+            )
+
+            setattr(graph_scheduler.condition, new_cls_name, cls)
+            setattr(graph_scheduler, new_cls_name, cls)
+
+            graph_scheduler.condition.__all__.append(new_cls_name)
+            graph_scheduler.__all__.append(new_cls_name)
+
+
+def remove_time_scale_alias(name: str):
+    """Removes an alias previously set by `set_time_scale_alias`
+
+    Args:
+        name (str): name of the TimeScale alias to remove
+    """
+    import graph_scheduler
+
+    name_aliased_time_scales = list(filter(
+        lambda e: _time_scale_aliases[e] == name,
+        _time_scale_aliases
+    ))
+    assert len(name_aliased_time_scales) <= 1
+
+    try:
+        del _time_scale_aliases[name_aliased_time_scales[0]]
+    except (IndexError, KeyError):
+        return
+    else:
+        delattr(TimeScale, name)
+        delattr(Time, name.lower())
+        delattr(SimpleTime, name.lower())
+
+        new_class_segment_name = _time_scale_to_class_str(name)
+        for cls_name, cls in graph_scheduler.__dict__.copy().items():
+
+            if isinstance(cls, (type, types.ModuleType)):
+                if isinstance(cls, types.ModuleType):
+                    if len(_time_scale_aliases) == 0:
+                        try:
+                            re.sub(_alias_docs_warning_str, '', cls.__doc__)
+                        except TypeError:
+                            pass
+
+                try:
+                    cls.__doc__ = cls._old_docstring
+                    del cls._old_docstring
+                except AttributeError:
+                    # not all modules have docstrings
+                    pass
+
+            # NOTE: this could accidentally remove some unintended conditions if
+            # an alias is constructed such that its determined class name is
+            # a substring of some other Condition class name, but this is unlikely
+            if new_class_segment_name in cls_name:
+                delattr(graph_scheduler.condition, cls_name)
+                delattr(graph_scheduler, cls_name)
+
+                graph_scheduler.condition.__all__.remove(cls_name)
+                graph_scheduler.__all__.remove(cls_name)
