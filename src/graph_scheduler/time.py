@@ -14,6 +14,7 @@ or :class:`Clock.simple_time <SimpleTime>`
 import copy
 import enum
 import functools
+import keyword
 import types
 
 from graph_scheduler import _unit_registry
@@ -214,14 +215,6 @@ class Time(types.SimpleNamespace):
             whether absolute time is used for this Time object
 
     """
-    _time_scale_attr_map = {
-        TimeScale.TIME_STEP: 'time_step',
-        TimeScale.PASS: 'pass_',
-        TimeScale.TRIAL: 'trial',
-        TimeScale.RUN: 'run',
-        TimeScale.LIFE: 'life'
-    }
-
     def __init__(
         self,
         time_step=0,
@@ -261,7 +254,7 @@ class Time(types.SimpleNamespace):
             this Time's value of a TimeScale by the TimeScale enum, rather \
             than by attribute : int
         """
-        return getattr(self, self._time_scale_attr_map[time_scale])
+        return getattr(self, _time_scale_to_attr_str(time_scale))
 
     def _set_by_time_scale(self, time_scale, value):
         """
@@ -272,7 +265,7 @@ class Time(types.SimpleNamespace):
         Sets this Time's value of a **time_scale** by the TimeScale enum,
         rather than by attribute
         """
-        setattr(self, self._time_scale_attr_map[time_scale], value)
+        setattr(self, _time_scale_to_attr_str(time_scale), value)
 
     def _increment_by_time_scale(self, time_scale):
         """
@@ -301,7 +294,7 @@ class Time(types.SimpleNamespace):
         e.g. _reset_by_time_scale(TimeScale.TRIAL) will set the values for
         TimeScale.PASS and TimeScale.TIME_STEP to 0
         """
-        for relative_time_scale in sorted(self._time_scale_attr_map):
+        for relative_time_scale in sorted(TimeScale):
             # this works because the enum is set so that higher granularities of time have lower values
             if relative_time_scale >= time_scale:
                 continue
@@ -549,3 +542,13 @@ class TimeHistoryTree:
                     node.index
                 )
             )
+
+
+@functools.lru_cache(maxsize=None)
+def _time_scale_to_attr_str(time_scale: TimeScale) -> str:
+    attr = time_scale.name.lower()
+
+    if keyword.iskeyword(attr):
+        return f'{attr}_'
+    else:
+        return attr
