@@ -54,13 +54,13 @@ When a Scheduler is created, it constructs a `consideration_queue`:  a list of `
 that defines the order in which `Components <Component>` are eligible to be executed.  This is based on the pattern of
 `Projections <Projection>` among them specified in the `Composition`, or on the dependencies specified in the graph
 specification dictionary, whichever was provided in the Scheduler's constructor.  Each `consideration_set
-<consideration_set>` is a set of Components that are eligible to execute at the same time/`TIME_STEP` (i.e.,
+<consideration_set>` is a set of Components that are eligible to execute at the same time/`CONSIDERATION_SET_EXECUTION` (i.e.,
 that appear at the same "depth" in a sequence of dependencies, and among which there are no dependencies).  The first
 `consideration_set <consideration_set>` consists of only `ORIGIN` Mechanisms. The second consists of all Components
 that receive `Projections <Projection>` from the Mechanisms in the first `consideration_set <consideration_set>`.
 The third consists of  Components that receive Projections from Components in the first two `consideration_sets
 <consideration_set>`, and so forth.  When the Scheduler is run, it uses the `consideration_queue` to determine which
-Components are eligible to execute in each `TIME_STEP` of a `PASS`, and then evaluates the `Condition <Condition>`
+Components are eligible to execute in each `CONSIDERATION_SET_EXECUTION` of a `PASS`, and then evaluates the `Condition <Condition>`
 associated with each Component in the current `consideration_set <consideration_set>` to determine which should
 actually be assigned for execution.
 
@@ -80,16 +80,16 @@ Pseudocode::
             do:
                 cur_consideration_set_has_changed <- False
                 for cur_node in cur_consideration_set:
-                    if  cur_node not in cur_time_step
+                    if  cur_node not in cur_consideration_set_execution
                         and cur_node`s Condition is satisfied:
 
                         cur_consideration_set_has_changed <- True
-                        add cur_node to cur_time_step
+                        add cur_node to cur_consideration_set_execution
                         increment execution and time counters
             while cur_consideration_set_has_changed
 
-            if cur_time_step is not empty:
-                yield cur_time_step
+            if cur_consideration_set_execution is not empty:
+                yield cur_consideration_set_execution
 
             increment cur_index
             increment time counters
@@ -113,13 +113,13 @@ which Components in the set are allowed to execute, based on whether their assoc
 been met. Any Component that does not have a `Condition` explicitly specified is assigned a Condition that causes it
 to be executed whenever it is `under consideration <Scheduler_Algorithm>` and all its structural parents have been
 executed at least once since the Component's last execution. All of the Components within a `consideration_set
-<consideration_set>` that are allowed to execute comprise a `TIME_STEP` of execution. These Components are considered
+<consideration_set>` that are allowed to execute comprise a `CONSIDERATION_SET_EXECUTION` of execution. These Components are considered
 as executing simultaneously.
 
 .. note::
-    The ordering of the Components specified within a `TIME_STEP` is arbitrary (and is irrelevant, as there are no
+    The ordering of the Components specified within a `CONSIDERATION_SET_EXECUTION` is arbitrary (and is irrelevant, as there are no
     graph dependencies among Components within the same `consideration_set <consideration_set>`). However,
-    the execution of a Component within a `time_step` may trigger the execution of another Component within its
+    the execution of a Component within a `CONSIDERATION_SET_EXECUTION` may trigger the execution of another Component within its
     `consideration_set <consideration_set>`, as in the example below::
 
             C
@@ -129,17 +129,17 @@ as executing simultaneously.
         scheduler.add_condition(B, graph_scheduler.EveryNCalls(A, 2))
         scheduler.add_condition(C, graph_scheduler.EveryNCalls(B, 1))
 
-        time steps: [{A}, {A, B}, {C}, ...]
+        execution sets: [{A}, {A, B}, {C}, ...]
 
-    Since there are no graph dependencies between `A` and `B`, they may execute in the same `TIME_STEP`. Morever,
+    Since there are no graph dependencies between `A` and `B`, they may execute in the same `CONSIDERATION_SET_EXECUTION`. Morever,
     `A` and `B` are in the same `consideration_set <consideration_set>`. Since `B` is specified to run every two
-    times `A` runs, `A`'s second execution in the second `TIME_STEP` allows `B` to run within that `TIME_STEP`,
+    times `A` runs, `A`'s second execution in the second `CONSIDERATION_SET_EXECUTION` allows `B` to run within that `CONSIDERATION_SET_EXECUTION`,
     rather than waiting for the next `PASS`.
 
-For each `TIME_STEP`, the Scheduler evaluates  whether any specified
+For each `CONSIDERATION_SET_EXECUTION`, the Scheduler evaluates  whether any specified
 `termination Conditions <Scheduler_Termination_Conditions>` have been met, and terminates if so.  Otherwise,
-it returns the set of Components that should be executed in the current `TIME_STEP`. Each subsequent call to the
-`run <Scheduler.run>` method returns the set of Components in the following `TIME_STEP`.
+it returns the set of Components that should be executed in the current `CONSIDERATION_SET_EXECUTION`. Each subsequent call to the
+`run <Scheduler.run>` method returns the set of Components in the following `CONSIDERATION_SET_EXECUTION`.
 
 Processing of all of the `consideration_sets <consideration_set>` in the `consideration_queue` constitutes a `PASS` of
 execution, over which every Component in the Composition has been considered for execution. Subsequent calls to the
@@ -229,8 +229,8 @@ When `Scheduler.mode` is `SchedulingMode.EXACT_TIME`, the scheduler is
 capable of handling examples like the one
 `above <Scheduler_Absolute_Time>`. In this mode, all nodes in the
 scheduler's graph become members of the same consideration set, and may
-be executed at the same time for every time step, subject to the
-conditions specified. As a result, the guarantees in
+be executed at the same time for every consideration set execution,
+subject to the conditions specified. As a result, the guarantees in
 `standard scheduling <Scheduler_Execution>` may not apply - that is,
 that all parent nodes get a chance to execute before their children, and
 that there exist no data dependencies (Projections) between nodes in the
@@ -409,7 +409,7 @@ class Scheduler:
 
     default_absolute_time_unit : ``pint.Quantity`` : ``1ms``
         if not otherwise determined by any absolute **conditions**,
-        specifies the absolute duration of a `TIME_STEP`
+        specifies the absolute duration of a `CONSIDERATION_SET_EXECUTION`
 
     Attributes
     ----------
@@ -418,7 +418,7 @@ class Scheduler:
         the set of Conditions the Scheduler uses when running
 
     execution_list : list
-        the full history of time steps the Scheduler has produced
+        the full history of consideration set executions the Scheduler has produced
 
     consideration_queue : list
         a list form of the Scheduler's toposort ordering of its nodes
@@ -437,7 +437,7 @@ class Scheduler:
 
     default_absolute_time_unit
         if not otherwise determined by any absolute **conditions**,
-        specifies the absolute duration of a `TIME_STEP`
+        specifies the absolute duration of a `CONSIDERATION_SET_EXECUTION`
 
         :type: ``pint.Quantity``
         :default: ``1ms``
@@ -721,7 +721,7 @@ class Scheduler:
         **kwargs,
     ):
         """
-        run is a python generator, that when iterated over provides the next `TIME_STEP` of
+        run is a python generator, that when iterated over provides the next `CONSIDERATION_SET_EXECUTION` of
         executions at each iteration
 
         :param termination_conds: (dict) - a mapping from `TimeScale`\\s to `Condition`\\s that when met
@@ -748,7 +748,7 @@ class Scheduler:
 
         in_absolute_time_mode = len(self.get_absolute_conditions(termination_conds)) > 0
         if in_absolute_time_mode:
-            current_time.absolute_interval = self._get_absolute_time_step_unit(termination_conds)
+            current_time.absolute_interval = self._get_absolute_consideration_set_execution_unit(termination_conds)
             # advance absolute clock time to first necessary time
             current_time.absolute = max(
                 current_time.absolute,
@@ -787,9 +787,9 @@ class Scheduler:
                 and not termination_conds[TimeScale.TRIAL].is_satisfied(**is_satisfied_kwargs)
                 and not termination_conds[TimeScale.RUN].is_satisfied(**is_satisfied_kwargs)
             ):
-                # all nodes to be added during this time step
-                cur_time_step_exec = set()
-                # the current "layer/group" of nodes that MIGHT be added during this time step
+                # all nodes to be added during this consideration set execution
+                cur_consideration_set_execution_exec = set()
+                # the current "layer/group" of nodes that MIGHT be added during this consideration set execution
                 cur_consideration_set = effective_consideration_queue[cur_index_consideration_queue]
 
                 try:
@@ -803,11 +803,11 @@ class Scheduler:
                 while True:
                     cur_consideration_set_has_changed = False
                     for current_node in cur_consideration_set:
-                        # only add each node once during a single time step, this also serves
+                        # only add each node once during a single consideration set execution, this also serves
                         # to prevent infinitely cascading adds
-                        if current_node not in cur_time_step_exec:
+                        if current_node not in cur_consideration_set_execution_exec:
                             if self.conditions.conditions[current_node].is_satisfied(**is_satisfied_kwargs):
-                                cur_time_step_exec.add(current_node)
+                                cur_consideration_set_execution_exec.add(current_node)
                                 execution_list_has_changed = True
                                 cur_consideration_set_has_changed = True
 
@@ -825,25 +825,25 @@ class Scheduler:
                     if not cur_consideration_set_has_changed:
                         break
 
-                # add a new time step at each step in a pass, if the time step would not be empty
-                if len(cur_time_step_exec) >= 1 or in_absolute_time_mode:
-                    self.execution_list[execution_id].append(cur_time_step_exec)
+                # add a new consideration set execution at each step in a pass, if the consideration set execution would not be empty
+                if len(cur_consideration_set_execution_exec) >= 1 or in_absolute_time_mode:
+                    self.execution_list[execution_id].append(cur_consideration_set_execution_exec)
                     if in_absolute_time_mode:
                         self.execution_timestamps[execution_id].append(
                             copy.copy(current_time)
                         )
                     yield self.execution_list[execution_id][-1]
 
-                    self.get_clock(execution_id)._increment_time(TimeScale.TIME_STEP)
+                    self.get_clock(execution_id)._increment_time(TimeScale.CONSIDERATION_SET_EXECUTION)
 
                 cur_index_consideration_queue += 1
 
-            # if an entire pass occurs with nothing running, add an empty time step
+            # if an entire pass occurs with nothing running, add an empty consideration set execution
             if not execution_list_has_changed and not in_absolute_time_mode:
                 self.execution_list[execution_id].append(set())
                 yield self.execution_list[execution_id][-1]
 
-                self.get_clock(execution_id)._increment_time(TimeScale.TIME_STEP)
+                self.get_clock(execution_id)._increment_time(TimeScale.CONSIDERATION_SET_EXECUTION)
 
             self.get_clock(execution_id)._increment_time(TimeScale.PASS)
 
@@ -858,13 +858,13 @@ class Scheduler:
     def _increment_time(self, time_scale, execution_id):
         self.get_clock(execution_id)._increment_time(time_scale)
 
-    def _get_absolute_time_step_unit(self, termination_conds=None):
-        """Computes the time length of the gap between two time steps
+    def _get_absolute_consideration_set_execution_unit(self, termination_conds=None):
+        """Computes the time length of the gap between two consideration set executions
         """
         if termination_conds is None:
             termination_conds = self.termination_conds
 
-        # all of the units of time that must occur on a time step
+        # all of the units of time that must occur on a consideration set execution
         intervals = []
         for c in self.get_absolute_conditions(termination_conds).values():
             intervals.extend(c.absolute_intervals)
@@ -882,7 +882,7 @@ class Scheduler:
                 intervals[i] = (int(a.m) * 10 ** unit_conversion) * min_time_unit
 
             # numerator is the largest possible length of a pass
-            # denominator evenly divides this length by number of time steps
+            # denominator evenly divides this length by number of consideration set executions
             numerator = np.gcd.reduce([interval.m for interval in intervals])
             if self.mode == SchedulingMode.STANDARD:
                 denominator = len(self.consideration_queue)

@@ -12,10 +12,10 @@ class TestTime:
     @pytest.mark.parametrize(
         'base, increment_time_scale, expected',
         [
-            (Time(run=0, trial=0, pass_=0, time_step=0), TimeScale.TRIAL, Time(run=0, trial=1, pass_=0, time_step=0)),
-            (Time(run=0, trial=0, pass_=5, time_step=9), TimeScale.TRIAL, Time(run=0, trial=1, pass_=0, time_step=0)),
-            (Time(run=1, trial=0, pass_=5, time_step=9), TimeScale.TRIAL, Time(run=1, trial=1, pass_=0, time_step=0)),
-            (Time(run=1, trial=0, pass_=5, time_step=9), TimeScale.TIME_STEP, Time(run=1, trial=0, pass_=5, time_step=10)),
+            (Time(run=0, trial=0, pass_=0, consideration_set_execution=0), TimeScale.TRIAL, Time(run=0, trial=1, pass_=0, consideration_set_execution=0)),
+            (Time(run=0, trial=0, pass_=5, consideration_set_execution=9), TimeScale.TRIAL, Time(run=0, trial=1, pass_=0, consideration_set_execution=0)),
+            (Time(run=1, trial=0, pass_=5, consideration_set_execution=9), TimeScale.TRIAL, Time(run=1, trial=1, pass_=0, consideration_set_execution=0)),
+            (Time(run=1, trial=0, pass_=5, consideration_set_execution=9), TimeScale.CONSIDERATION_SET_EXECUTION, Time(run=1, trial=0, pass_=5, consideration_set_execution=10)),
         ]
     )
     def test_increment(self, base, increment_time_scale, expected):
@@ -161,8 +161,8 @@ class TestAliasTimeScale:
         t = Time(my_trial_alias=1)
         st = SimpleTime(t)
 
-        assert repr(t) == 'Time(run: 0, my_trial_alias: 1, pass: 0, time_step: 0)'
-        assert repr(st) == 'Time(run: 0, my_trial_alias: 1, time_step: 0)'
+        assert repr(t) == 'Time(run: 0, my_trial_alias: 1, pass: 0, consideration_set_execution: 0)'
+        assert repr(st) == 'Time(run: 0, my_trial_alias: 1, consideration_set_execution: 0)'
 
     def test_aliased_conditions(self):
         graph = {'A': set()}

@@ -731,7 +731,7 @@ class TestBranching:
             termination_processing=term_conds
         )
 
-        # Intermediate time steps
+        # Intermediate consideration set executions
         #
         #     0   1   2   3
         #

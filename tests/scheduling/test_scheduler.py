@@ -178,7 +178,7 @@ class TestScheduler:
         C.run(inputs={D: [[1.0], [2.0]]},
               # termination_processing={TimeScale.TRIAL: WhenFinished(D)},
               call_after_trial=change_termination_processing,
-              reset_stateful_functions_when=pnl.AtTimeStep(0),
+              reset_stateful_functions_when=pnl.AtConsiderationSetExecution(0),
               num_trials=4)
         # Trial 0:
         # input = 1.0, termination condition = WhenFinished
@@ -1498,7 +1498,7 @@ class TestFeedback:
     @pytest.mark.mechanism
     @pytest.mark.transfer_mechanism
     @pytest.mark.parametrize('timescale, expected',
-                             [(TimeScale.TIME_STEP, [[0.5], [0.4375]]),
+                             [(TimeScale.CONSIDERATION_SET_EXECUTION, [[0.5], [0.4375]]),
                               (TimeScale.PASS, [[0.5], [0.4375]]),
                               (TimeScale.TRIAL, [[1.5], [0.4375]]),
                               (TimeScale.RUN, [[1.5], [0.4375]])],
@@ -1507,7 +1507,7 @@ class TestFeedback:
     # python values during execution is not implemented.
     @pytest.mark.usefixtures("comp_mode_no_llvm")
     def test_time_termination_measures(self, comp_mode, timescale, expected):
-        in_one_pass = timescale in {TimeScale.TIME_STEP, TimeScale.PASS}
+        in_one_pass = timescale in {TimeScale.CONSIDERATION_SET_EXECUTION, TimeScale.PASS}
         attention = pnl.TransferMechanism(name='Attention',
                                  integrator_mode=True,
                                  termination_threshold=3,
@@ -1656,4 +1656,4 @@ class TestAbsoluteTime:
         for node in conditions:
             comp.scheduler.add_condition(eval(node), conditions[node])
 
-        assert comp.scheduler._get_absolute_time_step_unit() == interval
+        assert comp.scheduler._get_absolute_consideration_set_execution_unit() == interval

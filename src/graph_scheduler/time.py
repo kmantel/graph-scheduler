@@ -54,14 +54,14 @@ class TimeScale(enum.Enum):
     Attributes
     ----------
 
-    TIME_STEP
+    CONSIDERATION_SET_EXECUTION
         the nuclear unit of time, corresponding to the execution of all `Mechanism <Mechanism>`\\ s allowed to execute
         from a single `consideration_set <consideration_set>` of a `Scheduler`, and which are considered to have
         executed simultaneously.
 
     PASS
         a full iteration through all of the `consideration_sets <consideration_set>` in a `Scheduler's <Scheduler>`
-        `consideration_queue`, consisting of one or more `TIME_STEPs <TIME_STEP>`, over which every `Component
+        `consideration_queue`, consisting of one or more `CONSIDERATION_SET_EXECUTIONs <CONSIDERATION_SET_EXECUTION>`, over which every `Component
         <Component>` `specified to a Scheduler <Scheduler_Creation>` is considered for execution at least once.
 
     TRIAL
@@ -75,7 +75,7 @@ class TimeScale(enum.Enum):
     LIFE
         the scope of time since the creation of an object.
     """
-    TIME_STEP = 0
+    CONSIDERATION_SET_EXECUTION = 0
     PASS = 1
     TRIAL = 2
     RUN = 3
@@ -209,8 +209,8 @@ class Time(types.SimpleNamespace):
         pass_ : int : 0
             the `TimeScale.PASS` value
 
-        time_step : int : 0
-            the `TimeScale.TIME_STEP` value
+        consideration_set_execution : int : 0
+            the `TimeScale.CONSIDERATION_SET_EXECUTION` value
 
         absolute : ``pint.Quantity`` : 0ms
             the absolute time value
@@ -218,7 +218,7 @@ class Time(types.SimpleNamespace):
         absolute_interval : ``pint.Quantity`` : 1ms
             the interval between units of absolute time
 
-        absolute_time_unit_scale : `TimeScale` : TimeScale.TIME_STEP
+        absolute_time_unit_scale : `TimeScale` : TimeScale.CONSIDERATION_SET_EXECUTION
             the `TimeScale` that corresponds to an interval of absolute time
 
         absolute_enabled : bool : False
@@ -227,14 +227,14 @@ class Time(types.SimpleNamespace):
     """
     def __init__(
         self,
-        time_step=0,
+        consideration_set_execution=0,
         pass_=0,
         trial=0,
         run=0,
         life=0,
         absolute=0 * _unit_registry.ms,
         absolute_interval=1 * _unit_registry.ms,
-        absolute_time_unit_scale=TimeScale.TIME_STEP,
+        absolute_time_unit_scale=TimeScale.CONSIDERATION_SET_EXECUTION,
         absolute_enabled=False,
         **alias_time_values,
     ):
@@ -254,7 +254,7 @@ class Time(types.SimpleNamespace):
             },
             absolute=0 * _unit_registry.ms,
             absolute_interval=1 * _unit_registry.ms,
-            absolute_time_unit_scale=TimeScale.TIME_STEP,
+            absolute_time_unit_scale=TimeScale.CONSIDERATION_SET_EXECUTION,
             absolute_enabled=False,
         )
 
@@ -328,7 +328,7 @@ class Time(types.SimpleNamespace):
         """
         Resets all the times for the time scale scope up to **time_scale**
         e.g. _reset_by_time_scale(TimeScale.TRIAL) will set the values for
-        TimeScale.PASS and TimeScale.TIME_STEP to 0
+        TimeScale.PASS and TimeScale.CONSIDERATION_SET_EXECUTION to 0
         """
         for relative_time_scale in sorted(TimeScale):
             # this works because the enum is set so that higher granularities of time have lower values
@@ -341,7 +341,7 @@ class Time(types.SimpleNamespace):
 class SimpleTime:
     """
     A subset class of `Time`, used to provide simple access to only
-    `run <Time.run>`, `trial <Time.trial>`, and `time_step <Time.time_step>`
+    `run <Time.run>`, `trial <Time.trial>`, and `consideration_set_execution <Time.consideration_set_execution>`
     """
     def __init__(self, time_ref):
         self._time_ref = time_ref
@@ -366,8 +366,8 @@ class SimpleTime:
         return self._time_ref.trial
 
     @property
-    def time_step(self):
-        return self._time_ref.time_step
+    def consideration_set_execution(self):
+        return self._time_ref.consideration_set_execution
 
 
 class TimeHistoryTree:
@@ -390,7 +390,7 @@ class TimeHistoryTree:
             the finest grain TimeScale that should be created as a subtree
             Setting this value lower allows for more precise measurements
             (by default, you cannot query the number of
-            `TimeScale.TIME_STEP`\\ s in a certain `TimeScale.PASS`), but
+            `TimeScale.CONSIDERATION_SET_EXECUTION`\\ s in a certain `TimeScale.PASS`), but
             this may use a large amount of memory in large simulations
 
         index : int

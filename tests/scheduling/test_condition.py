@@ -8,8 +8,8 @@ from psyneulink.core.components.projections.pathway.mappingprojection import Map
 from psyneulink.core.compositions.composition import Composition
 from psyneulink.core.scheduling.condition import (
     AfterCall, AfterNCalls, AfterNCallsCombined, AfterNPasses, AfterNTrials,
-    AfterPass, AfterTrial, All, AllHaveRun, Always, Any, AtPass, AtTimeStep,
-    AtTrial, AtTrialStart, BeforeNCalls, BeforePass, BeforeTimeStep,
+    AfterPass, AfterTrial, All, AllHaveRun, Always, Any, AtPass, AtConsiderationSetExecution,
+    AtTrial, AtTrialStart, BeforeNCalls, BeforePass, BeforeConsiderationSetExecution,
     BeforeTrial, Condition, ConditionError, EveryNCalls, EveryNPasses, Not,
     NWhen, TimeInterval, TimeTermination, WhenFinished, WhenFinishedAll,
     WhenFinishedAny, WhileNot,
@@ -211,13 +211,13 @@ class TestCondition:
 
     class TestTime:
 
-        def test_BeforeTimeStep(self):
+        def test_BeforeConsiderationSetExecution(self):
             comp = Composition()
             A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A')
             comp.add_node(A)
 
             sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
-            sched.add_condition(A, BeforeTimeStep(2))
+            sched.add_condition(A, BeforeConsiderationSetExecution(2))
 
             termination_conds = {}
             termination_conds[TimeScale.RUN] = AfterNTrials(1)
@@ -227,7 +227,7 @@ class TestCondition:
             expected_output = [A, A, set(), set(), set()]
             assert output == pytest.helpers.setify_expected_output(expected_output)
 
-        def test_BeforeTimeStep_2(self):
+        def test_BeforeConsiderationSetExecution_2(self):
             comp = Composition()
             A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A')
             B = TransferMechanism(name='B')
@@ -237,7 +237,7 @@ class TestCondition:
             comp.add_projection(MappingProjection(), A, B)
 
             sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
-            sched.add_condition(A, BeforeTimeStep(2))
+            sched.add_condition(A, BeforeConsiderationSetExecution(2))
             sched.add_condition(B, Always())
 
             termination_conds = {}
@@ -248,13 +248,13 @@ class TestCondition:
             expected_output = [A, B, B, B, B, B]
             assert output == pytest.helpers.setify_expected_output(expected_output)
 
-        def test_AtTimeStep(self):
+        def test_AtConsiderationSetExecution(self):
             comp = Composition()
             A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A')
             comp.add_node(A)
 
             sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
-            sched.add_condition(A, AtTimeStep(0))
+            sched.add_condition(A, AtConsiderationSetExecution(0))
 
             termination_conds = {}
             termination_conds[TimeScale.RUN] = AfterNTrials(1)
@@ -969,7 +969,7 @@ class TestAbsolute:
         comp = Composition()
         comp.add_nodes([self.A, self.B, self.C])
         comp.scheduler.add_condition_set(conditions)
-        time_step_abs_value = comp.scheduler._get_absolute_time_step_unit(termination_conds)
+        consideration_set_execution_abs_value = comp.scheduler._get_absolute_consideration_set_execution_unit(termination_conds)
 
         list(comp.scheduler.run(termination_conds=termination_conds))
 
@@ -986,13 +986,13 @@ class TestAbsolute:
                 if cond.repeat is not None:
                     assert interval == cond.repeat
                 else:
-                    assert interval == time_step_abs_value
+                    assert interval == consideration_set_execution_abs_value
 
             if cond.start is not None:
                 if cond.start_inclusive:
                     assert cond.start in executions
                 else:
-                    assert cond.start + time_step_abs_value in executions
+                    assert cond.start + consideration_set_execution_abs_value in executions
 
     @pytest.mark.parametrize(
         'repeat, unit, expected_repeat',
