@@ -68,7 +68,7 @@ class TimeScale(enum.Enum):
         an open-ended unit of time consisting of all actions that occurs within the scope of a single input to a
         `Composition <Composition>`.
 
-    RUN
+    ENVIRONMENT_SEQUENCE
         the scope of a call to the `run <Composition.run>` method of a `Composition <Composition>`,
         consisting of one or more `ENVIRONMENT_STATE_UPDATEs <TimeScale.ENVIRONMENT_STATE_UPDATE>`.
 
@@ -78,7 +78,7 @@ class TimeScale(enum.Enum):
     CONSIDERATION_SET_EXECUTION = 0
     PASS = 1
     ENVIRONMENT_STATE_UPDATE = 2
-    RUN = 3
+    ENVIRONMENT_SEQUENCE = 3
     LIFE = 4
 
     # ordering based on enum.OrderedEnum example
@@ -200,8 +200,8 @@ class Time(types.SimpleNamespace):
         life : int : 0
             the `TimeScale.LIFE` value
 
-        run : int : 0
-            the `TimeScale.RUN` value
+        environment_sequence : int : 0
+            the `TimeScale.ENVIRONMENT_SEQUENCE` value
 
         environment_state_update : int : 0
             the `TimeScale.ENVIRONMENT_STATE_UPDATE` value
@@ -230,7 +230,7 @@ class Time(types.SimpleNamespace):
         consideration_set_execution=0,
         pass_=0,
         environment_state_update=0,
-        run=0,
+        environment_sequence=0,
         life=0,
         absolute=0 * _unit_registry.ms,
         absolute_interval=1 * _unit_registry.ms,
@@ -341,7 +341,7 @@ class Time(types.SimpleNamespace):
 class SimpleTime:
     """
     A subset class of `Time`, used to provide simple access to only
-    `run <Time.run>`, `environment_state_update <Time.environment_state_update>`, and `consideration_set_execution <Time.consideration_set_execution>`
+    `environment_sequence <Time.environment_sequence>`, `environment_state_update <Time.environment_state_update>`, and `consideration_set_execution <Time.consideration_set_execution>`
     """
     def __init__(self, time_ref):
         self._time_ref = time_ref
@@ -358,8 +358,8 @@ class SimpleTime:
         return self._time_ref.absolute
 
     @property
-    def run(self):
-        return self._time_ref.run
+    def environment_sequence(self):
+        return self._time_ref.environment_sequence
 
     @property
     def environment_state_update(self):
@@ -380,7 +380,7 @@ class TimeHistoryTree:
         time_scale : :class:`TimeScale` : `TimeScale.LIFE`
             the TimeScale unit this tree/node represents
 
-        child_time_scale : :class:`TimeScale` : `TimeScale.RUN`
+        child_time_scale : :class:`TimeScale` : `TimeScale.ENVIRONMENT_SEQUENCE`
             the TimeScale unit for this tree's children
 
         children : list[`TimeHistoryTree`]
@@ -495,10 +495,10 @@ class TimeHistoryTree:
                 a dictionary specifying what scope of time query_time_scale \
                 is over. e.g.
 
-                    base_indices = {TimeScale.RUN: 1, TimeScale.ENVIRONMENT_STATE_UPDATE: 5}
+                    base_indices = {TimeScale.ENVIRONMENT_SEQUENCE: 1, TimeScale.ENVIRONMENT_STATE_UPDATE: 5}
 
                 gives the number of **query_time_scale**\\ s that have occurred \
-                in the 5th `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` of the 1st `RUN`. If an entry for a :class:`TimeScale` \
+                in the 5th `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` of the 1st `ENVIRONMENT_SEQUENCE`. If an entry for a :class:`TimeScale` \
                 is not specified but is coarser than **query_time_scale**, the latest \
                 value for that entry will be used
 
@@ -523,7 +523,7 @@ class TimeHistoryTree:
 
         default_base_indices = {
             TimeScale.LIFE: 0,
-            TimeScale.RUN: None,
+            TimeScale.ENVIRONMENT_SEQUENCE: None,
             TimeScale.ENVIRONMENT_STATE_UPDATE: None,
             TimeScale.PASS: None,
         }

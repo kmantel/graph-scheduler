@@ -12,10 +12,10 @@ class TestTime:
     @pytest.mark.parametrize(
         'base, increment_time_scale, expected',
         [
-            (Time(run=0, environment_state_update=0, pass_=0, consideration_set_execution=0), TimeScale.ENVIRONMENT_STATE_UPDATE, Time(run=0, environment_state_update=1, pass_=0, consideration_set_execution=0)),
-            (Time(run=0, environment_state_update=0, pass_=5, consideration_set_execution=9), TimeScale.ENVIRONMENT_STATE_UPDATE, Time(run=0, environment_state_update=1, pass_=0, consideration_set_execution=0)),
-            (Time(run=1, environment_state_update=0, pass_=5, consideration_set_execution=9), TimeScale.ENVIRONMENT_STATE_UPDATE, Time(run=1, environment_state_update=1, pass_=0, consideration_set_execution=0)),
-            (Time(run=1, environment_state_update=0, pass_=5, consideration_set_execution=9), TimeScale.CONSIDERATION_SET_EXECUTION, Time(run=1, environment_state_update=0, pass_=5, consideration_set_execution=10)),
+            (Time(environment_sequence=0, environment_state_update=0, pass_=0, consideration_set_execution=0), TimeScale.ENVIRONMENT_STATE_UPDATE, Time(environment_sequence=0, environment_state_update=1, pass_=0, consideration_set_execution=0)),
+            (Time(environment_sequence=0, environment_state_update=0, pass_=5, consideration_set_execution=9), TimeScale.ENVIRONMENT_STATE_UPDATE, Time(environment_sequence=0, environment_state_update=1, pass_=0, consideration_set_execution=0)),
+            (Time(environment_sequence=1, environment_state_update=0, pass_=5, consideration_set_execution=9), TimeScale.ENVIRONMENT_STATE_UPDATE, Time(environment_sequence=1, environment_state_update=1, pass_=0, consideration_set_execution=0)),
+            (Time(environment_sequence=1, environment_state_update=0, pass_=5, consideration_set_execution=9), TimeScale.CONSIDERATION_SET_EXECUTION, Time(environment_sequence=1, environment_state_update=0, pass_=5, consideration_set_execution=10)),
         ]
     )
     def test_increment(self, base, increment_time_scale, expected):
@@ -48,7 +48,7 @@ class TestTimeHistoryTree:
     @pytest.mark.parametrize(
         'max_depth',
         [
-            (TimeScale.RUN),
+            (TimeScale.ENVIRONMENT_SEQUENCE),
             (TimeScale.ENVIRONMENT_STATE_UPDATE)
         ])
     def test_max_depth(self, max_depth):
@@ -161,8 +161,8 @@ class TestAliasTimeScale:
         t = Time(my_environment_state_update_alias=1)
         st = SimpleTime(t)
 
-        assert repr(t) == 'Time(run: 0, my_environment_state_update_alias: 1, pass: 0, consideration_set_execution: 0)'
-        assert repr(st) == 'Time(run: 0, my_environment_state_update_alias: 1, consideration_set_execution: 0)'
+        assert repr(t) == 'Time(environment_sequence: 0, my_environment_state_update_alias: 1, pass: 0, consideration_set_execution: 0)'
+        assert repr(st) == 'Time(environment_sequence: 0, my_environment_state_update_alias: 1, consideration_set_execution: 0)'
 
     def test_aliased_conditions(self):
         graph = {'A': set()}

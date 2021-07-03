@@ -110,7 +110,7 @@ six types:
 .. note::
     The optional `TimeScale` argument in many `Conditions <Condition>` specifies the unit of time over which the
     Condition operates;  the default value is `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` for all Conditions except those with "EnvironmentStateUpdate"
-    in their name, for which it is `RUN`.
+    in their name, for which it is `ENVIRONMENT_SEQUENCE`.
 
 
 .. _Conditions_Generic:
@@ -204,14 +204,14 @@ specified `TimeScale` or `Time <Scheduler_Absolute_Time>`):
     * `AfterNEnvironmentStateUpdates` (int[, TimeScale])
       satisfied any time after the specified number of `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`\\ s has occurred.
 
-    * `AtRun` (int)
-      satisfied any time during the specified `RUN`.
+    * `AtEnvironmentSequence` (int)
+      satisfied any time during the specified `ENVIRONMENT_SEQUENCE`.
 
-    * `AfterRun` (int)
-      satisfied any time after the specified `RUN` occurs.
+    * `AfterEnvironmentSequence` (int)
+      satisfied any time after the specified `ENVIRONMENT_SEQUENCE` occurs.
 
-    * `AfterNRuns` (int)
-      satisfied any time after the specified number of `RUN`\\ s has occurred.
+    * `AfterNEnvironmentSequences` (int)
+      satisfied any time after the specified number of `ENVIRONMENT_SEQUENCE`\\ s has occurred.
 
 .. _Conditions_Component_Based:
 
@@ -264,11 +264,11 @@ specified `TimeScale` or `Time <Scheduler_Absolute_Time>`):
     * `AtEnvironmentStateUpdateNStart`
       satisfied on `PASS` 0 of the specified `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` counted using 'TimeScale`
 
-    * `AtRunStart`
-      satisfied at the beginning of a `RUN`
+    * `AtEnvironmentSequenceStart`
+      satisfied at the beginning of an `ENVIRONMENT_SEQUENCE`
 
-    * `AtRunNStart`
-      satisfied on `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` 0 of the specified `RUN` counted using 'TimeScale`
+    * `AtEnvironmentSequenceNStart`
+      satisfied on `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` 0 of the specified `ENVIRONMENT_SEQUENCE` counted using 'TimeScale`
 
 
 .. Condition_Execution:
@@ -303,8 +303,8 @@ from graph_scheduler.utilities import call_with_pruned_args
 
 __all__ = [
     'AfterCall', 'AfterNCalls', 'AfterNCallsCombined', 'AfterNPasses', 'AfterNConsiderationSetExecutions', 'AfterNEnvironmentStateUpdates', 'AfterPass',
-    'AtRun', 'AfterRun', 'AfterNRuns', 'AfterConsiderationSetExecution', 'AfterEnvironmentStateUpdate', 'All', 'AllHaveRun', 'Always', 'And', 'Any',
-    'AtNCalls','AtPass', 'AtRunStart', 'AtRunNStart', 'AtConsiderationSetExecution', 'AtEnvironmentStateUpdate',
+    'AtEnvironmentSequence', 'AfterEnvironmentSequence', 'AfterNEnvironmentSequences', 'AfterConsiderationSetExecution', 'AfterEnvironmentStateUpdate', 'All', 'AllHaveRun', 'Always', 'And', 'Any',
+    'AtNCalls','AtPass', 'AtEnvironmentSequenceStart', 'AtEnvironmentSequenceNStart', 'AtConsiderationSetExecution', 'AtEnvironmentStateUpdate',
     'AtEnvironmentStateUpdateStart', 'AtEnvironmentStateUpdateNStart', 'BeforeNCalls', 'BeforePass', 'BeforeConsiderationSetExecution', 'BeforeEnvironmentStateUpdate',
     'Condition','ConditionError', 'ConditionSet', 'EveryNCalls', 'EveryNPasses',
     'JustRan', 'Never', 'Not', 'NWhen', 'Or', 'WhenFinished', 'WhenFinishedAll', 'WhenFinishedAny', 'While', 'WhileNot', 'TimeInterval', 'TimeTermination'
@@ -1281,7 +1281,7 @@ class BeforeEnvironmentStateUpdate(Condition):
         n(int): the `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` before which the Condition is satisfied
 
         time_scale(TimeScale): the TimeScale used as basis for counting `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`\\ s
-        (default: TimeScale.RUN)
+        (default: TimeScale.ENVIRONMENT_SEQUENCE)
 
     Satisfied when:
 
@@ -1295,7 +1295,7 @@ class BeforeEnvironmentStateUpdate(Condition):
           and `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` 1.
 
     """
-    def __init__(self, n, time_scale=TimeScale.RUN):
+    def __init__(self, n, time_scale=TimeScale.ENVIRONMENT_SEQUENCE):
         def func(n, scheduler=None, execution_id=None):
             try:
                 return scheduler.get_clock(execution_id).get_total_times_relative(TimeScale.ENVIRONMENT_STATE_UPDATE, time_scale) < n
@@ -1313,7 +1313,7 @@ class AtEnvironmentStateUpdate(Condition):
         n(int): the `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` at which the Condition is satisfied
 
         time_scale(TimeScale): the TimeScale used as basis for counting `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`\\ s
-        (default: TimeScale.RUN)
+        (default: TimeScale.ENVIRONMENT_SEQUENCE)
 
     Satisfied when:
 
@@ -1327,7 +1327,7 @@ class AtEnvironmentStateUpdate(Condition):
           `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` (`ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` 0) has already occurred.
 
     """
-    def __init__(self, n, time_scale=TimeScale.RUN):
+    def __init__(self, n, time_scale=TimeScale.ENVIRONMENT_SEQUENCE):
         def func(n, scheduler=None, execution_id=None):
             try:
                 return scheduler.get_clock(execution_id).get_total_times_relative(TimeScale.ENVIRONMENT_STATE_UPDATE, time_scale) == n
@@ -1345,7 +1345,7 @@ class AfterEnvironmentStateUpdate(Condition):
         n(int): the `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` after which the Condition is satisfied
 
         time_scale(TimeScale): the TimeScale used as basis for counting `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`\\ s.
-        (default: TimeScale.RUN)
+        (default: TimeScale.ENVIRONMENT_SEQUENCE)
 
     Satisfied when:
 
@@ -1359,7 +1359,7 @@ class AfterEnvironmentStateUpdate(Condition):
         has occurred and thereafter (i.e., in `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`\\ s 2, 3, 4, etc.).
 
     """
-    def __init__(self, n, time_scale=TimeScale.RUN):
+    def __init__(self, n, time_scale=TimeScale.ENVIRONMENT_SEQUENCE):
         def func(n, scheduler=None, execution_id=None):
             try:
                 return scheduler.get_clock(execution_id).get_total_times_relative(TimeScale.ENVIRONMENT_STATE_UPDATE, time_scale) > n
@@ -1377,7 +1377,7 @@ class AfterNEnvironmentStateUpdates(Condition):
         n(int): the number of `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`\\ s after which the Condition is satisfied
 
         time_scale(TimeScale): the TimeScale used as basis for counting `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`\\ s
-        (default: TimeScale.RUN)
+        (default: TimeScale.ENVIRONMENT_SEQUENCE)
 
     Satisfied when:
 
@@ -1385,7 +1385,7 @@ class AfterNEnvironmentStateUpdates(Condition):
           specified by **time_scale**.
 
     """
-    def __init__(self, n, time_scale=TimeScale.RUN):
+    def __init__(self, n, time_scale=TimeScale.ENVIRONMENT_SEQUENCE):
         def func(n, time_scale, scheduler=None, execution_id=None):
             try:
                 return scheduler.get_clock(execution_id).get_total_times_relative(TimeScale.ENVIRONMENT_STATE_UPDATE, time_scale) >= n
@@ -1395,67 +1395,67 @@ class AfterNEnvironmentStateUpdates(Condition):
         super().__init__(func, n, time_scale)
 
 
-class AtRun(Condition):
-    """AtRun
+class AtEnvironmentSequence(Condition):
+    """AtEnvironmentSequence
 
     Parameters:
 
-        n(int): the `RUN` at which the Condition is satisfied
+        n(int): the `ENVIRONMENT_SEQUENCE` at which the Condition is satisfied
 
     Satisfied when:
 
-        - exactly n `RUN`\\ s have occurred.
+        - exactly n `ENVIRONMENT_SEQUENCE`\\ s have occurred.
 
     """
     def __init__(self, n):
         def func(n, scheduler=None, execution_id=None):
             try:
-                return scheduler.get_clock(execution_id).time.run == n
+                return scheduler.get_clock(execution_id).time.environment_sequence == n
             except AttributeError as e:
                 raise ConditionError(f'{type(self).__name__}: scheduler must be supplied to is_satisfied: {e}.')
 
         super().__init__(func, n)
 
 
-class AfterRun(Condition):
-    """AfterRun
+class AfterEnvironmentSequence(Condition):
+    """AfterEnvironmentSequence
 
     Parameters:
 
-        n(int): the `RUN` after which the Condition is satisfied
+        n(int): the `ENVIRONMENT_SEQUENCE` after which the Condition is satisfied
 
     Satisfied when:
 
-        - at least n+1 `RUN`\\ s have occurred.
+        - at least n+1 `ENVIRONMENT_SEQUENCE`\\ s have occurred.
 
     """
     def __init__(self, n):
         def func(n, scheduler=None, execution_id=None):
             try:
-                return scheduler.get_clock(execution_id).time.run > n
+                return scheduler.get_clock(execution_id).time.environment_sequence > n
             except AttributeError as e:
                 raise ConditionError(f'{type(self).__name__}: scheduler must be supplied to is_satisfied: {e}.')
 
         super().__init__(func, n)
 
 
-class AfterNRuns(Condition):
+class AfterNEnvironmentSequences(Condition):
     """AfterNEnvironmentStateUpdates
 
     Parameters:
 
-        n(int): the number of `RUN`\\ s after which the Condition is satisfied
+        n(int): the number of `ENVIRONMENT_SEQUENCE`\\ s after which the Condition is satisfied
 
     Satisfied when:
 
-        - at least n `RUN`\\ s have occured.
+        - at least n `ENVIRONMENT_SEQUENCE`\\ s have occured.
 
     """
 
     def __init__(self, n):
         def func(n, scheduler=None, execution_id=None):
             try:
-                return scheduler.get_clock(execution_id).time.run >= n
+                return scheduler.get_clock(execution_id).time.environment_sequence >= n
             except AttributeError as e:
                 raise ConditionError(f'{type(self).__name__}: scheduler must be supplied to is_satisfied: {e}.')
 
@@ -1883,7 +1883,7 @@ class AtEnvironmentStateUpdateNStart(All):
         n(int): the `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` on which the Condition is satisfied
 
         time_scale(TimeScale): the TimeScale used as basis for counting `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`\\ s
-        (default: TimeScale.RUN)
+        (default: TimeScale.ENVIRONMENT_SEQUENCE)
 
     Satisfied when:
 
@@ -1894,43 +1894,43 @@ class AtEnvironmentStateUpdateNStart(All):
         - identical to All(AtPass(0), AtEnvironmentStateUpdate(n, time_scale))
 
     """
-    def __init__(self, n, time_scale=TimeScale.RUN):
+    def __init__(self, n, time_scale=TimeScale.ENVIRONMENT_SEQUENCE):
         return super().__init__(AtPass(0), AtEnvironmentStateUpdate(n, time_scale))
 
 
-class AtRunStart(AtEnvironmentStateUpdate):
-    """AtRunStart
+class AtEnvironmentSequenceStart(AtEnvironmentStateUpdate):
+    """AtEnvironmentSequenceStart
 
     Satisfied when:
 
-        - at the beginning of a `RUN`
+        - at the beginning of an `ENVIRONMENT_SEQUENCE`
 
     Notes:
 
         - identical to `AtEnvironmentStateUpdate(0) <AtEnvironmentStateUpdate>`
     """
     def __init__(self):
-        super().__init__(0, time_scale=TimeScale.RUN)
+        super().__init__(0, time_scale=TimeScale.ENVIRONMENT_SEQUENCE)
 
     def __str__(self):
         return '{0}()'.format(self.__class__.__name__)
 
 
-class AtRunNStart(All):
-    """AtRunNStart
+class AtEnvironmentSequenceNStart(All):
+    """AtEnvironmentSequenceNStart
 
     Parameters:
 
-        n(int): the `RUN` on which the Condition is satisfied
+        n(int): the `ENVIRONMENT_SEQUENCE` on which the Condition is satisfied
 
     Satisfied when:
 
-        - on `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` 0 of the specified `RUN` counted using 'TimeScale`
+        - on `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` 0 of the specified `ENVIRONMENT_SEQUENCE` counted using 'TimeScale`
 
     Notes:
 
-        - identical to `All(AtEnvironmentStateUpdate(0), AtRun(n))`
+        - identical to `All(AtEnvironmentStateUpdate(0), AtEnvironmentSequence(n))`
 
     """
     def __init__(self, n):
-        return super().__init__(AtEnvironmentStateUpdate(0), AtRun(n))
+        return super().__init__(AtEnvironmentStateUpdate(0), AtEnvironmentSequence(n))

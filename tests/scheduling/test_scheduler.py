@@ -73,7 +73,7 @@ class TestScheduler:
         sched.add_condition(A, BeforeNCalls(A, 5, time_scale=TimeScale.LIFE))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(6)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(6)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNPasses(1)
         comp1.run(
             inputs={A: [[0], [1], [2], [3], [4], [5]]},
@@ -111,7 +111,7 @@ class TestScheduler:
         sched.add_condition(A, BeforeNCalls(A, 5, time_scale=TimeScale.LIFE))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(6)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(6)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNPasses(1)
         eid = 'eid'
         comp.run(
@@ -276,7 +276,7 @@ class TestLinear:
         sched.add_condition(C, EveryNCalls(B, 3))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 4, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
@@ -306,7 +306,7 @@ class TestLinear:
         sched.add_condition(C, EveryNCalls(B, 3))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 4, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
@@ -336,7 +336,7 @@ class TestLinear:
         sched.add_condition(C, EveryNCalls(B, 2))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 1, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
@@ -360,7 +360,7 @@ class TestLinear:
         sched.add_condition(C, All(AfterNCalls(B, 2), EveryNCalls(B, 1)))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 4, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
@@ -387,7 +387,7 @@ class TestLinear:
         sched.add_condition(C, AfterNCalls(B, 1))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 3)
         output = list(sched.run(termination_conds=termination_conds))
 
@@ -414,7 +414,7 @@ class TestLinear:
         sched.add_condition(C, AfterNCalls(B, 1))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(2)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(2)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 3)
         comp.run(
                 inputs={A: [[0], [1], [2], [3], [4], [5]]},
@@ -444,7 +444,7 @@ class TestLinear:
         sched.add_condition(B, EveryNCalls(A, 2))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = Any(AfterNCalls(A, 1), AfterNCalls(B, 1))
         output = list(sched.run(termination_conds=termination_conds))
 
@@ -465,7 +465,7 @@ class TestLinear:
         sched.add_condition(B, EveryNCalls(A, 2))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = All(AfterNCalls(A, 1), AfterNCalls(B, 1))
         output = list(sched.run(termination_conds=termination_conds))
 
@@ -486,7 +486,7 @@ class TestLinear:
         sched.add_condition(B, WhenFinished(A))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(B, 2)
 
         output = []
@@ -516,7 +516,7 @@ class TestLinear:
         sched.add_condition(B, WhenFinished(A))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AtPass(5)
         output = list(sched.run(termination_conds=termination_conds))
 
@@ -539,7 +539,7 @@ class TestLinear:
         sched.add_condition(B, Any(WhenFinished(A), AfterNCalls(A, 3)))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(B, 5)
         output = list(sched.run(termination_conds=termination_conds))
 
@@ -562,7 +562,7 @@ class TestLinear:
         sched.add_condition(B, Any(WhenFinished(A), AfterNCalls(A, 3)))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(B, 4)
         output = list(sched.run(termination_conds=termination_conds))
 
@@ -585,7 +585,7 @@ class TestLinear:
         sched.add_condition(B, All(WhenFinished(A), AfterNCalls(A, 3)))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(B, 4)
         output = list(sched.run(termination_conds=termination_conds))
 
@@ -608,7 +608,7 @@ class TestLinear:
         sched.add_condition(B, All(WhenFinished(A), AfterNCalls(A, 3)))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AtPass(10)
         output = list(sched.run(termination_conds=termination_conds))
 
@@ -632,7 +632,7 @@ class TestLinear:
         sched.add_condition(B, EveryNCalls(A, 2))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNCalls(B, 2, time_scale=TimeScale.RUN)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNCalls(B, 2, time_scale=TimeScale.ENVIRONMENT_SEQUENCE)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(B, 2, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
@@ -653,7 +653,7 @@ class TestLinear:
         sched.add_condition(B, Any(EveryNCalls(A, 1), EveryNCalls(B, 1)))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(B, 8, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
@@ -677,7 +677,7 @@ class TestLinear:
         sched.add_condition(C, Any(EveryNCalls(B, 2), JustRan(C)))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 4, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
@@ -701,7 +701,7 @@ class TestLinear:
         sched.add_condition(C, EveryNCalls(B, 1))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 4, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
@@ -749,7 +749,7 @@ class TestBranching:
         sched.add_condition(C, EveryNCalls(A, 1))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 3, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
@@ -778,7 +778,7 @@ class TestBranching:
         sched.add_condition(C, EveryNCalls(A, 2))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 3, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
@@ -810,7 +810,7 @@ class TestBranching:
         sched.add_condition(C, EveryNCalls(A, 3))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 2, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
@@ -839,7 +839,7 @@ class TestBranching:
         sched.add_condition(C, All(WhenFinished(A), AfterNCalls(B, 3)))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 1)
         output = []
         i = 0
@@ -872,7 +872,7 @@ class TestBranching:
         sched.add_condition(C, All(WhenFinished(A), AfterNCalls(B, 3)))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 1)
         output = []
         i = 0
@@ -910,7 +910,7 @@ class TestBranching:
         sched.add_condition(C, Any(AfterNCalls(A, 3), AfterNCalls(B, 3)))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 4, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
@@ -939,7 +939,7 @@ class TestBranching:
         sched.add_condition(C, All(AfterNCalls(A, 3), AfterNCalls(B, 3)))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 2, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
@@ -975,7 +975,7 @@ class TestBranching:
         sched.add_condition(D, Always())
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(D, 1, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
@@ -1004,7 +1004,7 @@ class TestBranching:
         sched.add_condition(D, All(EveryNCalls(B, 2), EveryNCalls(C, 2)))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(D, 1, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
@@ -1034,7 +1034,7 @@ class TestBranching:
         sched.add_condition(D, All(EveryNCalls(B, 2), EveryNCalls(C, 2)))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(D, 1, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
@@ -1076,7 +1076,7 @@ class TestBranching:
             sched.add_condition(m, Always())
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = All(AfterNCalls(C1, 1), AfterNCalls(C2, 1))
         output = list(sched.run(termination_conds=termination_conds))
 
@@ -1119,7 +1119,7 @@ class TestBranching:
         })
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = All(AfterNCalls(C1, 1), AfterNCalls(C2, 1))
         output = list(sched.run(termination_conds=termination_conds))
 
@@ -1158,7 +1158,7 @@ class TestTermination:
         sched.add_condition(B, EveryNCalls(A, 2))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
         termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(B, 2)
 
         output = list(sched.run(termination_conds=termination_conds))
@@ -1166,9 +1166,9 @@ class TestTermination:
         expected_output = [A, A, B, A, A, B]
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
-        # reset the RUN because schedulers run ENVIRONMENT_STATE_UPDATEs
-        sched.get_clock(sched.default_execution_id)._increment_time(TimeScale.RUN)
-        sched._reset_counts_total(TimeScale.RUN, execution_id=sched.default_execution_id)
+        # reset the ENVIRONMENT_SEQUENCE because schedulers run ENVIRONMENT_STATE_UPDATEs
+        sched.get_clock(sched.default_execution_id)._increment_time(TimeScale.ENVIRONMENT_SEQUENCE)
+        sched._reset_counts_total(TimeScale.ENVIRONMENT_SEQUENCE, execution_id=sched.default_execution_id)
 
         output = list(sched.run())
 
@@ -1501,7 +1501,7 @@ class TestFeedback:
                              [(TimeScale.CONSIDERATION_SET_EXECUTION, [[0.5], [0.4375]]),
                               (TimeScale.PASS, [[0.5], [0.4375]]),
                               (TimeScale.ENVIRONMENT_STATE_UPDATE, [[1.5], [0.4375]]),
-                              (TimeScale.RUN, [[1.5], [0.4375]])],
+                              (TimeScale.ENVIRONMENT_SEQUENCE, [[1.5], [0.4375]])],
                               ids=lambda x: x if isinstance(x, TimeScale) else "")
     # 'LLVM' mode is not supported, because synchronization of compiler and
     # python values during execution is not implemented.
@@ -1538,7 +1538,7 @@ class TestFeedback:
                               (pnl.BeforeNCalls, TimeScale.PASS, [[.05, .05]]),
                               (pnl.EveryNCalls, None, [[0.05, .05]]),
                               (pnl.AtNCalls, TimeScale.ENVIRONMENT_STATE_UPDATE, [[.25, .25]]),
-                              (pnl.AtNCalls, TimeScale.RUN, [[.25, .25]]),
+                              (pnl.AtNCalls, TimeScale.ENVIRONMENT_SEQUENCE, [[.25, .25]]),
                               (pnl.AfterNCalls, TimeScale.ENVIRONMENT_STATE_UPDATE, [[.25, .25]]),
                               (pnl.AfterNCalls, TimeScale.PASS, [[.05, .05]]),
                               (pnl.WhenFinished, None, [[1.0, 1.0]]),
@@ -1628,7 +1628,7 @@ class TestFeedback:
             pathways=[incrementing_mechanism]
         )
         comp.scheduler.termination_conds = {
-            pnl.TimeScale.RUN: condition(2)
+            pnl.TimeScale.ENVIRONMENT_SEQUENCE: condition(2)
         }
         r = comp.run(inputs=[1], num_trials=5, execution_mode=mode)
         assert np.allclose(r, expected_result[-1])

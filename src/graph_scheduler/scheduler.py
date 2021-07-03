@@ -163,9 +163,9 @@ Composition.
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 Termination conditions are `Conditions <Condition>` that specify when the open-ended units of time - `ENVIRONMENT_STATE_UPDATE
-<TimeScale.ENVIRONMENT_STATE_UPDATE>` and `RUN` - have ended.  By default, the termination condition for an `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` is
+<TimeScale.ENVIRONMENT_STATE_UPDATE>` and `ENVIRONMENT_SEQUENCE` - have ended.  By default, the termination condition for an `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` is
 `AllHaveRun`, which is satisfied when all Components have run at least once within the environment state update, and the termination
-condition for a `RUN` is when all of its constituent environment state updates have terminated. These defaults may be overriden when
+condition for an `ENVIRONMENT_SEQUENCE` is when all of its constituent environment state updates have terminated. These defaults may be overriden when
 running a Composition, by passing a dictionary mapping `TimeScales <TimeScale>` to `Conditions <Condition>` in the
 **termination_processing** argument of a call to `Composition.run` (to terminate the execution of processing)::
 
@@ -360,7 +360,7 @@ __all__ = [
 logger = logging.getLogger(__name__)
 
 default_termination_conds = {
-    TimeScale.RUN: Never(),
+    TimeScale.ENVIRONMENT_SEQUENCE: Never(),
     TimeScale.ENVIRONMENT_STATE_UPDATE: AllHaveRun(),
 }
 
@@ -444,8 +444,8 @@ class Scheduler:
 
     times : Dict[TimeScale: Dict[TimeScale: int]]
         a structure counting the number of occurrences of a certain `TimeScale` within the scope of another `TimeScale`.
-        For example, `times[TimeScale.RUN][TimeScale.PASS]` is the number of `PASS`es that have occurred in the
-        current `RUN` that the Scheduler is scheduling at the time it is accessed
+        For example, `times[TimeScale.ENVIRONMENT_SEQUENCE][TimeScale.PASS]` is the number of `PASS`es that have occurred in the
+        current `ENVIRONMENT_SEQUENCE` that the Scheduler is scheduling at the time it is accessed
 
     """
     def __init__(
@@ -775,7 +775,7 @@ class Scheduler:
 
         while (
             not termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE].is_satisfied(**is_satisfied_kwargs)
-            and not termination_conds[TimeScale.RUN].is_satisfied(**is_satisfied_kwargs)
+            and not termination_conds[TimeScale.ENVIRONMENT_SEQUENCE].is_satisfied(**is_satisfied_kwargs)
         ):
             self._reset_counts_total(TimeScale.PASS, execution_id)
 
@@ -785,7 +785,7 @@ class Scheduler:
             while (
                 cur_index_consideration_queue < len(effective_consideration_queue)
                 and not termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE].is_satisfied(**is_satisfied_kwargs)
-                and not termination_conds[TimeScale.RUN].is_satisfied(**is_satisfied_kwargs)
+                and not termination_conds[TimeScale.ENVIRONMENT_SEQUENCE].is_satisfied(**is_satisfied_kwargs)
             ):
                 # all nodes to be added during this consideration set execution
                 cur_consideration_set_execution_exec = set()
@@ -850,7 +850,7 @@ class Scheduler:
         if not skip_environment_state_update_time_increment:
             self.get_clock(execution_id)._increment_time(TimeScale.ENVIRONMENT_STATE_UPDATE)
 
-        if termination_conds[TimeScale.RUN].is_satisfied(**is_satisfied_kwargs):
+        if termination_conds[TimeScale.ENVIRONMENT_SEQUENCE].is_satisfied(**is_satisfied_kwargs):
             self.date_last_run_end = datetime.datetime.now()
 
         return self.execution_list[execution_id]
