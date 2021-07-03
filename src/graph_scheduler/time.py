@@ -64,20 +64,20 @@ class TimeScale(enum.Enum):
         `consideration_queue`, consisting of one or more `CONSIDERATION_SET_EXECUTIONs <CONSIDERATION_SET_EXECUTION>`, over which every `Component
         <Component>` `specified to a Scheduler <Scheduler_Creation>` is considered for execution at least once.
 
-    TRIAL
+    ENVIRONMENT_STATE_UPDATE
         an open-ended unit of time consisting of all actions that occurs within the scope of a single input to a
         `Composition <Composition>`.
 
     RUN
         the scope of a call to the `run <Composition.run>` method of a `Composition <Composition>`,
-        consisting of one or more `TRIALs <TimeScale.TRIAL>`.
+        consisting of one or more `ENVIRONMENT_STATE_UPDATEs <TimeScale.ENVIRONMENT_STATE_UPDATE>`.
 
     LIFE
         the scope of time since the creation of an object.
     """
     CONSIDERATION_SET_EXECUTION = 0
     PASS = 1
-    TRIAL = 2
+    ENVIRONMENT_STATE_UPDATE = 2
     RUN = 3
     LIFE = 4
 
@@ -203,8 +203,8 @@ class Time(types.SimpleNamespace):
         run : int : 0
             the `TimeScale.RUN` value
 
-        trial : int : 0
-            the `TimeScale.TRIAL` value
+        environment_state_update : int : 0
+            the `TimeScale.ENVIRONMENT_STATE_UPDATE` value
 
         pass_ : int : 0
             the `TimeScale.PASS` value
@@ -229,7 +229,7 @@ class Time(types.SimpleNamespace):
         self,
         consideration_set_execution=0,
         pass_=0,
-        trial=0,
+        environment_state_update=0,
         run=0,
         life=0,
         absolute=0 * _unit_registry.ms,
@@ -327,7 +327,7 @@ class Time(types.SimpleNamespace):
     def _reset_by_time_scale(self, time_scale):
         """
         Resets all the times for the time scale scope up to **time_scale**
-        e.g. _reset_by_time_scale(TimeScale.TRIAL) will set the values for
+        e.g. _reset_by_time_scale(TimeScale.ENVIRONMENT_STATE_UPDATE) will set the values for
         TimeScale.PASS and TimeScale.CONSIDERATION_SET_EXECUTION to 0
         """
         for relative_time_scale in sorted(TimeScale):
@@ -341,7 +341,7 @@ class Time(types.SimpleNamespace):
 class SimpleTime:
     """
     A subset class of `Time`, used to provide simple access to only
-    `run <Time.run>`, `trial <Time.trial>`, and `consideration_set_execution <Time.consideration_set_execution>`
+    `run <Time.run>`, `environment_state_update <Time.environment_state_update>`, and `consideration_set_execution <Time.consideration_set_execution>`
     """
     def __init__(self, time_ref):
         self._time_ref = time_ref
@@ -362,8 +362,8 @@ class SimpleTime:
         return self._time_ref.run
 
     @property
-    def trial(self):
-        return self._time_ref.trial
+    def environment_state_update(self):
+        return self._time_ref.environment_state_update
 
     @property
     def consideration_set_execution(self):
@@ -386,7 +386,7 @@ class TimeHistoryTree:
         children : list[`TimeHistoryTree`]
             an ordered list of this tree's children
 
-        max_depth : :class:`TimeScale` : `TimeScale.TRIAL`
+        max_depth : :class:`TimeScale` : `TimeScale.ENVIRONMENT_STATE_UPDATE`
             the finest grain TimeScale that should be created as a subtree
             Setting this value lower allows for more precise measurements
             (by default, you cannot query the number of
@@ -420,7 +420,7 @@ class TimeHistoryTree:
     def __init__(
         self,
         time_scale=TimeScale.LIFE,
-        max_depth=TimeScale.TRIAL,
+        max_depth=TimeScale.ENVIRONMENT_STATE_UPDATE,
         index=0,
         parent=None,
         enable_current_time=True
@@ -495,10 +495,10 @@ class TimeHistoryTree:
                 a dictionary specifying what scope of time query_time_scale \
                 is over. e.g.
 
-                    base_indices = {TimeScale.RUN: 1, TimeScale.TRIAL: 5}
+                    base_indices = {TimeScale.RUN: 1, TimeScale.ENVIRONMENT_STATE_UPDATE: 5}
 
                 gives the number of **query_time_scale**\\ s that have occurred \
-                in the 5th `TRIAL <TimeScale.TRIAL>` of the 1st `RUN`. If an entry for a :class:`TimeScale` \
+                in the 5th `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` of the 1st `RUN`. If an entry for a :class:`TimeScale` \
                 is not specified but is coarser than **query_time_scale**, the latest \
                 value for that entry will be used
 
@@ -524,7 +524,7 @@ class TimeHistoryTree:
         default_base_indices = {
             TimeScale.LIFE: 0,
             TimeScale.RUN: None,
-            TimeScale.TRIAL: None,
+            TimeScale.ENVIRONMENT_STATE_UPDATE: None,
             TimeScale.PASS: None,
         }
 
@@ -656,7 +656,7 @@ def set_time_scale_alias(name: str, target: TimeScale):
     # alias name in style of a class name
     new_class_segment_name = _time_scale_to_class_str(name)
     for cls_name, cls in graph_scheduler.__dict__.copy().items():
-        # make aliases of conditions that contain a TimeScale name (e.g. AtTrial)
+        # make aliases of conditions that contain a TimeScale name (e.g. AtEnvironmentStateUpdate)
         target_class_segment_name = _time_scale_to_class_str(target)
 
         if isinstance(cls, (type, types.ModuleType)):

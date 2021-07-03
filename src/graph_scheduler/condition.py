@@ -8,7 +8,7 @@ Overview
 `Conditions <Condition>` are used to specify when `Components <Component>` are allowed to execute.  Conditions
 can be used to specify a variety of required conditions for execution, including the state of the Component
 itself (e.g., how many times it has already executed, or the value of one of its attributes), the state of the
-Composition (e.g., how many `CONSIDERATION_SET_EXECUTION` s have occurred in the current `TRIAL <TimeScale.TRIAL>`), or the state of other
+Composition (e.g., how many `CONSIDERATION_SET_EXECUTION` s have occurred in the current `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`), or the state of other
 Components in a Composition (e.g., whether or how many times they have executed). PsyNeuLink provides a number of
 `pre-specified Conditions <Condition_Pre_Specified>` that can be parametrized (e.g., how many times a Component should
 be executed). `Custom conditions <Condition_Custom>` can also be created, by assigning a function to a Condition that
@@ -109,7 +109,7 @@ six types:
 
 .. note::
     The optional `TimeScale` argument in many `Conditions <Condition>` specifies the unit of time over which the
-    Condition operates;  the default value is `TRIAL <TimeScale.TRIAL>` for all Conditions except those with "Trial"
+    Condition operates;  the default value is `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` for all Conditions except those with "EnvironmentStateUpdate"
     in their name, for which it is `RUN`.
 
 
@@ -192,17 +192,17 @@ specified `TimeScale` or `Time <Scheduler_Absolute_Time>`):
     * `EveryNPasses` (int[, TimeScale])
       satisfied every time the specified number of `PASS`\\ es occurs.
 
-    * `BeforeTrial` (int[, TimeScale])
-      satisfied any time before the specified `TRIAL <TimeScale.TRIAL>` occurs.
+    * `BeforeEnvironmentStateUpdate` (int[, TimeScale])
+      satisfied any time before the specified `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` occurs.
 
-    * `AtTrial` (int[, TimeScale])
-      satisfied any time during the specified `TRIAL <TimeScale.TRIAL>`.
+    * `AtEnvironmentStateUpdate` (int[, TimeScale])
+      satisfied any time during the specified `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`.
 
-    * `AfterTrial` (int[, TimeScale])
-      satisfied any time after the specified `TRIAL <TimeScale.TRIAL>` occurs.
+    * `AfterEnvironmentStateUpdate` (int[, TimeScale])
+      satisfied any time after the specified `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` occurs.
 
-    * `AfterNTrials` (int[, TimeScale])
-      satisfied any time after the specified number of `TRIAL <TimeScale.TRIAL>`\\ s has occurred.
+    * `AfterNEnvironmentStateUpdates` (int[, TimeScale])
+      satisfied any time after the specified number of `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`\\ s has occurred.
 
     * `AtRun` (int)
       satisfied any time during the specified `RUN`.
@@ -258,17 +258,17 @@ specified `TimeScale` or `Time <Scheduler_Absolute_Time>`):
 **Convenience Conditions** (based on other Conditions, condensed for convenience)
 
 
-    * `AtTrialStart`
-      satisfied at the beginning of a `TRIAL <TimeScale.TRIAL>` (`AtPass(0) <AtPass>`)
+    * `AtEnvironmentStateUpdateStart`
+      satisfied at the beginning of an `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` (`AtPass(0) <AtPass>`)
 
-    * `AtTrialNStart`
-      satisfied on `PASS` 0 of the specified `TRIAL <TimeScale.TRIAL>` counted using 'TimeScale`
+    * `AtEnvironmentStateUpdateNStart`
+      satisfied on `PASS` 0 of the specified `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` counted using 'TimeScale`
 
     * `AtRunStart`
       satisfied at the beginning of a `RUN`
 
     * `AtRunNStart`
-      satisfied on `TRIAL <TimeScale.TRIAL>` 0 of the specified `RUN` counted using 'TimeScale`
+      satisfied on `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` 0 of the specified `RUN` counted using 'TimeScale`
 
 
 .. Condition_Execution:
@@ -302,10 +302,10 @@ from graph_scheduler.time import TimeScale
 from graph_scheduler.utilities import call_with_pruned_args
 
 __all__ = [
-    'AfterCall', 'AfterNCalls', 'AfterNCallsCombined', 'AfterNPasses', 'AfterNConsiderationSetExecutions', 'AfterNTrials', 'AfterPass',
-    'AtRun', 'AfterRun', 'AfterNRuns', 'AfterConsiderationSetExecution', 'AfterTrial', 'All', 'AllHaveRun', 'Always', 'And', 'Any',
-    'AtNCalls','AtPass', 'AtRunStart', 'AtRunNStart', 'AtConsiderationSetExecution', 'AtTrial',
-    'AtTrialStart', 'AtTrialNStart', 'BeforeNCalls', 'BeforePass', 'BeforeConsiderationSetExecution', 'BeforeTrial',
+    'AfterCall', 'AfterNCalls', 'AfterNCallsCombined', 'AfterNPasses', 'AfterNConsiderationSetExecutions', 'AfterNEnvironmentStateUpdates', 'AfterPass',
+    'AtRun', 'AfterRun', 'AfterNRuns', 'AfterConsiderationSetExecution', 'AfterEnvironmentStateUpdate', 'All', 'AllHaveRun', 'Always', 'And', 'Any',
+    'AtNCalls','AtPass', 'AtRunStart', 'AtRunNStart', 'AtConsiderationSetExecution', 'AtEnvironmentStateUpdate',
+    'AtEnvironmentStateUpdateStart', 'AtEnvironmentStateUpdateNStart', 'BeforeNCalls', 'BeforePass', 'BeforeConsiderationSetExecution', 'BeforeEnvironmentStateUpdate',
     'Condition','ConditionError', 'ConditionSet', 'EveryNCalls', 'EveryNPasses',
     'JustRan', 'Never', 'Not', 'NWhen', 'Or', 'WhenFinished', 'WhenFinishedAll', 'WhenFinishedAny', 'While', 'WhileNot', 'TimeInterval', 'TimeTermination'
 ]
@@ -1027,7 +1027,7 @@ class BeforeConsiderationSetExecution(Condition):
 
         n(int): the 'CONSIDERATION_SET_EXECUTION' before which the Condition is satisfied
 
-        time_scale(TimeScale): the TimeScale used as basis for counting `CONSIDERATION_SET_EXECUTION`\\ s (default: TimeScale.TRIAL)
+        time_scale(TimeScale): the TimeScale used as basis for counting `CONSIDERATION_SET_EXECUTION`\\ s (default: TimeScale.ENVIRONMENT_STATE_UPDATE)
 
     Satisfied when:
 
@@ -1039,7 +1039,7 @@ class BeforeConsiderationSetExecution(Condition):
           so, `BeforeConsiderationSetExecution(2)` is satisfied at `CONSIDERATION_SET_EXECUTION` 0 and `CONSIDERATION_SET_EXECUTION` 1.
 
     """
-    def __init__(self, n, time_scale=TimeScale.TRIAL):
+    def __init__(self, n, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE):
         def func(n, time_scale, scheduler=None, execution_id=None):
             try:
                 return scheduler.get_clock(execution_id).get_total_times_relative(TimeScale.CONSIDERATION_SET_EXECUTION, time_scale) < n
@@ -1056,7 +1056,7 @@ class AtConsiderationSetExecution(Condition):
 
         n(int): the `CONSIDERATION_SET_EXECUTION` at which the Condition is satisfied
 
-        time_scale(TimeScale): the TimeScale used as basis for counting `CONSIDERATION_SET_EXECUTION`\\ s (default: TimeScale.TRIAL)
+        time_scale(TimeScale): the TimeScale used as basis for counting `CONSIDERATION_SET_EXECUTION`\\ s (default: TimeScale.ENVIRONMENT_STATE_UPDATE)
 
     Satisfied when:
 
@@ -1069,7 +1069,7 @@ class AtConsiderationSetExecution(Condition):
           when two `CONSIDERATION_SET_EXECUTION`\\ s have occurred (`CONSIDERATION_SET_EXECUTION` 0 and `CONSIDERATION_SET_EXECUTION` 1), etc..
 
     """
-    def __init__(self, n, time_scale=TimeScale.TRIAL):
+    def __init__(self, n, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE):
         def func(n, scheduler=None, execution_id=None):
             try:
                 return scheduler.get_clock(execution_id).get_total_times_relative(TimeScale.CONSIDERATION_SET_EXECUTION, time_scale) == n
@@ -1086,7 +1086,7 @@ class AfterConsiderationSetExecution(Condition):
 
         n(int): the `CONSIDERATION_SET_EXECUTION` after which the Condition is satisfied
 
-        time_scale(TimeScale): the TimeScale used as basis for counting `CONSIDERATION_SET_EXECUTION`\\ s (default: TimeScale.TRIAL)
+        time_scale(TimeScale): the TimeScale used as basis for counting `CONSIDERATION_SET_EXECUTION`\\ s (default: TimeScale.ENVIRONMENT_STATE_UPDATE)
 
     Satisfied when:
 
@@ -1098,7 +1098,7 @@ class AfterConsiderationSetExecution(Condition):
           `AfterConsiderationSetExecution(1)` is satisfied after `CONSIDERATION_SET_EXECUTION` 1 has occurred and thereafter (i.e., in `CONSIDERATION_SET_EXECUTION`\\ s 2, 3, 4, etc.).
 
     """
-    def __init__(self, n, time_scale=TimeScale.TRIAL):
+    def __init__(self, n, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE):
         def func(n, time_scale, scheduler=None, execution_id=None):
             try:
                 return scheduler.get_clock(execution_id).get_total_times_relative(TimeScale.CONSIDERATION_SET_EXECUTION, time_scale) > n
@@ -1115,7 +1115,7 @@ class AfterNConsiderationSetExecutions(Condition):
 
         n(int): the number of `CONSIDERATION_SET_EXECUTION`\\ s after which the Condition is satisfied
 
-        time_scale(TimeScale): the TimeScale used as basis for counting `CONSIDERATION_SET_EXECUTION`\\ s (default: TimeScale.TRIAL)
+        time_scale(TimeScale): the TimeScale used as basis for counting `CONSIDERATION_SET_EXECUTION`\\ s (default: TimeScale.ENVIRONMENT_STATE_UPDATE)
 
 
     Satisfied when:
@@ -1123,7 +1123,7 @@ class AfterNConsiderationSetExecutions(Condition):
         - at least n `CONSIDERATION_SET_EXECUTION`\\ s have occurred within one unit of time at the `TimeScale` specified by **time_scale**.
 
     """
-    def __init__(self, n, time_scale=TimeScale.TRIAL):
+    def __init__(self, n, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE):
         def func(n, time_scale, scheduler=None, execution_id=None):
             try:
                 return scheduler.get_clock(execution_id).get_total_times_relative(TimeScale.CONSIDERATION_SET_EXECUTION, time_scale) >= n
@@ -1140,7 +1140,7 @@ class BeforePass(Condition):
 
         n(int): the 'PASS' before which the Condition is satisfied
 
-        time_scale(TimeScale): the TimeScale used as basis for counting `PASS`\\ es (default: TimeScale.TRIAL)
+        time_scale(TimeScale): the TimeScale used as basis for counting `PASS`\\ es (default: TimeScale.ENVIRONMENT_STATE_UPDATE)
 
     Satisfied when:
 
@@ -1152,7 +1152,7 @@ class BeforePass(Condition):
           so, `BeforePass(2)` is satisfied at `PASS` 0 and `PASS` 1.
 
     """
-    def __init__(self, n, time_scale=TimeScale.TRIAL):
+    def __init__(self, n, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE):
         def func(n, time_scale, scheduler=None, execution_id=None):
             try:
                 return scheduler.get_clock(execution_id).get_total_times_relative(TimeScale.PASS, time_scale) < n
@@ -1169,7 +1169,7 @@ class AtPass(Condition):
 
         n(int): the `PASS` at which the Condition is satisfied
 
-        time_scale(TimeScale): the TimeScale used as basis for counting `PASS`\\ es (default: TimeScale.TRIAL)
+        time_scale(TimeScale): the TimeScale used as basis for counting `PASS`\\ es (default: TimeScale.ENVIRONMENT_STATE_UPDATE)
 
     Satisfied when:
 
@@ -1182,7 +1182,7 @@ class AtPass(Condition):
           when two `PASS`\\ es have occurred (`PASS` 0 and `PASS` 1), etc..
 
     """
-    def __init__(self, n, time_scale=TimeScale.TRIAL):
+    def __init__(self, n, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE):
         def func(n, scheduler=None, execution_id=None):
             try:
                 return scheduler.get_clock(execution_id).get_total_times_relative(TimeScale.PASS, time_scale) == n
@@ -1199,7 +1199,7 @@ class AfterPass(Condition):
 
         n(int): the `PASS` after which the Condition is satisfied
 
-        time_scale(TimeScale): the TimeScale used as basis for counting `PASS`\\ es (default: TimeScale.TRIAL)
+        time_scale(TimeScale): the TimeScale used as basis for counting `PASS`\\ es (default: TimeScale.ENVIRONMENT_STATE_UPDATE)
 
     Satisfied when:
 
@@ -1211,7 +1211,7 @@ class AfterPass(Condition):
           `AfterPass(1)` is satisfied after `PASS` 1 has occurred and thereafter (i.e., in `PASS`\\ es 2, 3, 4, etc.).
 
     """
-    def __init__(self, n, time_scale=TimeScale.TRIAL):
+    def __init__(self, n, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE):
         def func(n, time_scale, scheduler=None, execution_id=None):
             try:
                 return scheduler.get_clock(execution_id).get_total_times_relative(TimeScale.PASS, time_scale) > n
@@ -1228,7 +1228,7 @@ class AfterNPasses(Condition):
 
         n(int): the number of `PASS`\\ es after which the Condition is satisfied
 
-        time_scale(TimeScale): the TimeScale used as basis for counting `PASS`\\ es (default: TimeScale.TRIAL)
+        time_scale(TimeScale): the TimeScale used as basis for counting `PASS`\\ es (default: TimeScale.ENVIRONMENT_STATE_UPDATE)
 
 
     Satisfied when:
@@ -1236,7 +1236,7 @@ class AfterNPasses(Condition):
         - at least n `PASS`\\ es have occurred within one unit of time at the `TimeScale` specified by **time_scale**.
 
     """
-    def __init__(self, n, time_scale=TimeScale.TRIAL):
+    def __init__(self, n, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE):
         def func(n, time_scale, scheduler=None, execution_id=None):
             try:
                 return scheduler.get_clock(execution_id).get_total_times_relative(TimeScale.PASS, time_scale) >= n
@@ -1253,7 +1253,7 @@ class EveryNPasses(Condition):
 
         n(int): the frequency of passes with which this condition is satisfied
 
-        time_scale(TimeScale): the TimeScale used as basis for counting `PASS`\\ es (default: TimeScale.TRIAL)
+        time_scale(TimeScale): the TimeScale used as basis for counting `PASS`\\ es (default: TimeScale.ENVIRONMENT_STATE_UPDATE)
 
     Satisfied when:
 
@@ -1263,7 +1263,7 @@ class EveryNPasses(Condition):
           **time_scale**) is evenly divisible by n.
 
     """
-    def __init__(self, n, time_scale=TimeScale.TRIAL):
+    def __init__(self, n, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE):
         def func(n, time_scale, scheduler=None, execution_id=None):
             try:
                 return scheduler.get_clock(execution_id).get_total_times_relative(TimeScale.PASS, time_scale) % n == 0
@@ -1273,122 +1273,122 @@ class EveryNPasses(Condition):
         super().__init__(func, n, time_scale)
 
 
-class BeforeTrial(Condition):
-    """BeforeTrial
+class BeforeEnvironmentStateUpdate(Condition):
+    """BeforeEnvironmentStateUpdate
 
     Parameters:
 
-        n(int): the `TRIAL <TimeScale.TRIAL>` before which the Condition is satisfied
+        n(int): the `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` before which the Condition is satisfied
 
-        time_scale(TimeScale): the TimeScale used as basis for counting `TRIAL <TimeScale.TRIAL>`\\ s
+        time_scale(TimeScale): the TimeScale used as basis for counting `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`\\ s
         (default: TimeScale.RUN)
 
     Satisfied when:
 
-        - at most n-1 `TRIAL <TimeScale.TRIAL>`\\ s have occurred within one unit of time at the `TimeScale`
+        - at most n-1 `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`\\ s have occurred within one unit of time at the `TimeScale`
           specified by **time_scale**.
 
     Notes:
 
-        - Counts of TimeScales are zero-indexed (that is, the first `TRIAL <TimeScale.TRIAL>` is 0, the second
-          `TRIAL <TimeScale.TRIAL>` is 1, etc.); so, `BeforeTrial(2)` is satisfied at `TRIAL <TimeScale.TRIAL>` 0
-          and `TRIAL <TimeScale.TRIAL>` 1.
+        - Counts of TimeScales are zero-indexed (that is, the first `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` is 0, the second
+          `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` is 1, etc.); so, `BeforeEnvironmentStateUpdate(2)` is satisfied at `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` 0
+          and `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` 1.
 
     """
     def __init__(self, n, time_scale=TimeScale.RUN):
         def func(n, scheduler=None, execution_id=None):
             try:
-                return scheduler.get_clock(execution_id).get_total_times_relative(TimeScale.TRIAL, time_scale) < n
+                return scheduler.get_clock(execution_id).get_total_times_relative(TimeScale.ENVIRONMENT_STATE_UPDATE, time_scale) < n
             except AttributeError as e:
                 raise ConditionError(f'{type(self).__name__}: scheduler must be supplied to is_satisfied: {e}.')
 
         super().__init__(func, n)
 
 
-class AtTrial(Condition):
-    """AtTrial
+class AtEnvironmentStateUpdate(Condition):
+    """AtEnvironmentStateUpdate
 
     Parameters:
 
-        n(int): the `TRIAL <TimeScale.TRIAL>` at which the Condition is satisfied
+        n(int): the `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` at which the Condition is satisfied
 
-        time_scale(TimeScale): the TimeScale used as basis for counting `TRIAL <TimeScale.TRIAL>`\\ s
+        time_scale(TimeScale): the TimeScale used as basis for counting `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`\\ s
         (default: TimeScale.RUN)
 
     Satisfied when:
 
-        - exactly n `TRIAL <TimeScale.TRIAL>`\\ s have occurred within one unit of time at the `TimeScale`
+        - exactly n `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`\\ s have occurred within one unit of time at the `TimeScale`
           specified by **time_scale**.
 
     Notes:
 
-        - Counts of TimeScales are zero-indexed (that is, the first `TRIAL <TimeScale.TRIAL>` is 0,
-          the second `TRIAL <TimeScale.TRIAL>` is 1, etc.); so, `AtTrial(1)` is satisfied when one
-          `TRIAL <TimeScale.TRIAL>` (`TRIAL <TimeScale.TRIAL>` 0) has already occurred.
+        - Counts of TimeScales are zero-indexed (that is, the first `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` is 0,
+          the second `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` is 1, etc.); so, `AtEnvironmentStateUpdate(1)` is satisfied when one
+          `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` (`ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` 0) has already occurred.
 
     """
     def __init__(self, n, time_scale=TimeScale.RUN):
         def func(n, scheduler=None, execution_id=None):
             try:
-                return scheduler.get_clock(execution_id).get_total_times_relative(TimeScale.TRIAL, time_scale) == n
+                return scheduler.get_clock(execution_id).get_total_times_relative(TimeScale.ENVIRONMENT_STATE_UPDATE, time_scale) == n
             except AttributeError as e:
                 raise ConditionError(f'{type(self).__name__}: scheduler must be supplied to is_satisfied: {e}.')
 
         super().__init__(func, n)
 
 
-class AfterTrial(Condition):
-    """AfterTrial
+class AfterEnvironmentStateUpdate(Condition):
+    """AfterEnvironmentStateUpdate
 
     Parameters:
 
-        n(int): the `TRIAL <TimeScale.TRIAL>` after which the Condition is satisfied
+        n(int): the `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` after which the Condition is satisfied
 
-        time_scale(TimeScale): the TimeScale used as basis for counting `TRIAL <TimeScale.TRIAL>`\\ s.
+        time_scale(TimeScale): the TimeScale used as basis for counting `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`\\ s.
         (default: TimeScale.RUN)
 
     Satisfied when:
 
-        - at least n+1 `TRIAL <TimeScale.TRIAL>`\\ s have occurred within one unit of time at the `TimeScale`
+        - at least n+1 `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`\\ s have occurred within one unit of time at the `TimeScale`
           specified by **time_scale**.
 
     Notes:
 
-        - Counts of TimeScales are zero-indexed (that is, the first `TRIAL <TimeScale.TRIAL>` is 0, the second
-        `TRIAL <TimeScale.TRIAL>` is 1, etc.); so,  `AfterPass(1)` is satisfied after `TRIAL <TimeScale.TRIAL>` 1
-        has occurred and thereafter (i.e., in `TRIAL <TimeScale.TRIAL>`\\ s 2, 3, 4, etc.).
+        - Counts of TimeScales are zero-indexed (that is, the first `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` is 0, the second
+        `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` is 1, etc.); so,  `AfterPass(1)` is satisfied after `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` 1
+        has occurred and thereafter (i.e., in `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`\\ s 2, 3, 4, etc.).
 
     """
     def __init__(self, n, time_scale=TimeScale.RUN):
         def func(n, scheduler=None, execution_id=None):
             try:
-                return scheduler.get_clock(execution_id).get_total_times_relative(TimeScale.TRIAL, time_scale) > n
+                return scheduler.get_clock(execution_id).get_total_times_relative(TimeScale.ENVIRONMENT_STATE_UPDATE, time_scale) > n
             except AttributeError as e:
                 raise ConditionError(f'{type(self).__name__}: scheduler must be supplied to is_satisfied: {e}.')
 
         super().__init__(func, n)
 
 
-class AfterNTrials(Condition):
-    """AfterNTrials
+class AfterNEnvironmentStateUpdates(Condition):
+    """AfterNEnvironmentStateUpdates
 
     Parameters:
 
-        n(int): the number of `TRIAL <TimeScale.TRIAL>`\\ s after which the Condition is satisfied
+        n(int): the number of `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`\\ s after which the Condition is satisfied
 
-        time_scale(TimeScale): the TimeScale used as basis for counting `TRIAL <TimeScale.TRIAL>`\\ s
+        time_scale(TimeScale): the TimeScale used as basis for counting `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`\\ s
         (default: TimeScale.RUN)
 
     Satisfied when:
 
-        - at least n `TRIAL <TimeScale.TRIAL>`\\ s have occured  within one unit of time at the `TimeScale`
+        - at least n `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`\\ s have occured  within one unit of time at the `TimeScale`
           specified by **time_scale**.
 
     """
     def __init__(self, n, time_scale=TimeScale.RUN):
         def func(n, time_scale, scheduler=None, execution_id=None):
             try:
-                return scheduler.get_clock(execution_id).get_total_times_relative(TimeScale.TRIAL, time_scale) >= n
+                return scheduler.get_clock(execution_id).get_total_times_relative(TimeScale.ENVIRONMENT_STATE_UPDATE, time_scale) >= n
             except AttributeError as e:
                 raise ConditionError(f'{type(self).__name__}: scheduler must be supplied to is_satisfied: {e}.')
 
@@ -1440,7 +1440,7 @@ class AfterRun(Condition):
 
 
 class AfterNRuns(Condition):
-    """AfterNTrials
+    """AfterNEnvironmentStateUpdates
 
     Parameters:
 
@@ -1477,7 +1477,7 @@ class BeforeNCalls(_DependencyValidation, Condition):
         n(int): the number of executions of **component** before which the Condition is satisfied
 
         time_scale(TimeScale): the TimeScale used as basis for counting executions of **component**
-        (default: TimeScale.TRIAL)
+        (default: TimeScale.ENVIRONMENT_STATE_UPDATE)
 
     Satisfied when:
 
@@ -1485,7 +1485,7 @@ class BeforeNCalls(_DependencyValidation, Condition):
           within one unit of time at the `TimeScale` specified by **time_scale**.
 
     """
-    def __init__(self, dependency, n, time_scale=TimeScale.TRIAL):
+    def __init__(self, dependency, n, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE):
         self.time_scale = time_scale
 
         def func(dependency, n, scheduler=None, execution_id=None):
@@ -1515,7 +1515,7 @@ class AtNCalls(_DependencyValidation, Condition):
         n(int): the number of executions of **component** at which the Condition is satisfied
 
         time_scale(TimeScale): the TimeScale used as basis for counting executions of **component**
-        (default: TimeScale.TRIAL)
+        (default: TimeScale.ENVIRONMENT_STATE_UPDATE)
 
     Satisfied when:
 
@@ -1523,7 +1523,7 @@ class AtNCalls(_DependencyValidation, Condition):
           within one unit of time at the `TimeScale` specified by **time_scale**.
 
     """
-    def __init__(self, dependency, n, time_scale=TimeScale.TRIAL):
+    def __init__(self, dependency, n, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE):
         self.time_scale = time_scale
 
         def func(dependency, n, scheduler=None, execution_id=None):
@@ -1547,7 +1547,7 @@ class AfterCall(_DependencyValidation, Condition):
         n(int): the number of executions of **component** after which the Condition is satisfied
 
         time_scale(TimeScale): the TimeScale used as basis for counting executions of **component**
-        (default: TimeScale.TRIAL)
+        (default: TimeScale.ENVIRONMENT_STATE_UPDATE)
 
     Satisfied when:
 
@@ -1555,7 +1555,7 @@ class AfterCall(_DependencyValidation, Condition):
           within one unit of time at the `TimeScale` specified by **time_scale**.
 
     """
-    def __init__(self, dependency, n, time_scale=TimeScale.TRIAL):
+    def __init__(self, dependency, n, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE):
         def func(dependency, n, scheduler=None, execution_id=None):
             try:
                 num_calls = scheduler.counts_total[execution_id][time_scale][dependency]
@@ -1577,7 +1577,7 @@ class AfterNCalls(_DependencyValidation, Condition):
         n(int): the number of executions of **component** after which the Condition is satisfied
 
         time_scale(TimeScale): the TimeScale used as basis for counting executions of **component**
-        (default: TimeScale.TRIAL)
+        (default: TimeScale.ENVIRONMENT_STATE_UPDATE)
 
     Satisfied when:
 
@@ -1585,7 +1585,7 @@ class AfterNCalls(_DependencyValidation, Condition):
           within one unit of time at the `TimeScale` specified by **time_scale**.
 
     """
-    def __init__(self, dependency, n, time_scale=TimeScale.TRIAL):
+    def __init__(self, dependency, n, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE):
         self.time_scale = time_scale
 
         def func(dependency, n, scheduler=None, execution_id=None):
@@ -1610,7 +1610,7 @@ class AfterNCallsCombined(_DependencyValidation, Condition):
         Condition is satisfied (default: None)
 
         time_scale(TimeScale): the TimeScale used as basis for counting executions of **component**
-        (default: TimeScale.TRIAL)
+        (default: TimeScale.ENVIRONMENT_STATE_UPDATE)
 
 
     Satisfied when:
@@ -1619,7 +1619,7 @@ class AfterNCallsCombined(_DependencyValidation, Condition):
           within one unit of time at the `TimeScale` specified by **time_scale**.
 
     """
-    def __init__(self, *dependencies, n=None, time_scale=TimeScale.TRIAL):
+    def __init__(self, *dependencies, n=None, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE):
         logger.debug('{0} args: deps {1}, n {2}, ts {3}'.format(type(self).__name__, dependencies, n, time_scale))
 
         def func(*dependencies, n=None, scheduler=None, execution_id=None):
@@ -1700,8 +1700,8 @@ class JustRan(_DependencyValidation, Condition):
     Notes:
 
         - This Condition can transcend divisions between `TimeScales <TimeScale>`.
-          For example, if A runs in the final `CONSIDERATION_SET_EXECUTION` of a `TRIAL <TimeScale.TRIAL>`,
-          JustRan(A) is satisfied at the beginning of the next `TRIAL <TimeScale.TRIAL>`.
+          For example, if A runs in the final `CONSIDERATION_SET_EXECUTION` of an `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`,
+          JustRan(A) is satisfied at the beginning of the next `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`.
 
     """
     def __init__(self, dependency):
@@ -1722,7 +1722,7 @@ class AllHaveRun(_DependencyValidation, Condition):
         *components(Components):  an iterable of Components on which the Condition depends
 
         time_scale(TimeScale): the TimeScale used as basis for counting executions of **component**
-        (default: TimeScale.TRIAL)
+        (default: TimeScale.ENVIRONMENT_STATE_UPDATE)
 
     Satisfied when:
 
@@ -1730,7 +1730,7 @@ class AllHaveRun(_DependencyValidation, Condition):
           within one unit of time at the `TimeScale` specified by **time_scale**.
 
     """
-    def __init__(self, *dependencies, time_scale=TimeScale.TRIAL):
+    def __init__(self, *dependencies, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE):
         self.time_scale = time_scale
 
         def func(*dependencies, scheduler=None, execution_id=None):
@@ -1857,12 +1857,12 @@ class WhenFinishedAll(_DependencyValidation, Condition):
 ######################################################################
 
 
-class AtTrialStart(AtPass):
-    """AtTrialStart
+class AtEnvironmentStateUpdateStart(AtPass):
+    """AtEnvironmentStateUpdateStart
 
     Satisfied when:
 
-        - at the beginning of a `TRIAL <TimeScale.TRIAL>`
+        - at the beginning of an `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`
 
     Notes:
 
@@ -1875,30 +1875,30 @@ class AtTrialStart(AtPass):
         return '{0}()'.format(self.__class__.__name__)
 
 
-class AtTrialNStart(All):
-    """AtTrialNStart
+class AtEnvironmentStateUpdateNStart(All):
+    """AtEnvironmentStateUpdateNStart
 
     Parameters:
 
-        n(int): the `TRIAL <TimeScale.TRIAL>` on which the Condition is satisfied
+        n(int): the `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` on which the Condition is satisfied
 
-        time_scale(TimeScale): the TimeScale used as basis for counting `TRIAL <TimeScale.TRIAL>`\\ s
+        time_scale(TimeScale): the TimeScale used as basis for counting `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`\\ s
         (default: TimeScale.RUN)
 
     Satisfied when:
 
-        - on `PASS` 0 of the specified `TRIAL <TimeScale.TRIAL>` counted using 'TimeScale`
+        - on `PASS` 0 of the specified `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` counted using 'TimeScale`
 
     Notes:
 
-        - identical to All(AtPass(0), AtTrial(n, time_scale))
+        - identical to All(AtPass(0), AtEnvironmentStateUpdate(n, time_scale))
 
     """
     def __init__(self, n, time_scale=TimeScale.RUN):
-        return super().__init__(AtPass(0), AtTrial(n, time_scale))
+        return super().__init__(AtPass(0), AtEnvironmentStateUpdate(n, time_scale))
 
 
-class AtRunStart(AtTrial):
+class AtRunStart(AtEnvironmentStateUpdate):
     """AtRunStart
 
     Satisfied when:
@@ -1907,7 +1907,7 @@ class AtRunStart(AtTrial):
 
     Notes:
 
-        - identical to `AtTrial(0) <AtTrial>`
+        - identical to `AtEnvironmentStateUpdate(0) <AtEnvironmentStateUpdate>`
     """
     def __init__(self):
         super().__init__(0, time_scale=TimeScale.RUN)
@@ -1925,12 +1925,12 @@ class AtRunNStart(All):
 
     Satisfied when:
 
-        - on `TRIAL <TimeScale.TRIAL>` 0 of the specified `RUN` counted using 'TimeScale`
+        - on `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` 0 of the specified `RUN` counted using 'TimeScale`
 
     Notes:
 
-        - identical to `All(AtTrial(0), AtRun(n))`
+        - identical to `All(AtEnvironmentStateUpdate(0), AtRun(n))`
 
     """
     def __init__(self, n):
-        return super().__init__(AtTrial(0), AtRun(n))
+        return super().__init__(AtEnvironmentStateUpdate(0), AtRun(n))

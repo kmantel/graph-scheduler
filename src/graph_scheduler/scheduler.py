@@ -68,12 +68,12 @@ Pseudocode::
 
     consideration_queue <- list(toposort(graph))
 
-    reset TimeScale.TRIAL counters
-    while TimeScale.TRIAL termination conditions are not satisfied:
+    reset TimeScale.ENVIRONMENT_STATE_UPDATE counters
+    while TimeScale.ENVIRONMENT_STATE_UPDATE termination conditions are not satisfied:
         reset TimeScale.PASS counters
         cur_index <- 0
 
-        while TimeScale.TRIAL termination conditions are not satisfied
+        while TimeScale.ENVIRONMENT_STATE_UPDATE termination conditions are not satisfied
               and cur_index < len(consideration_queue):
 
             cur_consideration_set <- consideration_queue[cur_index]
@@ -149,12 +149,12 @@ execution, over which every Component in the Composition has been considered for
 
 The Scheduler continues to make `PASS`es through the `consideration_queue` until a `termination Condition
 <Scheduler_Termination_Conditions>` is satisfied. If no termination Conditions are specified, by default the Scheduler
-terminates a `TRIAL <TimeScale.TRIAL>` when every Component has been specified for execution at least once
+terminates an `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` when every Component has been specified for execution at least once
 (corresponding to the `AllHaveRun` Condition).  However, other termination Conditions can be specified,
-that may cause the Scheduler to terminate a `TRIAL <TimeScale.TRIAL>` earlier  or later (e.g., when the  Condition
-for a particular Component or set of Components is met).  When the Scheduler terminates a `TRIAL <TimeScale.TRIAL>`,
+that may cause the Scheduler to terminate an `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` earlier  or later (e.g., when the  Condition
+for a particular Component or set of Components is met).  When the Scheduler terminates an `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`,
 the `Composition <Composition>` begins processing the next input specified in the call to its `run <Composition.run>`
-method. Thus, a `TRIAL <TimeScale.TRIAL>` is defined as the scope of processing associated with a given input to the
+method. Thus, an `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` is defined as the scope of processing associated with a given input to the
 Composition.
 
 .. _Scheduler_Termination_Conditions:
@@ -162,16 +162,16 @@ Composition.
 *Termination Conditions*
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Termination conditions are `Conditions <Condition>` that specify when the open-ended units of time - `TRIAL
-<TimeScale.TRIAL>` and `RUN` - have ended.  By default, the termination condition for a `TRIAL <TimeScale.TRIAL>` is
-`AllHaveRun`, which is satisfied when all Components have run at least once within the trial, and the termination
-condition for a `RUN` is when all of its constituent trials have terminated. These defaults may be overriden when
+Termination conditions are `Conditions <Condition>` that specify when the open-ended units of time - `ENVIRONMENT_STATE_UPDATE
+<TimeScale.ENVIRONMENT_STATE_UPDATE>` and `RUN` - have ended.  By default, the termination condition for an `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` is
+`AllHaveRun`, which is satisfied when all Components have run at least once within the environment state update, and the termination
+condition for a `RUN` is when all of its constituent environment state updates have terminated. These defaults may be overriden when
 running a Composition, by passing a dictionary mapping `TimeScales <TimeScale>` to `Conditions <Condition>` in the
 **termination_processing** argument of a call to `Composition.run` (to terminate the execution of processing)::
 
     Composition.run(
         ...,
-        termination_processing={TimeScale.TRIAL: WhenFinished(ddm)}
+        termination_processing={TimeScale.ENVIRONMENT_STATE_UPDATE: WhenFinished(ddm)}
         )
 
 
@@ -295,7 +295,7 @@ Please see `Condition` for a list of all supported Conditions and their behavior
     ...     )
     ... )
     >>> termination_conds = {
-    ...     graph_scheduler.TimeScale.TRIAL: graph_scheduler.AfterNCalls(B, 4, time_scale=graph_scheduler.TimeScale.TRIAL)
+    ...     graph_scheduler.TimeScale.ENVIRONMENT_STATE_UPDATE: graph_scheduler.AfterNCalls(B, 4, time_scale=graph_scheduler.TimeScale.ENVIRONMENT_STATE_UPDATE)
     ... }
     >>> execution_sequence = list(comp.scheduler.run(termination_conds=termination_conds))
     >>> execution_sequence # doctest: +SKIP
@@ -322,7 +322,7 @@ Please see `Condition` for a list of all supported Conditions and their behavior
     ...     )
     ... )
     >>> termination_conds = {
-    ...     graph_scheduler.TimeScale.TRIAL: graph_scheduler.AfterNCalls(C, 4, time_scale=graph_scheduler.TimeScale.TRIAL)
+    ...     graph_scheduler.TimeScale.ENVIRONMENT_STATE_UPDATE: graph_scheduler.AfterNCalls(C, 4, time_scale=graph_scheduler.TimeScale.ENVIRONMENT_STATE_UPDATE)
     ... }
     >>> execution_sequence = list(comp.scheduler.run(termination_conds=termination_conds))
     >>> execution_sequence  # doctest: +SKIP
@@ -361,7 +361,7 @@ logger = logging.getLogger(__name__)
 
 default_termination_conds = {
     TimeScale.RUN: Never(),
-    TimeScale.TRIAL: AllHaveRun(),
+    TimeScale.ENVIRONMENT_STATE_UPDATE: AllHaveRun(),
 }
 
 
@@ -526,7 +526,7 @@ class Scheduler:
         # it can be reused in multiple contexts
 
         # stores total the number of occurrences of a node through the time scale
-        # i.e. the number of times node has ran/been queued to run in a trial
+        # i.e. the number of times node has ran/been queued to run in a environment state update
         if execution_id not in self.counts_total:
             if base_execution_id is not NotImplemented:
                 if base_execution_id not in self.counts_total:
@@ -717,7 +717,7 @@ class Scheduler:
         termination_conds=None,
         execution_id=None,
         base_execution_id=None,
-        skip_trial_time_increment=False,
+        skip_environment_state_update_time_increment=False,
         **kwargs,
     ):
         """
@@ -771,10 +771,10 @@ class Scheduler:
 
         self._init_counts(execution_id, base_execution_id)
         self._reset_counts_useable(execution_id)
-        self._reset_counts_total(TimeScale.TRIAL, execution_id)
+        self._reset_counts_total(TimeScale.ENVIRONMENT_STATE_UPDATE, execution_id)
 
         while (
-            not termination_conds[TimeScale.TRIAL].is_satisfied(**is_satisfied_kwargs)
+            not termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE].is_satisfied(**is_satisfied_kwargs)
             and not termination_conds[TimeScale.RUN].is_satisfied(**is_satisfied_kwargs)
         ):
             self._reset_counts_total(TimeScale.PASS, execution_id)
@@ -784,7 +784,7 @@ class Scheduler:
 
             while (
                 cur_index_consideration_queue < len(effective_consideration_queue)
-                and not termination_conds[TimeScale.TRIAL].is_satisfied(**is_satisfied_kwargs)
+                and not termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE].is_satisfied(**is_satisfied_kwargs)
                 and not termination_conds[TimeScale.RUN].is_satisfied(**is_satisfied_kwargs)
             ):
                 # all nodes to be added during this consideration set execution
@@ -847,8 +847,8 @@ class Scheduler:
 
             self.get_clock(execution_id)._increment_time(TimeScale.PASS)
 
-        if not skip_trial_time_increment:
-            self.get_clock(execution_id)._increment_time(TimeScale.TRIAL)
+        if not skip_environment_state_update_time_increment:
+            self.get_clock(execution_id)._increment_time(TimeScale.ENVIRONMENT_STATE_UPDATE)
 
         if termination_conds[TimeScale.RUN].is_satisfied(**is_satisfied_kwargs):
             self.date_last_run_end = datetime.datetime.now()

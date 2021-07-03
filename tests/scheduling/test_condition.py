@@ -7,10 +7,10 @@ from psyneulink.core.components.mechanisms.processing.transfermechanism import T
 from psyneulink.core.components.projections.pathway.mappingprojection import MappingProjection
 from psyneulink.core.compositions.composition import Composition
 from psyneulink.core.scheduling.condition import (
-    AfterCall, AfterNCalls, AfterNCallsCombined, AfterNPasses, AfterNTrials,
-    AfterPass, AfterTrial, All, AllHaveRun, Always, Any, AtPass, AtConsiderationSetExecution,
-    AtTrial, AtTrialStart, BeforeNCalls, BeforePass, BeforeConsiderationSetExecution,
-    BeforeTrial, Condition, ConditionError, EveryNCalls, EveryNPasses, Not,
+    AfterCall, AfterNCalls, AfterNCallsCombined, AfterNPasses, AfterNEnvironmentStateUpdates,
+    AfterPass, AfterEnvironmentStateUpdate, All, AllHaveRun, Always, Any, AtPass, AtConsiderationSetExecution,
+    AtEnvironmentStateUpdate, AtEnvironmentStateUpdateStart, BeforeNCalls, BeforePass, BeforeConsiderationSetExecution,
+    BeforeEnvironmentStateUpdate, Condition, ConditionError, EveryNCalls, EveryNPasses, Not,
     NWhen, TimeInterval, TimeTermination, WhenFinished, WhenFinishedAll,
     WhenFinishedAny, WhileNot,
 )
@@ -87,11 +87,11 @@ class TestCondition:
             comp.add_node(A)
 
             sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
-            sched.add_condition(A, WhileNot(lambda sched: sched.get_clock(sched.default_execution_id).get_total_times_relative(TimeScale.PASS, TimeScale.TRIAL) == 0, sched))
+            sched.add_condition(A, WhileNot(lambda sched: sched.get_clock(sched.default_execution_id).get_total_times_relative(TimeScale.PASS, TimeScale.ENVIRONMENT_STATE_UPDATE) == 0, sched))
 
             termination_conds = {}
-            termination_conds[TimeScale.RUN] = AfterNTrials(1)
-            termination_conds[TimeScale.TRIAL] = AtPass(5)
+            termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+            termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AtPass(5)
             output = list(sched.run(termination_conds=termination_conds))
 
             expected_output = [set(), A, A, A, A]
@@ -103,11 +103,11 @@ class TestCondition:
             comp.add_node(A)
 
             sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
-            sched.add_condition(A, WhileNot(lambda sched: sched.get_clock(sched.default_execution_id).get_total_times_relative(TimeScale.PASS, TimeScale.TRIAL) == 2, sched))
+            sched.add_condition(A, WhileNot(lambda sched: sched.get_clock(sched.default_execution_id).get_total_times_relative(TimeScale.PASS, TimeScale.ENVIRONMENT_STATE_UPDATE) == 2, sched))
 
             termination_conds = {}
-            termination_conds[TimeScale.RUN] = AfterNTrials(1)
-            termination_conds[TimeScale.TRIAL] = AtPass(5)
+            termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+            termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AtPass(5)
             output = list(sched.run(termination_conds=termination_conds))
 
             expected_output = [A, A, set(), A, A]
@@ -125,8 +125,8 @@ class TestCondition:
             sched.add_condition(A, EveryNPasses(1))
 
             termination_conds = {}
-            termination_conds[TimeScale.RUN] = AfterNTrials(1)
-            termination_conds[TimeScale.TRIAL] = Any(AfterNCalls(A, 10), AtPass(5))
+            termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+            termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = Any(AfterNCalls(A, 10), AtPass(5))
             output = list(sched.run(termination_conds=termination_conds))
 
             expected_output = [A for _ in range(5)]
@@ -142,8 +142,8 @@ class TestCondition:
             sched.add_condition(A, EveryNPasses(1))
 
             termination_conds = {}
-            termination_conds[TimeScale.RUN] = AfterNTrials(1)
-            termination_conds[TimeScale.TRIAL] = Any(AfterNCalls(A, 5), AtPass(10))
+            termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+            termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = Any(AfterNCalls(A, 5), AtPass(10))
             output = list(sched.run(termination_conds=termination_conds))
 
             expected_output = [A for _ in range(5)]
@@ -158,8 +158,8 @@ class TestCondition:
             sched.add_condition(A, Not(AtPass(0)))
 
             termination_conds = {}
-            termination_conds[TimeScale.RUN] = AfterNTrials(1)
-            termination_conds[TimeScale.TRIAL] = AtPass(5)
+            termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+            termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AtPass(5)
             output = list(sched.run(termination_conds=termination_conds))
 
             expected_output = [set(), A, A, A, A]
@@ -174,8 +174,8 @@ class TestCondition:
             sched.add_condition(A, Not(AtPass(2)))
 
             termination_conds = {}
-            termination_conds[TimeScale.RUN] = AfterNTrials(1)
-            termination_conds[TimeScale.TRIAL] = AtPass(5)
+            termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+            termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AtPass(5)
             output = list(sched.run(termination_conds=termination_conds))
 
             expected_output = [A, A, set(), A, A]
@@ -201,8 +201,8 @@ class TestCondition:
             sched.add_condition(B, NWhen(AfterNCalls(A, 3), n))
 
             termination_conds = {}
-            termination_conds[TimeScale.RUN] = AfterNTrials(1)
-            termination_conds[TimeScale.TRIAL] = AfterNCalls(A, 6)
+            termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+            termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(A, 6)
             output = list(sched.run(termination_conds=termination_conds))
 
             expected_output = [A if x == 'A' else B for x in expected_output]
@@ -220,8 +220,8 @@ class TestCondition:
             sched.add_condition(A, BeforeConsiderationSetExecution(2))
 
             termination_conds = {}
-            termination_conds[TimeScale.RUN] = AfterNTrials(1)
-            termination_conds[TimeScale.TRIAL] = AtPass(5)
+            termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+            termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AtPass(5)
             output = list(sched.run(termination_conds=termination_conds))
 
             expected_output = [A, A, set(), set(), set()]
@@ -241,8 +241,8 @@ class TestCondition:
             sched.add_condition(B, Always())
 
             termination_conds = {}
-            termination_conds[TimeScale.RUN] = AfterNTrials(1)
-            termination_conds[TimeScale.TRIAL] = AtPass(5)
+            termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+            termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AtPass(5)
             output = list(sched.run(termination_conds=termination_conds))
 
             expected_output = [A, B, B, B, B, B]
@@ -257,8 +257,8 @@ class TestCondition:
             sched.add_condition(A, AtConsiderationSetExecution(0))
 
             termination_conds = {}
-            termination_conds[TimeScale.RUN] = AfterNTrials(1)
-            termination_conds[TimeScale.TRIAL] = AtPass(5)
+            termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+            termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AtPass(5)
             output = list(sched.run(termination_conds=termination_conds))
 
             expected_output = [A, set(), set(), set(), set()]
@@ -273,8 +273,8 @@ class TestCondition:
             sched.add_condition(A, BeforePass(2))
 
             termination_conds = {}
-            termination_conds[TimeScale.RUN] = AfterNTrials(1)
-            termination_conds[TimeScale.TRIAL] = AtPass(5)
+            termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+            termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AtPass(5)
             output = list(sched.run(termination_conds=termination_conds))
 
             expected_output = [A, A, set(), set(), set()]
@@ -289,8 +289,8 @@ class TestCondition:
             sched.add_condition(A, AtPass(0))
 
             termination_conds = {}
-            termination_conds[TimeScale.RUN] = AfterNTrials(1)
-            termination_conds[TimeScale.TRIAL] = AtPass(5)
+            termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+            termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AtPass(5)
             output = list(sched.run(termination_conds=termination_conds))
 
             expected_output = [A, set(), set(), set(), set()]
@@ -312,8 +312,8 @@ class TestCondition:
             sched.add_condition(C, Always())
 
             termination_conds = {}
-            termination_conds[TimeScale.RUN] = AfterNTrials(1)
-            termination_conds[TimeScale.TRIAL] = AfterNCalls(C, 2)
+            termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+            termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 2)
             output = list(sched.run(termination_conds=termination_conds))
 
             expected_output = [A, B, C, B, C]
@@ -328,8 +328,8 @@ class TestCondition:
             sched.add_condition(A, AtPass(2))
 
             termination_conds = {}
-            termination_conds[TimeScale.RUN] = AfterNTrials(1)
-            termination_conds[TimeScale.TRIAL] = AtPass(5)
+            termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+            termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AtPass(5)
             output = list(sched.run(termination_conds=termination_conds))
 
             expected_output = [set(), set(), A, set(), set()]
@@ -344,8 +344,8 @@ class TestCondition:
             sched.add_condition(A, AtPass(5))
 
             termination_conds = {}
-            termination_conds[TimeScale.RUN] = AfterNTrials(1)
-            termination_conds[TimeScale.TRIAL] = AtPass(5)
+            termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+            termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AtPass(5)
             output = list(sched.run(termination_conds=termination_conds))
 
             expected_output = [set(), set(), set(), set(), set()]
@@ -360,8 +360,8 @@ class TestCondition:
             sched.add_condition(A, AtPass(6))
 
             termination_conds = {}
-            termination_conds[TimeScale.RUN] = AfterNTrials(1)
-            termination_conds[TimeScale.TRIAL] = AtPass(5)
+            termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+            termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AtPass(5)
             output = list(sched.run(termination_conds=termination_conds))
 
             expected_output = [set(), set(), set(), set(), set()]
@@ -376,8 +376,8 @@ class TestCondition:
             sched.add_condition(A, AfterPass(0))
 
             termination_conds = {}
-            termination_conds[TimeScale.RUN] = AfterNTrials(1)
-            termination_conds[TimeScale.TRIAL] = AtPass(5)
+            termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+            termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AtPass(5)
             output = list(sched.run(termination_conds=termination_conds))
 
             expected_output = [set(), A, A, A, A]
@@ -392,24 +392,24 @@ class TestCondition:
             sched.add_condition(A, AfterNPasses(1))
 
             termination_conds = {}
-            termination_conds[TimeScale.RUN] = AfterNTrials(1)
-            termination_conds[TimeScale.TRIAL] = AtPass(5)
+            termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+            termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AtPass(5)
             output = list(sched.run(termination_conds=termination_conds))
 
             expected_output = [set(), A, A, A, A]
             assert output == pytest.helpers.setify_expected_output(expected_output)
 
-        def test_BeforeTrial(self):
+        def test_BeforeEnvironmentStateUpdate(self):
             comp = Composition()
             A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A')
             comp.add_node(A)
 
             sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
-            sched.add_condition(A, BeforeTrial(4))
+            sched.add_condition(A, BeforeEnvironmentStateUpdate(4))
 
             termination_conds = {}
-            termination_conds[TimeScale.RUN] = AfterNTrials(5)
-            termination_conds[TimeScale.TRIAL] = AtPass(1)
+            termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(5)
+            termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AtPass(1)
             comp.run(
                 inputs={A: range(6)},
                 scheduler=sched,
@@ -420,7 +420,7 @@ class TestCondition:
             expected_output = [A, A, A, A, set()]
             assert output == pytest.helpers.setify_expected_output(expected_output)
 
-        def test_AtTrial(self):
+        def test_AtEnvironmentStateUpdate(self):
             comp = Composition()
             A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A')
             comp.add_node(A)
@@ -429,8 +429,8 @@ class TestCondition:
             sched.add_condition(A, Always())
 
             termination_conds = {}
-            termination_conds[TimeScale.RUN] = AtTrial(4)
-            termination_conds[TimeScale.TRIAL] = AtPass(1)
+            termination_conds[TimeScale.RUN] = AtEnvironmentStateUpdate(4)
+            termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AtPass(1)
             comp.run(
                 inputs={A: range(6)},
                 scheduler=sched,
@@ -441,7 +441,7 @@ class TestCondition:
             expected_output = [A, A, A, A]
             assert output == pytest.helpers.setify_expected_output(expected_output)
 
-        def test_AfterTrial(self):
+        def test_AfterEnvironmentStateUpdate(self):
             comp = Composition()
             A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A')
             comp.add_node(A)
@@ -450,8 +450,8 @@ class TestCondition:
             sched.add_condition(A, Always())
 
             termination_conds = {}
-            termination_conds[TimeScale.RUN] = AfterTrial(4)
-            termination_conds[TimeScale.TRIAL] = AtPass(1)
+            termination_conds[TimeScale.RUN] = AfterEnvironmentStateUpdate(4)
+            termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AtPass(1)
             comp.run(
                 inputs={A: range(6)},
                 scheduler=sched,
@@ -462,7 +462,7 @@ class TestCondition:
             expected_output = [A, A, A, A, A]
             assert output == pytest.helpers.setify_expected_output(expected_output)
 
-        def test_AfterNTrials(self):
+        def test_AfterNEnvironmentStateUpdates(self):
             comp = Composition()
             A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A')
             comp.add_node(A)
@@ -471,8 +471,8 @@ class TestCondition:
             sched.add_condition(A, AfterNPasses(1))
 
             termination_conds = {}
-            termination_conds[TimeScale.RUN] = AfterNTrials(1)
-            termination_conds[TimeScale.TRIAL] = AtPass(5)
+            termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+            termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AtPass(5)
             output = list(sched.run(termination_conds=termination_conds))
 
             expected_output = [set(), A, A, A, A]
@@ -489,8 +489,8 @@ class TestCondition:
             sched.add_condition(A, BeforeNCalls(A, 3))
 
             termination_conds = {}
-            termination_conds[TimeScale.RUN] = AfterNTrials(1)
-            termination_conds[TimeScale.TRIAL] = AtPass(5)
+            termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+            termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AtPass(5)
             output = list(sched.run(termination_conds=termination_conds))
 
             expected_output = [A, A, A, set(), set()]
@@ -514,8 +514,8 @@ class TestCondition:
         #     sched.add_condition(B, AtCall(A, 3))
 
         #     termination_conds = {}
-        #     termination_conds[TimeScale.RUN] = AfterNTrials(1)
-        #     termination_conds[TimeScale.TRIAL] = AtPass(5)
+        #     termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        #     termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AtPass(5)
         #     output = list(sched.run(termination_conds=termination_conds))
 
         #     expected_output = [A, A, set([A, B]), A, A]
@@ -532,8 +532,8 @@ class TestCondition:
             sched.add_condition(B, AfterCall(A, 3))
 
             termination_conds = {}
-            termination_conds[TimeScale.RUN] = AfterNTrials(1)
-            termination_conds[TimeScale.TRIAL] = AtPass(5)
+            termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+            termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AtPass(5)
             output = list(sched.run(termination_conds=termination_conds))
 
             expected_output = [A, A, A, set([A, B]), set([A, B])]
@@ -551,8 +551,8 @@ class TestCondition:
             sched.add_condition(B, AfterNCalls(A, 3))
 
             termination_conds = {}
-            termination_conds[TimeScale.RUN] = AfterNTrials(1)
-            termination_conds[TimeScale.TRIAL] = AtPass(5)
+            termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+            termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AtPass(5)
             output = list(sched.run(termination_conds=termination_conds))
 
             expected_output = [A, A, set([A, B]), set([A, B]), set([A, B])]
@@ -560,17 +560,17 @@ class TestCondition:
 
     class TestConvenience:
 
-        def test_AtTrialStart(self):
+        def test_AtEnvironmentStateUpdateStart(self):
             comp = Composition()
             A = TransferMechanism(name='A')
             B = TransferMechanism(name='B')
             comp.add_linear_processing_pathway([A, B])
 
             sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
-            sched.add_condition(B, AtTrialStart())
+            sched.add_condition(B, AtEnvironmentStateUpdateStart())
 
             termination_conds = {
-                TimeScale.TRIAL: AtPass(3)
+                TimeScale.ENVIRONMENT_STATE_UPDATE: AtPass(3)
             }
             output = list(sched.run(termination_conds=termination_conds))
 
@@ -603,8 +603,8 @@ class TestCondition:
         )
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNTrials(1)
-        termination_conds[TimeScale.TRIAL] = AfterNCalls(C, 3)
+        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 3)
         output = list(sched.run(termination_conds=termination_conds))
         expected_output = [
             A, A, B, A, A, B, C, A, C, A, B, C
@@ -629,8 +629,8 @@ class TestCondition:
         sched.add_condition(C, EveryNCalls(B, 2))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNTrials(1)
-        termination_conds[TimeScale.TRIAL] = AfterNCallsCombined(B, C, n=4)
+        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCallsCombined(B, C, n=4)
         output = list(sched.run(termination_conds=termination_conds))
 
         expected_output = [
@@ -656,8 +656,8 @@ class TestCondition:
         sched.add_condition(C, EveryNCalls(B, 2))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNTrials(1)
-        termination_conds[TimeScale.TRIAL] = AllHaveRun(A, B, C)
+        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AllHaveRun(A, B, C)
         output = list(sched.run(termination_conds=termination_conds))
 
         expected_output = [
@@ -681,8 +681,8 @@ class TestCondition:
         sched.add_condition(C, EveryNCalls(B, 2))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNTrials(1)
-        termination_conds[TimeScale.TRIAL] = AllHaveRun()
+        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AllHaveRun()
         output = list(sched.run(termination_conds=termination_conds))
 
         expected_output = [
@@ -724,8 +724,8 @@ class TestWhenFinished:
         sched.add_condition(C, WhenFinishedAny(A, B))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNTrials(1)
-        termination_conds[TimeScale.TRIAL] = AfterNCalls(C, 1)
+        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 1)
         output = list(sched.run(termination_conds=termination_conds))
         expected_output = [
             set([A, B]), C
@@ -750,8 +750,8 @@ class TestWhenFinished:
         sched.add_condition(C, WhenFinishedAny(A, B))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNTrials(1)
-        termination_conds[TimeScale.TRIAL] = AfterNCalls(A, 5)
+        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(A, 5)
         output = list(sched.run(termination_conds=termination_conds))
         expected_output = [
             set([A, B]), C, set([A, B]), C, set([A, B]), C, set([A, B]), C, set([A, B])
@@ -775,8 +775,8 @@ class TestWhenFinished:
         sched.add_condition(C, Always())
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNTrials(1)
-        termination_conds[TimeScale.TRIAL] = WhenFinishedAny()
+        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = WhenFinishedAny()
         output = []
         i = 0
         for step in sched.run(termination_conds=termination_conds):
@@ -810,8 +810,8 @@ class TestWhenFinished:
         sched.add_condition(C, WhenFinishedAll(A, B))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNTrials(1)
-        termination_conds[TimeScale.TRIAL] = AfterNCalls(C, 1)
+        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 1)
         output = list(sched.run(termination_conds=termination_conds))
         expected_output = [
             set([A, B]), C
@@ -836,8 +836,8 @@ class TestWhenFinished:
         sched.add_condition(C, WhenFinishedAll(A, B))
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNTrials(1)
-        termination_conds[TimeScale.TRIAL] = AfterNCalls(A, 5)
+        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(A, 5)
         output = list(sched.run(termination_conds=termination_conds))
         expected_output = [
             set([A, B]), set([A, B]), set([A, B]), set([A, B]), set([A, B]),
@@ -861,8 +861,8 @@ class TestWhenFinished:
         sched.add_condition(C, Always())
 
         termination_conds = {}
-        termination_conds[TimeScale.RUN] = AfterNTrials(1)
-        termination_conds[TimeScale.TRIAL] = WhenFinishedAll()
+        termination_conds[TimeScale.RUN] = AfterNEnvironmentStateUpdates(1)
+        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = WhenFinishedAll()
         output = []
         i = 0
         for step in sched.run(termination_conds=termination_conds):
@@ -889,32 +889,32 @@ class TestAbsolute:
         [
             (
                 {A: TimeInterval(repeat=8), B: TimeInterval(repeat=4), C: TimeInterval(repeat=2)},
-                {TimeScale.TRIAL: AfterNCalls(A, 2)},
+                {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(A, 2)},
             ),
             (
                 {A: TimeInterval(repeat=5), B: TimeInterval(repeat=3), C: TimeInterval(repeat=1)},
-                {TimeScale.TRIAL: AfterNCalls(A, 2)},
+                {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(A, 2)},
             ),
             (
                 {A: TimeInterval(repeat=3), B: TimeInterval(repeat=2)},
-                {TimeScale.TRIAL: AfterNCalls(A, 2)},
+                {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(A, 2)},
             ),
             (
                 {A: TimeInterval(repeat=5), B: TimeInterval(repeat=7)},
-                {TimeScale.TRIAL: AfterNCalls(B, 2)},
+                {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(B, 2)},
             ),
             (
                 {A: TimeInterval(repeat=1200), B: TimeInterval(repeat=1000)},
-                {TimeScale.TRIAL: AfterNCalls(A, 3)},
+                {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(A, 3)},
             ),
             (
                 {A: TimeInterval(repeat=0.33333), B: TimeInterval(repeat=0.66666)},
-                {TimeScale.TRIAL: AfterNCalls(B, 3)},
+                {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(B, 3)},
             ),
             # smaller than default units cause floating point issue without mitigation
             (
                 {A: TimeInterval(repeat=2 * _unit_registry.us), B: TimeInterval(repeat=4 * _unit_registry.us)},
-                {TimeScale.TRIAL: AfterNCalls(B, 3)},
+                {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(B, 3)},
             ),
         ]
     )
@@ -945,7 +945,7 @@ class TestAbsolute:
                     B: TimeInterval(repeat=10, start=300),
                     C: TimeInterval(repeat=10, start=400)
                 },
-                {TimeScale.TRIAL: TimeInterval(start=500)}
+                {TimeScale.ENVIRONMENT_STATE_UPDATE: TimeInterval(start=500)}
             ),
             (
                 {
@@ -953,7 +953,7 @@ class TestAbsolute:
                     B: TimeInterval(start=300),
                     C: TimeInterval(start=400)
                 },
-                {TimeScale.TRIAL: TimeInterval(start=500)}
+                {TimeScale.ENVIRONMENT_STATE_UPDATE: TimeInterval(start=500)}
             ),
             (
                 {
@@ -961,7 +961,7 @@ class TestAbsolute:
                     B: TimeInterval(repeat=7, start=317),
                     C: TimeInterval(repeat=11, start=431)
                 },
-                {TimeScale.TRIAL: TimeInterval(start=597)}
+                {TimeScale.ENVIRONMENT_STATE_UPDATE: TimeInterval(start=597)}
             ),
         ]
     )
@@ -1032,7 +1032,7 @@ class TestAbsolute:
         _, comp = three_node_linear_composition
 
         comp.scheduler.termination_conds = {
-            TimeScale.TRIAL: TimeTermination(repeat, inclusive)
+            TimeScale.ENVIRONMENT_STATE_UPDATE: TimeTermination(repeat, inclusive)
         }
         list(comp.scheduler.run())
 

@@ -77,7 +77,7 @@ class TestLinear:
 
         c = Composition(pathways=[A])
 
-        term_conds = {TimeScale.TRIAL: AfterNCalls(A, 2)}
+        term_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(A, 2)}
         stim_list = {A: [[1]]}
 
         c.run(
@@ -110,7 +110,7 @@ class TestLinear:
 
         c = Composition(pathways=[A, B])
 
-        term_conds = {TimeScale.TRIAL: AfterNCalls(B, 1)}
+        term_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(B, 1)}
         stim_list = {A: [[1]]}
 
         sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
@@ -147,7 +147,7 @@ class TestLinear:
 
         c = Composition(pathways=[A, B])
 
-        term_conds = {TimeScale.TRIAL: AfterNCalls(B, 2)}
+        term_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(B, 2)}
         stim_list = {A: [[1]]}
 
         sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
@@ -193,7 +193,7 @@ class TestBranching:
 
         c = Composition(pathways=[[A,B],[A,C]])
 
-        term_conds = {TimeScale.TRIAL: AfterNCalls(C, 1)}
+        term_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(C, 1)}
         stim_list = {A: [[1]]}
 
         sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
@@ -242,7 +242,7 @@ class TestBranching:
 
         c = Composition(pathways=[[A,B],[A,C]])
 
-        term_conds = {TimeScale.TRIAL: AfterNCalls(C, 1)}
+        term_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(C, 1)}
         stim_list = {A: [[1]]}
 
         c.scheduler.add_condition(B, Any(AtNCalls(A, 1), EveryNCalls(A, 2)))
@@ -289,7 +289,7 @@ class TestBranching:
 
         c = Composition(pathways=[[A,B],[A,C]])
 
-        term_conds = {TimeScale.TRIAL: AfterNCalls(C, 2)}
+        term_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(C, 2)}
         stim_list = {A: [[1]]}
 
         sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
@@ -341,7 +341,7 @@ class TestBranching:
 
         c = Composition(pathways=[[A,C],[B,C]])
 
-        term_conds = {TimeScale.TRIAL: AfterNCalls(C, 1)}
+        term_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(C, 1)}
         stim_list = {A: [[1]], B: [[2]]}
 
         sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
@@ -389,7 +389,7 @@ class TestBranching:
 
         c = Composition(pathways=[[A,C],[B,C]])
 
-        term_conds = {TimeScale.TRIAL: AfterNCalls(C, 2)}
+        term_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(C, 2)}
         stim_list = {A: [[1]], B: [[2]]}
 
         sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
@@ -439,7 +439,7 @@ class TestBranching:
 
         c = Composition(pathways=[[A,C],[B,C]])
 
-        term_conds = {TimeScale.TRIAL: AfterNCalls(C, 2)}
+        term_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(C, 2)}
         stim_list = {A: [[1]], B: [[1]]}
 
         sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
@@ -500,7 +500,7 @@ class TestBranching:
 
         c = Composition(pathways=[[A,B,D],[A,C,D]])
 
-        term_conds = {TimeScale.TRIAL: AfterNCalls(D, 1)}
+        term_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(D, 1)}
         stim_list = {A: [[1]]}
 
         sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
@@ -560,7 +560,7 @@ class TestBranching:
 
         c = Composition(pathways=[[A,C],[A,D],[B,C],[B,D]])
 
-        term_conds = {TimeScale.TRIAL: All(AfterNCalls(C, 1), AfterNCalls(D, 1))}
+        term_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: All(AfterNCalls(C, 1), AfterNCalls(D, 1))}
         stim_list = {A: [[1]], B: [[1]]}
 
         sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
@@ -629,7 +629,7 @@ class TestBranching:
 
         c = Composition(pathways=[[A,C,D],[B,C,E]])
 
-        term_conds = {TimeScale.TRIAL: AfterNCalls(E, 1)}
+        term_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(E, 1)}
         stim_list = {A: [[1]], B: [[2]]}
 
         sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
@@ -715,7 +715,7 @@ class TestBranching:
 
         c = Composition(pathways=[[A,C,E],[A,C,F],[A,D,E],[A,D,F],[B,C,E],[B,C,F],[B,D,E],[B,D,F]])
 
-        term_conds = {TimeScale.TRIAL: All(AfterNCalls(E, 1), AfterNCalls(F, 1))}
+        term_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: All(AfterNCalls(E, 1), AfterNCalls(F, 1))}
         stim_list = {A: [[1]], B: [[1]]}
 
         sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
@@ -787,7 +787,7 @@ class TestTermination:
 
         c = Composition(pathways=[[A,B]])
 
-        term_conds = {TimeScale.TRIAL: AfterNCalls(B, 2)}
+        term_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(B, 2)}
         stim_list = {A: [[1]]}
 
         sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
