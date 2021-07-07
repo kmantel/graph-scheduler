@@ -12,11 +12,27 @@ class TestTime:
     @pytest.mark.parametrize(
         'base, increment_time_scale, expected',
         [
-            (Time(environment_sequence=0, environment_state_update=0, pass_=0, consideration_set_execution=0), TimeScale.ENVIRONMENT_STATE_UPDATE, Time(environment_sequence=0, environment_state_update=1, pass_=0, consideration_set_execution=0)),
-            (Time(environment_sequence=0, environment_state_update=0, pass_=5, consideration_set_execution=9), TimeScale.ENVIRONMENT_STATE_UPDATE, Time(environment_sequence=0, environment_state_update=1, pass_=0, consideration_set_execution=0)),
-            (Time(environment_sequence=1, environment_state_update=0, pass_=5, consideration_set_execution=9), TimeScale.ENVIRONMENT_STATE_UPDATE, Time(environment_sequence=1, environment_state_update=1, pass_=0, consideration_set_execution=0)),
-            (Time(environment_sequence=1, environment_state_update=0, pass_=5, consideration_set_execution=9), TimeScale.CONSIDERATION_SET_EXECUTION, Time(environment_sequence=1, environment_state_update=0, pass_=5, consideration_set_execution=10)),
-        ]
+            (
+                Time(environment_sequence=0, environment_state_update=0, pass_=0, consideration_set_execution=0),
+                TimeScale.ENVIRONMENT_STATE_UPDATE,
+                Time(environment_sequence=0, environment_state_update=1, pass_=0, consideration_set_execution=0),
+            ),
+            (
+                Time(environment_sequence=0, environment_state_update=0, pass_=5, consideration_set_execution=9),
+                TimeScale.ENVIRONMENT_STATE_UPDATE,
+                Time(environment_sequence=0, environment_state_update=1, pass_=0, consideration_set_execution=0),
+            ),
+            (
+                Time(environment_sequence=1, environment_state_update=0, pass_=5, consideration_set_execution=9),
+                TimeScale.ENVIRONMENT_STATE_UPDATE,
+                Time(environment_sequence=1, environment_state_update=1, pass_=0, consideration_set_execution=0),
+            ),
+            (
+                Time(environment_sequence=1, environment_state_update=0, pass_=5, consideration_set_execution=9),
+                TimeScale.CONSIDERATION_SET_EXECUTION,
+                Time(environment_sequence=1, environment_state_update=0, pass_=5, consideration_set_execution=10),
+            ),
+        ],
     )
     def test_increment(self, base, increment_time_scale, expected):
         base._increment_by_time_scale(increment_time_scale)
