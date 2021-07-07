@@ -19,5 +19,6 @@ setuptools.setup(
     install_requires=get_requirements(),
     extras_require={
         'dev': get_requirements('dev'),
+        'docs': get_requirements('docs'),
     }
 )

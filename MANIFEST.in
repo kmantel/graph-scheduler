@@ -5,3 +5,9 @@ recursive-include tests *.py
 
 include versioneer.py
 include src/graph_scheduler/_version.py
+
+# added by check-manifest
+recursive-include docs *.bat
+recursive-include docs *.py
+recursive-include docs *.rst
+recursive-include docs Makefile
