@@ -470,7 +470,6 @@ class Scheduler:
         """
         self.conditions = ConditionSet(conditions)
 
-        # stores the in order list of self.run's yielded outputs
         self.consideration_queue = []
         if termination_conds is None:
             termination_conds = default_termination_conds.copy()
@@ -506,6 +505,7 @@ class Scheduler:
         self._generate_consideration_queue_indices()
 
         self.default_execution_id = default_execution_id
+        # stores the in order list of self.run's yielded outputs
         self.execution_list = {self.default_execution_id: []}
         self.execution_timestamps = {self.default_execution_id: []}
         self.clocks = {self.default_execution_id: Clock()}
