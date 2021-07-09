@@ -1,4 +1,5 @@
 import numpy
+import pytest
 
 from psyneulink.core.compositions.composition import Composition
 from psyneulink.core.components.functions.stateful.integratorfunctions import SimpleIntegrator
@@ -51,7 +52,7 @@ class TestInit:
                                               [Word_Input, Word_Hidden, Output, Decision],
                                               [Reward]])
 
-        sched = Scheduler(composition=myComposition)
+        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(myComposition))
 
         expected_consideration_queue = [
             {Color_Input, Word_Input, Reward},
@@ -112,7 +113,7 @@ class TestLinear:
         term_conds = {TimeScale.TRIAL: AfterNCalls(B, 1)}
         stim_list = {A: [[1]]}
 
-        sched = Scheduler(composition=c)
+        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
         sched.add_condition(B, EveryNCalls(A, 2))
         c.scheduler = sched
 
@@ -149,7 +150,7 @@ class TestLinear:
         term_conds = {TimeScale.TRIAL: AfterNCalls(B, 2)}
         stim_list = {A: [[1]]}
 
-        sched = Scheduler(composition=c)
+        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
         sched.add_condition(A, Any(AtPass(0), AfterNCalls(B, 2)))
         sched.add_condition(B, Any(JustRan(A), JustRan(B)))
         c.scheduler = sched
@@ -195,7 +196,7 @@ class TestBranching:
         term_conds = {TimeScale.TRIAL: AfterNCalls(C, 1)}
         stim_list = {A: [[1]]}
 
-        sched = Scheduler(composition=c)
+        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
         sched.add_condition(B, Any(AtNCalls(A, 1), EveryNCalls(A, 2)))
         sched.add_condition(C, EveryNCalls(A, 2))
         c.scheduler = sched
@@ -291,7 +292,7 @@ class TestBranching:
         term_conds = {TimeScale.TRIAL: AfterNCalls(C, 2)}
         stim_list = {A: [[1]]}
 
-        sched = Scheduler(composition=c)
+        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
         sched.add_condition(B, Any(AtNCalls(A, 1), EveryNCalls(A, 2)))
         sched.add_condition(C, EveryNCalls(A, 2))
         c.scheduler = sched
@@ -343,7 +344,7 @@ class TestBranching:
         term_conds = {TimeScale.TRIAL: AfterNCalls(C, 1)}
         stim_list = {A: [[1]], B: [[2]]}
 
-        sched = Scheduler(composition=c)
+        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
         sched.add_condition(C, All(EveryNCalls(A, 1), EveryNCalls(B, 1)))
         c.scheduler = sched
 
@@ -391,7 +392,7 @@ class TestBranching:
         term_conds = {TimeScale.TRIAL: AfterNCalls(C, 2)}
         stim_list = {A: [[1]], B: [[2]]}
 
-        sched = Scheduler(composition=c)
+        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
         sched.add_condition(C, All(EveryNCalls(A, 1), EveryNCalls(B, 1)))
         c.scheduler = sched
 
@@ -441,7 +442,7 @@ class TestBranching:
         term_conds = {TimeScale.TRIAL: AfterNCalls(C, 2)}
         stim_list = {A: [[1]], B: [[1]]}
 
-        sched = Scheduler(composition=c)
+        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
         sched.add_condition(B, EveryNCalls(A, 2))
         sched.add_condition(C, Any(EveryNCalls(A, 1), EveryNCalls(B, 1)))
         c.scheduler = sched
@@ -502,7 +503,7 @@ class TestBranching:
         term_conds = {TimeScale.TRIAL: AfterNCalls(D, 1)}
         stim_list = {A: [[1]]}
 
-        sched = Scheduler(composition=c)
+        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
         sched.add_condition(B, EveryNCalls(A, 1))
         sched.add_condition(C, EveryNCalls(A, 2))
         sched.add_condition(D, Any(EveryNCalls(B, 3), EveryNCalls(C, 3)))
@@ -562,7 +563,7 @@ class TestBranching:
         term_conds = {TimeScale.TRIAL: All(AfterNCalls(C, 1), AfterNCalls(D, 1))}
         stim_list = {A: [[1]], B: [[1]]}
 
-        sched = Scheduler(composition=c)
+        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
         sched.add_condition(B, EveryNCalls(A, 2))
         sched.add_condition(C, EveryNCalls(A, 1))
         sched.add_condition(D, EveryNCalls(B, 1))
@@ -631,7 +632,7 @@ class TestBranching:
         term_conds = {TimeScale.TRIAL: AfterNCalls(E, 1)}
         stim_list = {A: [[1]], B: [[2]]}
 
-        sched = Scheduler(composition=c)
+        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
         sched.add_condition(C, Any(EveryNCalls(A, 1), EveryNCalls(B, 1)))
         sched.add_condition(D, EveryNCalls(C, 1))
         sched.add_condition(E, EveryNCalls(C, 1))
@@ -717,7 +718,7 @@ class TestBranching:
         term_conds = {TimeScale.TRIAL: All(AfterNCalls(E, 1), AfterNCalls(F, 1))}
         stim_list = {A: [[1]], B: [[1]]}
 
-        sched = Scheduler(composition=c)
+        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
         sched.add_condition(B, EveryNCalls(A, 2))
         sched.add_condition(C, EveryNCalls(A, 1))
         sched.add_condition(D, EveryNCalls(B, 1))
@@ -789,7 +790,7 @@ class TestTermination:
         term_conds = {TimeScale.TRIAL: AfterNCalls(B, 2)}
         stim_list = {A: [[1]]}
 
-        sched = Scheduler(composition=c)
+        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
         sched.add_condition(B, EveryNCalls(A, 2))
         c.scheduler = sched
 

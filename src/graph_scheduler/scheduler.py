@@ -29,9 +29,6 @@ A Scheduler can be created explicitly using its constructor.  However, more comm
 for a `Composition <Composition>` when it is created.  When creating a Scheduler explicitly, the set of `Components
 <Component>` to be executed and their order must be specified in the Scheduler's constructor using one the following:
 
-* a `Composition` in the **composition** argument - if a Composition is specified,
-  the Scheduler is created using the nodes and edges in the Composition's `graph <Composition.graph_processing>`.
-
 * a *graph specification dictionary* in the **graph** argument -
   each entry of the dictionary must be a Component of a Composition, and the value of each entry must be a set of
   zero or more Components that project directly to the key.  The graph must be acyclic; an error is generated if any

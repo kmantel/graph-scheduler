@@ -59,3 +59,12 @@ def get_comp_execution_modes():
             pytest.param(pnlvm.ExecutionMode.PTXExec, marks=[pytest.mark.llvm, pytest.mark.cuda]),
             pytest.param(pnlvm.ExecutionMode.PTXRun, marks=[pytest.mark.llvm,  pytest.mark.cuda])
            ]
+
+
+# TODO: remove this helper when tests no longer use psyneulink
+@pytest.helpers.register
+def composition_to_scheduler_args(composition):
+    return {
+        'graph': composition.graph_processing.prune_feedback_edges()[0],
+        'default_execution_id': composition.default_execution_id
+    }

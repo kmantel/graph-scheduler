@@ -86,7 +86,7 @@ class TestCondition:
             A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A')
             comp.add_node(A)
 
-            sched = Scheduler(composition=comp)
+            sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
             sched.add_condition(A, WhileNot(lambda sched: sched.get_clock(sched.default_execution_id).get_total_times_relative(TimeScale.PASS, TimeScale.TRIAL) == 0, sched))
 
             termination_conds = {}
@@ -102,7 +102,7 @@ class TestCondition:
             A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A')
             comp.add_node(A)
 
-            sched = Scheduler(composition=comp)
+            sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
             sched.add_condition(A, WhileNot(lambda sched: sched.get_clock(sched.default_execution_id).get_total_times_relative(TimeScale.PASS, TimeScale.TRIAL) == 2, sched))
 
             termination_conds = {}
@@ -120,7 +120,7 @@ class TestCondition:
             A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A')
             for m in [A]:
                 comp.add_node(m)
-            sched = Scheduler(composition=comp)
+            sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
             sched.add_condition(A, EveryNPasses(1))
 
@@ -137,7 +137,7 @@ class TestCondition:
             A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A')
             for m in [A]:
                 comp.add_node(m)
-            sched = Scheduler(composition=comp)
+            sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
             sched.add_condition(A, EveryNPasses(1))
 
@@ -154,7 +154,7 @@ class TestCondition:
             A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A')
             comp.add_node(A)
 
-            sched = Scheduler(composition=comp)
+            sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
             sched.add_condition(A, Not(AtPass(0)))
 
             termination_conds = {}
@@ -170,7 +170,7 @@ class TestCondition:
             A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A')
             comp.add_node(A)
 
-            sched = Scheduler(composition=comp)
+            sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
             sched.add_condition(A, Not(AtPass(2)))
 
             termination_conds = {}
@@ -196,7 +196,7 @@ class TestCondition:
                 comp.add_node(m)
             comp.add_projection(MappingProjection(), A, B)
 
-            sched = Scheduler(composition=comp)
+            sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
             sched.add_condition(A, Always())
             sched.add_condition(B, NWhen(AfterNCalls(A, 3), n))
 
@@ -216,7 +216,7 @@ class TestCondition:
             A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A')
             comp.add_node(A)
 
-            sched = Scheduler(composition=comp)
+            sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
             sched.add_condition(A, BeforeTimeStep(2))
 
             termination_conds = {}
@@ -236,7 +236,7 @@ class TestCondition:
 
             comp.add_projection(MappingProjection(), A, B)
 
-            sched = Scheduler(composition=comp)
+            sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
             sched.add_condition(A, BeforeTimeStep(2))
             sched.add_condition(B, Always())
 
@@ -253,7 +253,7 @@ class TestCondition:
             A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A')
             comp.add_node(A)
 
-            sched = Scheduler(composition=comp)
+            sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
             sched.add_condition(A, AtTimeStep(0))
 
             termination_conds = {}
@@ -269,7 +269,7 @@ class TestCondition:
             A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A')
             comp.add_node(A)
 
-            sched = Scheduler(composition=comp)
+            sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
             sched.add_condition(A, BeforePass(2))
 
             termination_conds = {}
@@ -285,7 +285,7 @@ class TestCondition:
             A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A')
             comp.add_node(A)
 
-            sched = Scheduler(composition=comp)
+            sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
             sched.add_condition(A, AtPass(0))
 
             termination_conds = {}
@@ -306,7 +306,7 @@ class TestCondition:
             comp.add_projection(MappingProjection(), A, B)
             comp.add_projection(MappingProjection(), B, C)
 
-            sched = Scheduler(composition=comp)
+            sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
             sched.add_condition(A, AtPass(0))
             sched.add_condition(B, Always())
             sched.add_condition(C, Always())
@@ -324,7 +324,7 @@ class TestCondition:
             A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A')
             comp.add_node(A)
 
-            sched = Scheduler(composition=comp)
+            sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
             sched.add_condition(A, AtPass(2))
 
             termination_conds = {}
@@ -340,7 +340,7 @@ class TestCondition:
             A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A')
             comp.add_node(A)
 
-            sched = Scheduler(composition=comp)
+            sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
             sched.add_condition(A, AtPass(5))
 
             termination_conds = {}
@@ -356,7 +356,7 @@ class TestCondition:
             A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A')
             comp.add_node(A)
 
-            sched = Scheduler(composition=comp)
+            sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
             sched.add_condition(A, AtPass(6))
 
             termination_conds = {}
@@ -372,7 +372,7 @@ class TestCondition:
             A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A')
             comp.add_node(A)
 
-            sched = Scheduler(composition=comp)
+            sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
             sched.add_condition(A, AfterPass(0))
 
             termination_conds = {}
@@ -388,7 +388,7 @@ class TestCondition:
             A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A')
             comp.add_node(A)
 
-            sched = Scheduler(composition=comp)
+            sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
             sched.add_condition(A, AfterNPasses(1))
 
             termination_conds = {}
@@ -404,7 +404,7 @@ class TestCondition:
             A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A')
             comp.add_node(A)
 
-            sched = Scheduler(composition=comp)
+            sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
             sched.add_condition(A, BeforeTrial(4))
 
             termination_conds = {}
@@ -425,7 +425,7 @@ class TestCondition:
             A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A')
             comp.add_node(A)
 
-            sched = Scheduler(composition=comp)
+            sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
             sched.add_condition(A, Always())
 
             termination_conds = {}
@@ -446,7 +446,7 @@ class TestCondition:
             A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A')
             comp.add_node(A)
 
-            sched = Scheduler(composition=comp)
+            sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
             sched.add_condition(A, Always())
 
             termination_conds = {}
@@ -467,7 +467,7 @@ class TestCondition:
             A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A')
             comp.add_node(A)
 
-            sched = Scheduler(composition=comp)
+            sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
             sched.add_condition(A, AfterNPasses(1))
 
             termination_conds = {}
@@ -485,7 +485,7 @@ class TestCondition:
             A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A')
             comp.add_node(A)
 
-            sched = Scheduler(composition=comp)
+            sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
             sched.add_condition(A, BeforeNCalls(A, 3))
 
             termination_conds = {}
@@ -509,7 +509,7 @@ class TestCondition:
         #     for m in [A,B]:
         #         comp.add_node(m)
 
-        #     sched = Scheduler(composition=comp)
+        #     sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
         #     sched.add_condition(A, Always())
         #     sched.add_condition(B, AtCall(A, 3))
 
@@ -528,7 +528,7 @@ class TestCondition:
             for m in [A, B]:
                 comp.add_node(m)
 
-            sched = Scheduler(composition=comp)
+            sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
             sched.add_condition(B, AfterCall(A, 3))
 
             termination_conds = {}
@@ -546,7 +546,7 @@ class TestCondition:
             for m in [A, B]:
                 comp.add_node(m)
 
-            sched = Scheduler(composition=comp)
+            sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
             sched.add_condition(A, Always())
             sched.add_condition(B, AfterNCalls(A, 3))
 
@@ -566,7 +566,7 @@ class TestCondition:
             B = TransferMechanism(name='B')
             comp.add_linear_processing_pathway([A, B])
 
-            sched = Scheduler(composition=comp)
+            sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
             sched.add_condition(B, AtTrialStart())
 
             termination_conds = {
@@ -586,7 +586,7 @@ class TestCondition:
             comp.add_node(m)
         comp.add_projection(MappingProjection(), A, B)
         comp.add_projection(MappingProjection(), B, C)
-        sched = Scheduler(composition=comp)
+        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, EveryNPasses(1))
         sched.add_condition(B, EveryNCalls(A, 2))
@@ -622,7 +622,7 @@ class TestCondition:
             comp.add_node(m)
         comp.add_projection(MappingProjection(), A, B)
         comp.add_projection(MappingProjection(), B, C)
-        sched = Scheduler(composition=comp)
+        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, EveryNPasses(1))
         sched.add_condition(B, EveryNCalls(A, 2))
@@ -649,7 +649,7 @@ class TestCondition:
             comp.add_node(m)
         comp.add_projection(MappingProjection(), A, B)
         comp.add_projection(MappingProjection(), B, C)
-        sched = Scheduler(composition=comp)
+        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, EveryNPasses(1))
         sched.add_condition(B, EveryNCalls(A, 2))
@@ -674,7 +674,7 @@ class TestCondition:
             comp.add_node(m)
         comp.add_projection(MappingProjection(), A, B)
         comp.add_projection(MappingProjection(), B, C)
-        sched = Scheduler(composition=comp)
+        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, EveryNPasses(1))
         sched.add_condition(B, EveryNCalls(A, 2))
@@ -717,7 +717,7 @@ class TestWhenFinished:
             comp.add_node(m)
         comp.add_projection(MappingProjection(), A, C)
         comp.add_projection(MappingProjection(), B, C)
-        sched = Scheduler(composition=comp)
+        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, EveryNPasses(1))
         sched.add_condition(B, EveryNPasses(1))
@@ -743,7 +743,7 @@ class TestWhenFinished:
             comp.add_node(m)
         comp.add_projection(MappingProjection(), A, C)
         comp.add_projection(MappingProjection(), B, C)
-        sched = Scheduler(composition=comp)
+        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, EveryNPasses(1))
         sched.add_condition(B, EveryNPasses(1))
@@ -768,7 +768,7 @@ class TestWhenFinished:
             comp.add_node(m)
         comp.add_projection(MappingProjection(), A, C)
         comp.add_projection(MappingProjection(), B, C)
-        sched = Scheduler(composition=comp)
+        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, Always())
         sched.add_condition(B, Always())
@@ -803,7 +803,7 @@ class TestWhenFinished:
             comp.add_node(m)
         comp.add_projection(MappingProjection(), A, C)
         comp.add_projection(MappingProjection(), B, C)
-        sched = Scheduler(composition=comp)
+        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, EveryNPasses(1))
         sched.add_condition(B, EveryNPasses(1))
@@ -829,7 +829,7 @@ class TestWhenFinished:
             comp.add_node(m)
         comp.add_projection(MappingProjection(), A, C)
         comp.add_projection(MappingProjection(), B, C)
-        sched = Scheduler(composition=comp)
+        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, EveryNPasses(1))
         sched.add_condition(B, EveryNPasses(1))
@@ -854,7 +854,7 @@ class TestWhenFinished:
             m.is_finished_flag = False
         comp.add_projection(MappingProjection(), A, C)
         comp.add_projection(MappingProjection(), B, C)
-        sched = Scheduler(composition=comp)
+        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, Always())
         sched.add_condition(B, Always())
