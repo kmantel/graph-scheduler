@@ -394,10 +394,6 @@ class Scheduler:
     Arguments
     ---------
 
-    composition : Composition
-        specifies the `Components <Component>` to be ordered for execution, and any dependencies among them,
-        based on the `Composition <Composition>`\\'s `graph <Composition.graph_processing>`.
-
     conditions  : ConditionSet
         set of `Conditions <Condition>` that specify when individual `Components` <Component>` in **composition**
         execute and any dependencies among them.
@@ -454,8 +450,7 @@ class Scheduler:
     """
     def __init__(
         self,
-        composition=None,
-        graph=None,
+        graph,
         conditions=None,
         termination_conds=None,
         default_execution_id=None,
@@ -465,11 +460,12 @@ class Scheduler:
     ):
         """
         :param self:
-        :param composition: (Composition) - the Composition this scheduler is scheduling for
         :param conditions: (ConditionSet) - a :keyword:`ConditionSet` to be scheduled
         """
         self.conditions = ConditionSet(conditions)
 
+        # the consideration queue is the ordered list of sets of nodes in the graph, by the
+        # order in which they should be checked to ensure that all parents have a chance to run before their children
         self.consideration_queue = []
         if termination_conds is None:
             termination_conds = default_termination_conds.copy()
@@ -482,25 +478,17 @@ class Scheduler:
         self.mode = mode
         self.default_absolute_time_unit = _parse_absolute_unit(default_absolute_time_unit)
 
-        if composition is not None:
-            self.nodes = [vert.component for vert in composition.graph_processing.vertices]
-            self._init_consideration_queue_from_graph(composition.graph_processing)
-            if default_execution_id is None:
-                default_execution_id = composition.default_execution_id
-        elif graph is not None:
-            try:
-                self.nodes = [vert.component for vert in graph.vertices]
-                self._init_consideration_queue_from_graph(graph)
-            except AttributeError:
-                self.dependency_dict = graph
-                self.consideration_queue = list(toposort(graph))
-                self.nodes = []
-                for consideration_set in self.consideration_queue:
-                    for node in consideration_set:
-                        self.nodes.append(node)
+        if graph is not None:
+            self.dependency_dict = graph
+            self.consideration_queue = list(toposort(graph))
+            self.nodes = []
+            for consideration_set in self.consideration_queue:
+                for node in consideration_set:
+                    self.nodes.append(node)
         else:
-            raise SchedulerError('Must instantiate a Scheduler with either a Composition (kwarg composition) '
-                                 'or a graph dependency dict (kwarg graph)')
+            raise SchedulerError(
+                'Must instantiate a Scheduler with a graph dependency dict'
+            )
 
         self._generate_consideration_queue_indices()
 
@@ -514,12 +502,6 @@ class Scheduler:
         self._init_counts(execution_id=self.default_execution_id)
         self.date_creation = datetime.datetime.now()
         self.date_last_run_end = None
-
-    # the consideration queue is the ordered list of sets of nodes in the graph, by the
-    # order in which they should be checked to ensure that all parents have a chance to run before their children
-    def _init_consideration_queue_from_graph(self, graph):
-        self.dependency_dict, self.removed_dependencies, self.structural_dependencies = graph.prune_feedback_edges()
-        self.consideration_queue = list(toposort(self.dependency_dict))
 
     def _generate_consideration_queue_indices(self):
         self.consideration_queue_indices = {}
