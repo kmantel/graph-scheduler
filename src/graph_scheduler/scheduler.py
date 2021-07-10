@@ -442,11 +442,6 @@ class Scheduler:
         :type: ``pint.Quantity``
         :default: ``1ms``
 
-    times : Dict[TimeScale: Dict[TimeScale: int]]
-        a structure counting the number of occurrences of a certain `TimeScale` within the scope of another `TimeScale`.
-        For example, `times[TimeScale.ENVIRONMENT_SEQUENCE][TimeScale.PASS]` is the number of `PASS`es that have occurred in the
-        current `ENVIRONMENT_SEQUENCE` that the Scheduler is scheduling at the time it is accessed
-
     """
     def __init__(
         self,
