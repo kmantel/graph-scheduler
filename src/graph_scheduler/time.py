@@ -46,8 +46,7 @@ class TimeScaleError(Exception):
 # Time scale modes
 @functools.total_ordering
 class TimeScale(enum.Enum):
-    """Represents divisions of time used by the `Scheduler`, `Conditions <Condition>`, and the **time_scale**
-    argument of a Composition's `run <Composition.run>` method.
+    """Represents divisions of time used by the `Scheduler` and `Conditions <Condition>`.
 
     The values of TimeScale are defined as follows (in order of increasingly coarse granularity):
 
@@ -55,22 +54,23 @@ class TimeScale(enum.Enum):
     ----------
 
     CONSIDERATION_SET_EXECUTION
-        the nuclear unit of time, corresponding to the execution of all `Mechanism <Mechanism>`\\ s allowed to execute
+        the nuclear unit of time, corresponding to the execution of all nodes allowed to execute
         from a single `consideration_set <consideration_set>` of a `Scheduler`, and which are considered to have
         executed simultaneously.
 
     PASS
         a full iteration through all of the `consideration_sets <consideration_set>` in a `Scheduler's <Scheduler>`
-        `consideration_queue`, consisting of one or more `CONSIDERATION_SET_EXECUTIONs <CONSIDERATION_SET_EXECUTION>`, over which every `Component
-        <Component>` `specified to a Scheduler <Scheduler_Creation>` is considered for execution at least once.
+        `consideration_queue`, consisting of one or more `CONSIDERATION_SET_EXECUTIONs <CONSIDERATION_SET_EXECUTION>`, over which every node
+        specified to a Scheduler <Scheduler_Creation>` is considered for execution at least once.
 
     ENVIRONMENT_STATE_UPDATE
-        an open-ended unit of time consisting of all actions that occurs within the scope of a single input to a
-        `Composition <Composition>`.
+        an open-ended unit of time consisting of all actions that occurs within the scope of a single
+        call to `run <Scheduler.run>`
 
     ENVIRONMENT_SEQUENCE
-        the scope of a call to the `run <Composition.run>` method of a `Composition <Composition>`,
-        consisting of one or more `ENVIRONMENT_STATE_UPDATEs <TimeScale.ENVIRONMENT_STATE_UPDATE>`.
+        the scope of a batch of one or more `ENVIRONMENT_STATE_UPDATE
+        <TimeScale.ENVIRONMENT_STATE_UPDATE>`_\\s, managed by the
+        environment using the Scheduler.
 
     LIFE
         the scope of time since the creation of an object.
