@@ -5,22 +5,14 @@
 Overview
 --------
 
-`Conditions <Condition>` are used to specify when `Components <Component>` are allowed to execute.  Conditions
-can be used to specify a variety of required conditions for execution, including the state of the Component
+`Conditions <Condition>` are used to specify when nodes are allowed to execute.  Conditions
+can be used to specify a variety of required conditions for execution, including the state of the node
 itself (e.g., how many times it has already executed, or the value of one of its attributes), the state of the
-Composition (e.g., how many `CONSIDERATION_SET_EXECUTION` s have occurred in the current `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`), or the state of other
-Components in a Composition (e.g., whether or how many times they have executed). PsyNeuLink provides a number of
-`pre-specified Conditions <Condition_Pre_Specified>` that can be parametrized (e.g., how many times a Component should
+`Scheduler` (e.g., how many `CONSIDERATION_SET_EXECUTION` s have occurred in the current `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`), or the state of other
+nodes in a graph (e.g., whether or how many times they have executed). This package provides a number of
+`pre-specified Conditions <Condition_Pre_Specified>` that can be parametrized (e.g., how many times a node should
 be executed). `Custom conditions <Condition_Custom>` can also be created, by assigning a function to a Condition that
-can reference any Component or its attributes in PsyNeuLink, thus providing considerable flexibility for scheduling.
-
-.. note::
-    Any Component that is part of a collection `specified to a Scheduler for execution <Scheduler_Creation>` can be
-    associated with a Condition.  Most commonly, these are `Mechanisms <Mechanism>`.  However, in some circumstances
-    `Projections <Projection>` can be included in the specification to a Scheduler (e.g., for
-    `learning <Process_Learning>`) in which case these can also be assigned Conditions.
-
-
+can reference any node or its attributes, thus providing considerable flexibility for scheduling.
 
 .. _Condition_Creation:
 
@@ -35,7 +27,7 @@ Creating Conditions
 `Pre-specified Conditions <Condition_Pre-Specified_List>` can be instantiated and added to a `Scheduler` at any time,
 and take effect immediately for the execution of that Scheduler. Most pre-specified Conditions have one or more
 arguments that must be specified to achieve the desired behavior. Many Conditions are also associated with an
-`owner <Condition.owner>` attribute (a `Component` to which the Condition belongs). `Scheduler`\\ s maintain the data
+`owner <Condition.owner>` attribute (a node to which the Condition belongs). `Scheduler`\\ s maintain the data
 used to test for satisfaction of Condition, independent in different `execution context`\\ s. The Scheduler is generally
 responsible for ensuring that Conditions have access to the necessary data.
 When pre-specified Conditions are instantiated within a call to the `add` method of a `Scheduler` or `ConditionSet`,
@@ -57,38 +49,38 @@ Custom Conditions can be created by calling the constructor for the base class (
 `generic classes <Conditions_Generic>`,  and assigning a function to the **func** argument and any arguments it
 requires to the **args** and/or **kwargs** arguments (for formal or keyword arguments, respectively). The function
 is called with **args** and **kwargs** by the `Scheduler` on each `PASS` through its `consideration_queue`, and the result is
-used to determine whether the associated Component is allowed to execute on that `PASS`. Custom Conditions allow
-arbitrary schedules to be created, in which the execution of each Component can depend on one or more attributes of
-any other Components in the Composition.
+used to determine whether the associated node is allowed to execute on that `PASS`. Custom Conditions allow
+arbitrary schedules to be created, in which the execution of each node can depend on one or more attributes of
+any other node in the graph.
 
 .. _Condition_Recurrent_Example:
 
-For example, the following script fragment creates a custom Condition in which `mech_A` is scheduled to wait to
-execute until a `RecurrentTransferMechanism` `mech_B` has "converged" (that is, settled to the point that none of
+For example, the following script fragment creates a custom Condition in which `node_A` is scheduled to wait to
+execute until `node_B` has "converged" (that is, settled to the point that none of
 its elements has changed in value more than a specified amount since the previous `CONSIDERATION_SET_EXECUTION`)::
 
-    def converge(mech, thresh):
-        for val in mech.delta:
+    def converge(node, thresh):
+        for val in node.delta:
             if abs(val) >= thresh:
                 return False
         return True
     epsilon = 0.01
-    my_scheduler.add_condition(mech_A, NWhen(Condition(converge, mech_B, epsilon), 1))
+    my_scheduler.add_condition(node_A, NWhen(Condition(converge, node_B, epsilon), 1))
 
-In the example, a function `converge` is defined that references the `delta <TransferMechanism.delta>` attribute of
-a `TransferMechanism` (which reports the change in its `value <Mechanism_Base.value>`). The function is assigned to
-the standard `Condition()` with `mech_A` and `epsilon` as its arguments, and `composite Condition <Conditions_Composite>`
-`NWhen` (which is satisfied the first N times after its condition becomes true),  The Condition is assigned to `mech_B`,
-thus scheduling it to execute one time when all of the elements of `mech_A` have changed by less than `epsilon`.
+In the example, a function `converge` is defined that references the `delta` attribute of
+a node (which reports the change in its `value`). The function is assigned to
+the standard `Condition()` with `node_A` and `epsilon` as its arguments, and `composite Condition <Conditions_Composite>`
+`NWhen` (which is satisfied the first N times after its condition becomes true),  The Condition is assigned to `node_B`,
+thus scheduling it to execute one time when all of the elements of `node_A` have changed by less than `epsilon`.
 
 .. _Condition_Structure:
 
 Structure
 ---------
 
-The `Scheduler` associates every Component with a Condition.  If a Component has not been explicitly assigned a
+The `Scheduler` associates every node with a Condition.  If a node has not been explicitly assigned a
 Condition, it is assigned a Condition that causes it to be executed whenever it is `under consideration <Scheduler_Algorithm>`
-and all its structural parents have been executed at least once since the Component's last execution.
+and all its structural parents have been executed at least once since the node's last execution.
 Condition subclasses (`listed below <Condition_Pre-Specified_List>`)
 provide a standard set of Conditions that can be implemented simply by specifying their parameter(s). There are
 six types:
@@ -99,7 +91,7 @@ six types:
   * `Composite <Conditions_Composite>` - satisfied based on one or more other Conditions;
   * `Time-based <Conditions_Time_Based>` - satisfied based on the current count of units of time at a specified
     `TimeScale`;
-  * `Component-based <Conditions_Component_Based>` - based on the execution or state of other Components.
+  * `Node-based <Conditions_Node_Based>` - based on the execution or state of other nodes.
   * `Convenience <Conditions_Convenience>` - based on other Conditions, condensed for convenience
 
 .. _Condition_Pre-Specified_List:
@@ -127,7 +119,7 @@ six types:
 
 .. _Conditions_Static:
 
-**Static Conditions** (independent of other Conditions, Components or time):
+**Static Conditions** (independent of other Conditions, nodes or time):
 
     * `Always`
       always satisfied.
@@ -213,45 +205,45 @@ specified `TimeScale` or `Time <Scheduler_Absolute_Time>`):
     * `AfterNEnvironmentSequences` (int)
       satisfied any time after the specified number of `ENVIRONMENT_SEQUENCE`\\ s has occurred.
 
-.. _Conditions_Component_Based:
+.. _Conditions_Node_Based:
 
-**Component-Based Conditions** (based on the execution or state of other Components):
+**Node-Based Conditions** (based on the execution or state of other nodes):
 
 
-    * `BeforeNCalls` (Component, int[, TimeScale])
-      satisfied any time before the specified Component has executed the specified number of times.
+    * `BeforeNCalls` (node, int[, TimeScale])
+      satisfied any time before the specified node has executed the specified number of times.
 
-    * `AtNCalls` (Component, int[, TimeScale])
-      satisfied when the specified Component has executed the specified number of times.
+    * `AtNCalls` (node, int[, TimeScale])
+      satisfied when the specified node has executed the specified number of times.
 
-    * `AfterCall` (Component, int[, TimeScale])
-      satisfied any time after the Component has executed the specified number of times.
+    * `AfterCall` (node, int[, TimeScale])
+      satisfied any time after the node has executed the specified number of times.
 
-    * `AfterNCalls` (Component, int[, TimeScale])
-      satisfied when or any time after the Component has executed the specified number of times.
+    * `AfterNCalls` (node, int[, TimeScale])
+      satisfied when or any time after the node has executed the specified number of times.
 
-    * `AfterNCallsCombined` (*Components, int[, TimeScale])
-      satisfied when or any time after the specified Components have executed the specified number
+    * `AfterNCallsCombined` (*nodes, int[, TimeScale])
+      satisfied when or any time after the specified nodes have executed the specified number
       of times among themselves, in total.
 
-    * `EveryNCalls` (Component, int[, TimeScale])
-      satisfied when the specified Component has executed the specified number of times since the
+    * `EveryNCalls` (node, int[, TimeScale])
+      satisfied when the specified node has executed the specified number of times since the
       last time `owner` has run.
 
-    * `JustRan` (Component)
-      satisfied if the specified Component was assigned to run in the previous `CONSIDERATION_SET_EXECUTION`.
+    * `JustRan` (node)
+      satisfied if the specified node was assigned to run in the previous `CONSIDERATION_SET_EXECUTION`.
 
-    * `AllHaveRun` (*Components)
-      satisfied when all of the specified Components have executed at least once.
+    * `AllHaveRun` (*nodes)
+      satisfied when all of the specified nodes have executed at least once.
 
-    * `WhenFinished` (Component)
-      satisfied when the specified Component has set its `is_finished` attribute to `True`.
+    * `WhenFinished` (node)
+      satisfied when the specified node has set its `is_finished` attribute to `True`.
 
-    * `WhenFinishedAny` (*Components)
-      satisfied when any of the specified Components has set their `is_finished` attribute to `True`.
+    * `WhenFinishedAny` (*nodes)
+      satisfied when any of the specified nodes has set their `is_finished` attribute to `True`.
 
-    * `WhenFinishedAll` (*Components)
-      satisfied when all of the specified Components have set their `is_finished` attributes to `True`.
+    * `WhenFinishedAll` (*nodes)
+      satisfied when all of the specified nodes have set their `is_finished` attributes to `True`.
 
 .. _Conditions_Convenience:
 
@@ -277,10 +269,10 @@ Execution
 ---------
 
 When the `Scheduler` `runs <Schedule_Execution>`, it makes a sequential `PASS` through its `consideration_queue`,
-evaluating each `consideration_set <consideration_set>` in the queue to determine which Components should be assigned
-to execute. It evaluates the Components in each set by calling the `is_satisfied` method of the Condition associated
-with each of those Components.  If it returns `True`, then the Component is assigned to the execution set for the
-`CONSIDERATION_SET_EXECUTION` of execution generated by that `PASS`.  Otherwise, the Component is not executed.
+evaluating each `consideration_set <consideration_set>` in the queue to determine which nodes should be assigned
+to execute. It evaluates the nodes in each set by calling the `is_satisfied` method of the Condition associated
+with each of those nodes.  If it returns `True`, then the node is assigned to the execution set for the
+`CONSIDERATION_SET_EXECUTION` of execution generated by that `PASS`.  Otherwise, the node is not executed.
 
 .. _Condition_Class_Reference:
 
@@ -388,21 +380,21 @@ class ConditionError(Exception):
 
 
 class ConditionSet(object):
-    """Used in conjunction with a `Scheduler` to store the `Conditions <Condition>` associated with a `Component`.
+    """Used in conjunction with a `Scheduler` to store the `Conditions <Condition>` associated with a node.
 
     Arguments
     ---------
 
-    conditions : Dict[`Component <Component>`: `Condition`]
-        specifies an iterable collection of `Components <Component>` and the `Conditions <Condition>` associated
+    conditions : Dict[node: `Condition`]
+        specifies an iterable collection of nodes and the `Conditions <Condition>` associated
         with each.
 
     Attributes
     ----------
 
-    conditions : Dict[`Component <Component>`: `Condition`]
-        the key of each entry is a `Component <Component>`, and its value is the `Condition <Condition>` associated
-        with that Component.  Conditions can be added to the
+    conditions : Dict[node: `Condition`]
+        the key of each entry is a node, and its value is the `Condition <Condition>` associated
+        with that node.  Conditions can be added to the
         ConditionSet using the ConditionSet's `add_condition` method.
 
     """
@@ -442,8 +434,8 @@ class ConditionSet(object):
         Arguments
         ---------
 
-        owner : Component
-            specifies the Component with which the **condition** should be associated. **condition**
+        owner : node
+            specifies the node with which the **condition** should be associated. **condition**
             will govern the execution behavior of **owner**
 
         condition : Condition
@@ -462,11 +454,11 @@ class ConditionSet(object):
         Arguments
         ---------
 
-        conditions : dict[`Component <Component>`: `Condition`], `ConditionSet`
+        conditions : dict[node: `Condition`], `ConditionSet`
             specifies collection of Conditions to be added to this ConditionSet,
 
             if a dict is provided:
-                each entry should map an owner `Component` (the `Component` whose execution behavior will be
+                each entry should map an owner node (the node whose execution behavior will be
                 governed) to a `Condition <Condition>`
 
         """
@@ -476,7 +468,7 @@ class ConditionSet(object):
 
 class Condition:
     """
-    Used in conjunction with a `Scheduler` to specify the condition under which a `Component` should be
+    Used in conjunction with a `Scheduler` to specify the condition under which a node should be
     allowed to execute.
 
     Arguments
@@ -494,8 +486,8 @@ class Condition:
     Attributes
     ----------
 
-    owner (Component):
-        the `Component` with which the Condition is associated, and the execution of which it determines.
+    owner (node):
+        the node with which the Condition is associated, and the execution of which it determines.
 
     """
     def __init__(self, func, *args, **kwargs):
@@ -644,7 +636,7 @@ class WhileNot(Condition):
 
 ######################################################################
 # Static Conditions
-#   - independent of components and time
+#   - independent of nodes and time
 ######################################################################
 
 
@@ -727,7 +719,7 @@ class All(CompositeCondition):
 
         - To initialize with a list (for example)::
 
-            conditions = [AfterNCalls(mechanism, 5) for mechanism in mechanism_list]
+            conditions = [AfterNCalls(node, 5) for node in node_list]
 
           unpack the list to supply its members as args::
 
@@ -760,7 +752,7 @@ class Any(CompositeCondition):
 
         - To initialize with a list (for example)::
 
-            conditions = [AfterNCalls(mechanism, 5) for mechanism in mechanism_list]
+            conditions = [AfterNCalls(node, 5) for node in node_list]
 
           unpack the list to supply its members as args::
 
@@ -1462,8 +1454,8 @@ class AfterNEnvironmentSequences(Condition):
         super().__init__(func, n)
 
 ######################################################################
-# Component-based Conditions
-#   - satisfied based on executions or state of Components
+# Node-based Conditions
+#   - satisfied based on executions or state of nodes
 ######################################################################
 
 
@@ -1472,16 +1464,16 @@ class BeforeNCalls(_DependencyValidation, Condition):
 
     Parameters:
 
-        component(Component):  the Component on which the Condition depends
+        dependency(node):  the node on which the Condition depends
 
-        n(int): the number of executions of **component** before which the Condition is satisfied
+        n(int): the number of executions of **dependency** before which the Condition is satisfied
 
-        time_scale(TimeScale): the TimeScale used as basis for counting executions of **component**
+        time_scale(TimeScale): the TimeScale used as basis for counting executions of **dependency**
         (default: TimeScale.ENVIRONMENT_STATE_UPDATE)
 
     Satisfied when:
 
-        - the Component specified in **component** has executed at most n-1 times
+        - the node specified in **dependency** has executed at most n-1 times
           within one unit of time at the `TimeScale` specified by **time_scale**.
 
     """
@@ -1499,7 +1491,7 @@ class BeforeNCalls(_DependencyValidation, Condition):
         super().__init__(func, dependency, n)
 
 # NOTE:
-# The behavior of AtNCalls is not desired (i.e. depending on the order mechanisms are checked, B running AtNCalls(A, x))
+# The behavior of AtNCalls is not desired (i.e. depending on the order nodes are checked, B running AtNCalls(A, x))
 # may run on both the xth and x+1st call of A; if A and B are not parent-child
 # A fix could invalidate key assumptions and affect many other conditions
 # Since this condition is unlikely to be used, it's best to leave it for now
@@ -1510,16 +1502,16 @@ class AtNCalls(_DependencyValidation, Condition):
 
     Parameters:
 
-        component(Component):  the Component on which the Condition depends
+        dependency(node):  the node on which the Condition depends
 
-        n(int): the number of executions of **component** at which the Condition is satisfied
+        n(int): the number of executions of **dependency** at which the Condition is satisfied
 
-        time_scale(TimeScale): the TimeScale used as basis for counting executions of **component**
+        time_scale(TimeScale): the TimeScale used as basis for counting executions of **dependency**
         (default: TimeScale.ENVIRONMENT_STATE_UPDATE)
 
     Satisfied when:
 
-        - the Component specified in **component** has executed exactly n times
+        - the node specified in **dependency** has executed exactly n times
           within one unit of time at the `TimeScale` specified by **time_scale**.
 
     """
@@ -1542,16 +1534,16 @@ class AfterCall(_DependencyValidation, Condition):
 
     Parameters:
 
-        component(Component):  the Component on which the Condition depends
+        dependency(node):  the node on which the Condition depends
 
-        n(int): the number of executions of **component** after which the Condition is satisfied
+        n(int): the number of executions of **dependency** after which the Condition is satisfied
 
-        time_scale(TimeScale): the TimeScale used as basis for counting executions of **component**
+        time_scale(TimeScale): the TimeScale used as basis for counting executions of **dependency**
         (default: TimeScale.ENVIRONMENT_STATE_UPDATE)
 
     Satisfied when:
 
-        - the Component specified in **component** has executed at least n+1 times
+        - the node specified in **dependency** has executed at least n+1 times
           within one unit of time at the `TimeScale` specified by **time_scale**.
 
     """
@@ -1572,16 +1564,16 @@ class AfterNCalls(_DependencyValidation, Condition):
 
     Parameters:
 
-        component(Component):  the Component on which the Condition depends
+        dependency(node):  the node on which the Condition depends
 
-        n(int): the number of executions of **component** after which the Condition is satisfied
+        n(int): the number of executions of **dependency** after which the Condition is satisfied
 
-        time_scale(TimeScale): the TimeScale used as basis for counting executions of **component**
+        time_scale(TimeScale): the TimeScale used as basis for counting executions of **dependency**
         (default: TimeScale.ENVIRONMENT_STATE_UPDATE)
 
     Satisfied when:
 
-        - the Component specified in **component** has executed at least n times
+        - the node specified in **dependency** has executed at least n times
           within one unit of time at the `TimeScale` specified by **time_scale**.
 
     """
@@ -1604,18 +1596,18 @@ class AfterNCallsCombined(_DependencyValidation, Condition):
 
     Parameters:
 
-        *components(Components):  one or more Components on which the Condition depends
+        *nodes(nodes):  one or more nodes on which the Condition depends
 
-        n(int): the number of combined executions of all Components specified in **components** after which the
+        n(int): the number of combined executions of all nodes specified in **dependencies** after which the
         Condition is satisfied (default: None)
 
-        time_scale(TimeScale): the TimeScale used as basis for counting executions of **component**
+        time_scale(TimeScale): the TimeScale used as basis for counting executions of **dependency**
         (default: TimeScale.ENVIRONMENT_STATE_UPDATE)
 
 
     Satisfied when:
 
-        - there have been at least n+1 executions among all of the Components specified in **components**
+        - there have been at least n+1 executions among all of the nodes specified in **dependencies**
           within one unit of time at the `TimeScale` specified by **time_scale**.
 
     """
@@ -1643,21 +1635,21 @@ class EveryNCalls(_DependencyValidation, Condition):
 
     Parameters:
 
-        component(Component):  the Component on which the Condition depends
+        dependency(node):  the node on which the Condition depends
 
-        n(int): the frequency of executions of **component** at which the Condition is satisfied
+        n(int): the frequency of executions of **dependency** at which the Condition is satisfied
 
 
     Satisfied when:
 
-        - the Component specified in **component** has executed at least n times since the last time the
+        - the node specified in **dependency** has executed at least n times since the last time the
           Condition's owner executed.
 
         COMMENT:
             JDC: IS THE FOLLOWING TRUE OF ALL OF THE ABOVE AS WELL??
             K: No, EveryNCalls is tricky in how it needs to be implemented, because it's in a sense
                 tracking the relative frequency of calls between two objects. So the idea is that the scheduler
-                tracks how many executions of a component are "useable" by other components for EveryNCalls conditions.
+                tracks how many executions of a node are "useable" by other nodes for EveryNCalls conditions.
                 So, suppose you had something like add_condition(B, All(AfterNCalls(A, 10), EveryNCalls(A, 2))). You
                 would want the AAB pattern to start happening after A has run 10 times. Useable counts allows B to see
                 whether A has run enough times for it to run, and then B spends its "useable executions" of A. Then,
@@ -1670,8 +1662,8 @@ class EveryNCalls(_DependencyValidation, Condition):
 
     Notes:
 
-        - scheduler's count of each other Component that is "useable" by the Component is reset to 0 when the
-          Component runs
+        - scheduler's count of each other node that is "useable" by the node is reset to 0 when the
+          node runs
 
     """
     def __init__(self, dependency, n):
@@ -1691,11 +1683,11 @@ class JustRan(_DependencyValidation, Condition):
 
     Parameters:
 
-        component(Component):  the Component on which the Condition depends
+        dependency(node):  the node on which the Condition depends
 
     Satisfied when:
 
-        - the Component specified in **component** executed in the previous `CONSIDERATION_SET_EXECUTION`.
+        - the node specified in **dependency** executed in the previous `CONSIDERATION_SET_EXECUTION`.
 
     Notes:
 
@@ -1719,14 +1711,14 @@ class AllHaveRun(_DependencyValidation, Condition):
 
     Parameters:
 
-        *components(Components):  an iterable of Components on which the Condition depends
+        *nodes(nodes):  an iterable of nodes on which the Condition depends
 
-        time_scale(TimeScale): the TimeScale used as basis for counting executions of **component**
+        time_scale(TimeScale): the TimeScale used as basis for counting executions of **dependency**
         (default: TimeScale.ENVIRONMENT_STATE_UPDATE)
 
     Satisfied when:
 
-        - all of the Components specified in **components** have executed at least once
+        - all of the nodes specified in **dependencies** have executed at least once
           within one unit of time at the `TimeScale` specified by **time_scale**.
 
     """
@@ -1755,16 +1747,16 @@ class WhenFinished(_DependencyValidation, Condition):
 
     Parameters:
 
-        component(Component):  the Component on which the Condition depends
+        dependency(node):  the node on which the Condition depends
 
     Satisfied when:
 
-        - the `is_finished` methods of the Component specified in **components** returns `True`.
+        - the `is_finished` methods of the node specified in **dependencies** returns `True`.
 
     Notes:
 
-        - This is a dynamic Condition: Each Component is responsible for managing its finished status on its
-          own, which can occur independently of the execution of other Components.  Therefore the satisfaction of
+        - This is a dynamic Condition: Each node is responsible for managing its finished status on its
+          own, which can occur independently of the execution of other nodes.  Therefore the satisfaction of
           this Condition) can vary arbitrarily in time.
 
     """
@@ -1783,20 +1775,20 @@ class WhenFinishedAny(_DependencyValidation, Condition):
 
     Parameters:
 
-        *components(Components):  zero or more Components on which the Condition depends
+        *nodes(nodes):  zero or more nodes on which the Condition depends
 
     Satisfied when:
 
-        - the `is_finished` methods of any Components specified in **components** returns `True`.
+        - the `is_finished` methods of any nodes specified in **dependencies** returns `True`.
 
     Notes:
 
         - This is a convenience class; WhenFinishedAny(A, B, C) is equivalent to
           Any(WhenFinished(A), WhenFinished(B), WhenFinished(C)).
-          If no components are specified, the condition will default to checking all of scheduler's Components.
+          If no nodes are specified, the condition will default to checking all of scheduler's nodes.
 
-        - This is a dynamic Condition: Each Component is responsible for managing its finished status on its
-          own, which can occur independently of the execution of other Components.  Therefore the satisfaction of
+        - This is a dynamic Condition: Each node is responsible for managing its finished status on its
+          own, which can occur independently of the execution of other nodes.  Therefore the satisfaction of
           this Condition) can vary arbitrarily in time.
 
     """
@@ -1820,20 +1812,20 @@ class WhenFinishedAll(_DependencyValidation, Condition):
 
     Parameters:
 
-        *components(Components):  zero or more Components on which the Condition depends
+        *nodes(nodes):  zero or more nodes on which the Condition depends
 
     Satisfied when:
 
-        - the `is_finished` methods of all Components specified in **components** return `True`.
+        - the `is_finished` methods of all nodes specified in **dependencies** return `True`.
 
     Notes:
 
         - This is a convenience class; WhenFinishedAny(A, B, C) is equivalent to
           All(WhenFinished(A), WhenFinished(B), WhenFinished(C)).
-          If no components are specified, the condition will default to checking all of scheduler's Components.
+          If no nodes are specified, the condition will default to checking all of scheduler's nodes.
 
-        - This is a dynamic Condition: Each Component is responsible for managing its finished status on its
-          own, which can occur independently of the execution of other Components.  Therefore the satisfaction of
+        - This is a dynamic Condition: Each node is responsible for managing its finished status on its
+          own, which can occur independently of the execution of other nodes.  Therefore the satisfaction of
           this Condition) can vary arbitrarily in time.
 
     """
