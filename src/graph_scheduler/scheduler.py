@@ -373,11 +373,19 @@ class Scheduler:
     conditions : ConditionSet
         the set of Conditions the Scheduler uses when running
 
+    default_execution_id : object
+        the execution_id to use if none is supplied to `run`; a unique
+        identifier to allow multiple schedulings independently. Must be
+        hashable.
+
     execution_list : list
         the full history of consideration set executions the Scheduler has produced
 
     consideration_queue : list
         a list form of the Scheduler's toposort ordering of its nodes
+
+    consideration_queue_indices : dict
+        a dict mapping **nodes** to their position in the `consideration_queue`
 
     termination_conds : Dict[TimeScale: Condition]
         a mapping from `TimeScales <TimeScale>` to `Conditions <Condition>` that, when met, terminate the execution
