@@ -5,7 +5,7 @@ Overview
 
 A Scheduler is used to generate the order in which the nodes of a graph are
 executed. By default, a Scheduler executes nodes in an order determined by the pattern of edges among the nodes in the graph, with each node executed once
-per `PASS` through the graph. For example, in a `graph` in which a node *A* projects to a node
+per `PASS` through the graph. For example, in a ``graph`` in which a node *A* projects to a node
 *B* that projects to a node *C*, *A* will execute first followed by *B*, and then *C* in each `PASS` through the
 graph. However, a Scheduler can be used to implement more complex patterns of execution, by specifying
 `Conditions <Condition>` that determine when and how many times individual nodes execute, and whether and how
@@ -38,19 +38,19 @@ ConditionSets can also be added after the  Scheduler has been created, using its
 Algorithm
 ---------
 
-.. _consideration_set:
+.. _Consideration_Set:
 
-When a Scheduler is created, it constructs a `consideration_queue`:  a list of `consideration_sets <consideration_set>`
+When a Scheduler is created, it constructs a `consideration_queue`:  a list of ``consideration sets``
 that defines the order in which nodes are eligible to be executed.  This is based on the dependencies specified in the graph
-specification provided in the Scheduler's constructor.  Each `consideration_set
-<consideration_set>` is a set of nodes that are eligible to execute at the same time/`CONSIDERATION_SET_EXECUTION` (i.e.,
+specification provided in the Scheduler's constructor.  Each ``consideration_set``
+is a set of nodes that are eligible to execute at the same time/`CONSIDERATION_SET_EXECUTION` (i.e.,
 that appear at the same "depth" in a sequence of dependencies, and among which there are no dependencies).  The first
-`consideration_set <consideration_set>` consists of only origin nodes. The second consists of all nodes
-that receive edges from the nodes in the first `consideration_set <consideration_set>`.
-The third consists of  nodes that receive edges from nodes in the first two `consideration_sets
-<consideration_set>`, and so forth.  When the Scheduler is run, it uses the `consideration_queue` to determine which
+``consideration_set`` consists of only origin nodes. The second consists of all nodes
+that receive edges from the nodes in the first ``consideration_set``.
+The third consists of  nodes that receive edges from nodes in the first two ``consideration sets``,
+and so forth.  When the Scheduler is run, it uses the `consideration_queue` to determine which
 nodes are eligible to execute in each `CONSIDERATION_SET_EXECUTION` of a `PASS`, and then evaluates the `Condition <Condition>`
-associated with each node in the current `consideration_set <consideration_set>` to determine which should
+associated with each node in the current ``consideration_set`` to determine which should
 actually be assigned for execution.
 
 Pseudocode::
@@ -102,7 +102,7 @@ Execution
 When a Scheduler is run, it provides a set of nodes that should be run next, based on their dependencies in the
 graph specification, and any `Conditions <Condition>`, specified in the Scheduler's
 constructor. For each call to the `run <Scheduler.run>` method, the Scheduler sequentially evaluates its
-`consideration_sets <consideration_set>` in their order in the `consideration_queue`.  For each set, it  determines
+`consideration sets <Consideration_Set>` in their order in the `consideration_queue`.  For each set, it  determines
 which nodes in the set are allowed to execute, based on whether their associated `Condition <Condition>` has
 been met. Any node that does not have a `Condition` explicitly specified is assigned a Condition that causes it
 to be executed whenever it is `under consideration <Scheduler_Algorithm>` and all its structural parents have been
@@ -112,9 +112,9 @@ as executing simultaneously.
 
 .. note::
     The ordering of the nodes specified within a `CONSIDERATION_SET_EXECUTION` is arbitrary (and is irrelevant, as there are no
-    graph dependencies among nodes within the same `consideration_set <consideration_set>`). However,
+    graph dependencies among nodes within the same ``consideration_set``). However,
     the execution of a node within a `CONSIDERATION_SET_EXECUTION` may trigger the execution of another node within its
-    `consideration_set <consideration_set>`, as in the example below::
+    ``consideration_set``, as in the example below::
 
             C
           ↗ ↖
@@ -126,7 +126,7 @@ as executing simultaneously.
         execution sets: [{A}, {A, B}, {C}, ...]
 
     Since there are no graph dependencies between `A` and `B`, they may execute in the same `CONSIDERATION_SET_EXECUTION`. Morever,
-    `A` and `B` are in the same `consideration_set <consideration_set>`. Since `B` is specified to run every two
+    `A` and `B` are in the same ``consideration_set``. Since `B` is specified to run every two
     times `A` runs, `A`'s second execution in the second `CONSIDERATION_SET_EXECUTION` allows `B` to run within that `CONSIDERATION_SET_EXECUTION`,
     rather than waiting for the next `PASS`.
 
@@ -216,8 +216,8 @@ that all parent nodes get a chance to execute before their children, and
 that there exist no data dependencies (edges) between nodes in the
 same execution set. In exact time mode, all nodes will be in one
 [unordered] execution set. An ordering may be inferred by the original
-graph, however, using the `indices in the original consideration queue
-<Scheduler.consideration_queue_indices>`_.
+graph, however, using the `indices in the original consideration queue\
+<graph_scheduler.scheduler.Scheduler.consideration_queue_indices>`.
 Additionally, non-absolute conditions like
 `EveryNCalls` may behave unexpectedly in some cases.
 
@@ -368,7 +368,7 @@ class Scheduler:
         sets the mode of scheduling: `standard <Scheduler_Execution>` or
         `exact time <Scheduler_Exact_Time>`
 
-    default_absolute_time_unit : ``pint.Quantity`` : ``1ms``
+    default_absolute_time_unit : `pint.Quantity` : ``1ms``
         if not otherwise determined by any absolute **conditions**,
         specifies the absolute duration of a `CONSIDERATION_SET_EXECUTION`
 
@@ -408,7 +408,7 @@ class Scheduler:
         if not otherwise determined by any absolute **conditions**,
         specifies the absolute duration of a `CONSIDERATION_SET_EXECUTION`
 
-        :type: ``pint.Quantity``
+        :type: `pint.Quantity`
         :default: ``1ms``
 
     """

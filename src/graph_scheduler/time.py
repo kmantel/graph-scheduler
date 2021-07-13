@@ -55,11 +55,11 @@ class TimeScale(enum.Enum):
 
     CONSIDERATION_SET_EXECUTION
         the nuclear unit of time, corresponding to the execution of all nodes allowed to execute
-        from a single `consideration_set <consideration_set>` of a `Scheduler`, and which are considered to have
+        from a single `consideration set <Consideration_Set>` of a `Scheduler <graph_scheduler.scheduler.Scheduler>`, and which are considered to have
         executed simultaneously.
 
     PASS
-        a full iteration through all of the `consideration_sets <consideration_set>` in a `Scheduler's <Scheduler>`
+        a full iteration through all of the consideration sets in a Scheduler's <Scheduler>
         `consideration_queue`, consisting of one or more `CONSIDERATION_SET_EXECUTIONs <CONSIDERATION_SET_EXECUTION>`, over which every node
         specified to a Scheduler <Scheduler_Creation>` is considered for execution at least once.
 
@@ -212,10 +212,10 @@ class Time(types.SimpleNamespace):
         consideration_set_execution : int : 0
             the `TimeScale.CONSIDERATION_SET_EXECUTION` value
 
-        absolute : ``pint.Quantity`` : 0ms
+        absolute : `pint.Quantity` : 0ms
             the absolute time value
 
-        absolute_interval : ``pint.Quantity`` : 1ms
+        absolute_interval : `pint.Quantity` : 1ms
             the interval between units of absolute time
 
         absolute_time_unit_scale : `TimeScale` : TimeScale.CONSIDERATION_SET_EXECUTION

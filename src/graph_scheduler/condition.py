@@ -1,14 +1,14 @@
 """
 
-.. _Condition_Overview
+.. _Condition_Overview:
 
 Overview
 --------
 
-`Conditions <Condition>` are used to specify when nodes are allowed to execute.  Conditions
+:class:`Conditions <Condition>` are used to specify when nodes are allowed to execute.  Conditions
 can be used to specify a variety of required conditions for execution, including the state of the node
 itself (e.g., how many times it has already executed, or the value of one of its attributes), the state of the
-`Scheduler` (e.g., how many `CONSIDERATION_SET_EXECUTION` s have occurred in the current `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`), or the state of other
+:class:`Scheduler <graph_scheduler.scheduler.Scheduler>` (e.g., how many `CONSIDERATION_SET_EXECUTION` s have occurred in the current `ENVIRONMENT_STATE_UPDATE`), or the state of other
 nodes in a graph (e.g., whether or how many times they have executed). This package provides a number of
 `pre-specified Conditions <Condition_Pre_Specified>` that can be parametrized (e.g., how many times a node should
 be executed). `Custom conditions <Condition_Custom>` can also be created, by assigning a function to a Condition that
@@ -24,13 +24,13 @@ Creating Conditions
 *Pre-specified Conditions*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`Pre-specified Conditions <Condition_Pre-Specified_List>` can be instantiated and added to a `Scheduler` at any time,
+`Pre-specified Conditions <Condition_Pre-Specified_List>` can be instantiated and added to a :class:`Scheduler <graph_scheduler.scheduler.Scheduler>` at any time,
 and take effect immediately for the execution of that Scheduler. Most pre-specified Conditions have one or more
 arguments that must be specified to achieve the desired behavior. Many Conditions are also associated with an
-`owner <Condition.owner>` attribute (a node to which the Condition belongs). `Scheduler`\\ s maintain the data
-used to test for satisfaction of Condition, independent in different `execution context`\\ s. The Scheduler is generally
+`owner <Condition.owner>` attribute (a node to which the Condition belongs). Schedulers maintain the data
+used to test for satisfaction of Condition, independent in different `execution contexts <default_execution_id>`. The Scheduler is generally
 responsible for ensuring that Conditions have access to the necessary data.
-When pre-specified Conditions are instantiated within a call to the `add` method of a `Scheduler` or `ConditionSet`,
+When pre-specified Conditions are instantiated within a call to the `add_condition` method of a `Scheduler` or `ConditionSet`,
 the Condition's `owner <Condition.owner>` is determined through
 context and assigned automatically, as in the following example::
 
@@ -38,7 +38,7 @@ context and assigned automatically, as in the following example::
     my_scheduler.add_condition(B, EveryNCalls(A, 2))
     my_scheduler.add_condition(C, EveryNCalls(B, 2))
 
-Here, `EveryNCalls(A, 2)` for example, is assigned the `owner` `B`.
+Here, ``EveryNCalls`(A, 2)`` for example, is assigned the `owner` ``B``.
 
 .. _Condition_Custom:
 
@@ -55,8 +55,8 @@ any other node in the graph.
 
 .. _Condition_Recurrent_Example:
 
-For example, the following script fragment creates a custom Condition in which `node_A` is scheduled to wait to
-execute until `node_B` has "converged" (that is, settled to the point that none of
+For example, the following script fragment creates a custom Condition in which ``node_A`` is scheduled to wait to
+execute until ``node_B`` has "converged" (that is, settled to the point that none of
 its elements has changed in value more than a specified amount since the previous `CONSIDERATION_SET_EXECUTION`)::
 
     def converge(node, thresh):
@@ -67,18 +67,18 @@ its elements has changed in value more than a specified amount since the previou
     epsilon = 0.01
     my_scheduler.add_condition(node_A, NWhen(Condition(converge, node_B, epsilon), 1))
 
-In the example, a function `converge` is defined that references the `delta` attribute of
-a node (which reports the change in its `value`). The function is assigned to
-the standard `Condition()` with `node_A` and `epsilon` as its arguments, and `composite Condition <Conditions_Composite>`
-`NWhen` (which is satisfied the first N times after its condition becomes true),  The Condition is assigned to `node_B`,
-thus scheduling it to execute one time when all of the elements of `node_A` have changed by less than `epsilon`.
+In the example, a function ``converge`` is defined that references the ``delta`` attribute of
+a node (which reports the change in its ``value``). The function is assigned to
+the standard :class:`Condition` with ``node_A`` and ``epsilon`` as its arguments, and `composite Condition <Conditions_Composite>`
+`NWhen` (which is satisfied the first N times after its condition becomes true),  The Condition is assigned to ``node_B``,
+thus scheduling it to execute one time when all of the elements of ``node_A`` have changed by less than ``epsilon``.
 
 .. _Condition_Structure:
 
 Structure
 ---------
 
-The `Scheduler` associates every node with a Condition.  If a node has not been explicitly assigned a
+The `Scheduler <graph_scheduler.scheduler.Scheduler>` associates every node with a Condition.  If a node has not been explicitly assigned a
 Condition, it is assigned a Condition that causes it to be executed whenever it is `under consideration <Scheduler_Algorithm>`
 and all its structural parents have been executed at least once since the node's last execution.
 Condition subclasses (`listed below <Condition_Pre-Specified_List>`)
@@ -110,12 +110,12 @@ six types:
 **Generic Conditions** (used to construct `custom Conditions <Condition_Custom>`):
 
     * `While` (func, *args, **kwargs)
-      satisfied whenever the specified function (or callable) called with args and/or kwargs evaluates to `True`.
-      Equivalent to `Condition(func, *args, **kwargs)`
+      satisfied whenever the specified function (or callable) called with args and/or kwargs evaluates to :keyword:`True`.
+      Equivalent to ``Condition(func, *args, **kwargs)``
 
     * `WhileNot` (func, *args, **kwargs)
-      satisfied whenever the specified function (or callable) called with args and/or kwargs evaluates to `False`.
-      Equivalent to `Not(Condition(func, *args, **kwargs))`
+      satisfied whenever the specified function (or callable) called with args and/or kwargs evaluates to :keyword:`False`.
+      Equivalent to ``Not(Condition(func, *args, **kwargs))``
 
 .. _Conditions_Static:
 
@@ -380,7 +380,7 @@ class ConditionError(Exception):
 
 
 class ConditionSet(object):
-    """Used in conjunction with a `Scheduler` to store the `Conditions <Condition>` associated with a node.
+    """Used in conjunction with a `Scheduler <graph_scheduler.scheduler.Scheduler>` to store the `Conditions <Condition>` associated with a node.
 
     Arguments
     ---------
@@ -468,7 +468,7 @@ class ConditionSet(object):
 
 class Condition:
     """
-    Used in conjunction with a `Scheduler` to specify the condition under which a node should be
+    Used in conjunction with a :class:`Scheduler` to specify the condition under which a node should be
     allowed to execute.
 
     Arguments
