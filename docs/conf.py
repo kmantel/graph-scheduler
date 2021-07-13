@@ -40,6 +40,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
     'sphinx.ext.napoleon',
+    'sphinx_autodoc_typehints',
     'sphinx_rtd_theme',
     'm2r2',
 ]
