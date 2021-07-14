@@ -1,3 +1,4 @@
+networkx <2.7
 # below is the required psyneulink tag, but circular dependencies prevent inclusion
 # psyneulink @ git+https://github.com/PrincetonUniversity/PsyNeuLink@scheduler-extracted
 psyneulink

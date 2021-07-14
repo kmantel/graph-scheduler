@@ -1,5 +1,6 @@
 import fractions
 import logging
+import networkx as nx
 import numpy as np
 import psyneulink as pnl
 import pytest
@@ -42,6 +43,10 @@ class TestScheduler:
                 pytest.helpers.create_graph_from_pathways(*stroop_paths),
                 stroop_consideration_queue
             ),
+            (
+                nx.DiGraph(pytest.helpers.create_graph_from_pathways(*stroop_paths)),
+                stroop_consideration_queue
+            )
         ]
     )
     def test_construction(self, graph, expected_consideration_queue):

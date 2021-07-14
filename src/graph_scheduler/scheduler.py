@@ -356,7 +356,7 @@ class Scheduler:
     Arguments
     ---------
 
-    graph : Dict[object: set(object)]
+    graph : Dict[object: set(object)], `networkx.DiGraph`
         a graph specification dictionary - each entry of the dictionary must be an object,
         and the value of each entry must be a set of zero or more objects that project directly to the key.
 
@@ -443,15 +443,22 @@ class Scheduler:
         self.default_absolute_time_unit = _parse_absolute_unit(default_absolute_time_unit)
 
         if graph is not None:
-            self.dependency_dict = graph
-            self.consideration_queue = list(toposort(graph))
+            try:
+                # networkx graph
+                self.dependency_dict = {
+                    child: set(parents.keys())
+                    for child, parents in graph.succ.items()
+                }
+            except AttributeError:
+                self.dependency_dict = graph
+            self.consideration_queue = list(toposort(self.dependency_dict))
             self.nodes = []
             for consideration_set in self.consideration_queue:
                 for node in consideration_set:
                     self.nodes.append(node)
         else:
             raise SchedulerError(
-                'Must instantiate a Scheduler with a graph dependency dict'
+                'Must instantiate a Scheduler with a graph dependency dict or a networkx.DiGraph'
             )
 
         self._generate_consideration_queue_indices()
