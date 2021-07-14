@@ -25,12 +25,12 @@ to be executed and their order must be specified in the Scheduler's constructor 
   each entry of the dictionary must be a node of a graph, and the value of each entry must be a set of
   zero or more nodes that project directly to the key.  The graph must be acyclic; an error is generated if any
   cycles (e.g., recurrent dependencies) are detected.  The Scheduler computes a `toposort` from the graph that is
-  used as the default order of executions, subject to any `Condition`s that have been specified
+  used as the default order of executions, subject to any Conditions that have been specified
   (see `below <Scheduler_Algorithm>`).
 
 Conditions can be added to a Scheduler when it is created by specifying a `ConditionSet` (a set of
 `Conditions <Condition>`) in the **conditions** argument of its constructor.  Individual Conditions and/or
-ConditionSets can also be added after the  Scheduler has been created, using its `add_condition` and
+ConditionSets can also be added after the Scheduler has been created, using its `add_condition` and
 `add_condition_set` methods, respectively.
 
 .. _Scheduler_Algorithm:
@@ -47,7 +47,7 @@ is a set of nodes that are eligible to execute at the same time/`CONSIDERATION_S
 that appear at the same "depth" in a sequence of dependencies, and among which there are no dependencies).  The first
 ``consideration_set`` consists of only origin nodes. The second consists of all nodes
 that receive edges from the nodes in the first ``consideration_set``.
-The third consists of  nodes that receive edges from nodes in the first two ``consideration sets``,
+The third consists of nodes that receive edges from nodes in the first two ``consideration sets``,
 and so forth.  When the Scheduler is run, it uses the `consideration_queue` to determine which
 nodes are eligible to execute in each `CONSIDERATION_SET_EXECUTION` of a `PASS`, and then evaluates the `Condition <Condition>`
 associated with each node in the current ``consideration_set`` to determine which should
@@ -102,7 +102,7 @@ Execution
 When a Scheduler is run, it provides a set of nodes that should be run next, based on their dependencies in the
 graph specification, and any `Conditions <Condition>`, specified in the Scheduler's
 constructor. For each call to the `run <Scheduler.run>` method, the Scheduler sequentially evaluates its
-`consideration sets <Consideration_Set>` in their order in the `consideration_queue`.  For each set, it  determines
+`consideration sets <Consideration_Set>` in their order in the `consideration_queue`.  For each set, it determines
 which nodes in the set are allowed to execute, based on whether their associated `Condition <Condition>` has
 been met. Any node that does not have a `Condition` explicitly specified is assigned a Condition that causes it
 to be executed whenever it is `under consideration <Scheduler_Algorithm>` and all its structural parents have been
@@ -116,7 +116,7 @@ as executing simultaneously.
     the execution of a node within a `CONSIDERATION_SET_EXECUTION` may trigger the execution of another node within its
     ``consideration_set``, as in the example below::
 
-            C
+           C
           ↗ ↖
          A   B
 
@@ -130,7 +130,7 @@ as executing simultaneously.
     times `A` runs, `A`'s second execution in the second `CONSIDERATION_SET_EXECUTION` allows `B` to run within that `CONSIDERATION_SET_EXECUTION`,
     rather than waiting for the next `PASS`.
 
-For each `CONSIDERATION_SET_EXECUTION`, the Scheduler evaluates  whether any specified
+For each `CONSIDERATION_SET_EXECUTION`, the Scheduler evaluates whether any specified
 `termination Conditions <Scheduler_Termination_Conditions>` have been met, and terminates if so.  Otherwise,
 it returns the set of nodes that should be executed in the current `CONSIDERATION_SET_EXECUTION`. Each subsequent call to the
 `run <Scheduler.run>` method returns the set of nodes in the following `CONSIDERATION_SET_EXECUTION`.
@@ -141,11 +141,11 @@ execution, over which every node in the graph has been considered for execution.
 <consideration_set>` in the same order as previously. Different subsets of nodes within the same `consideration_set
 <consideration_set>` may be assigned to execute on each `PASS`, since different Conditions may be satisfied.
 
-The Scheduler continues to make `PASS`es through the `consideration_queue` until a `termination Condition
+The Scheduler continues to make `PASS`\\ es through the `consideration_queue` until a `termination Condition
 <Scheduler_Termination_Conditions>` is satisfied. If no termination Conditions are specified, by default the Scheduler
 terminates an `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` when every node has been specified for execution at least once
 (corresponding to the `AllHaveRun` Condition).  However, other termination Conditions can be specified,
-that may cause the Scheduler to terminate an `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` earlier  or later (e.g., when the  Condition
+that may cause the Scheduler to terminate an `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` earlier or later (e.g., when the Condition
 for a particular node or set of nodes is met).
 
 .. _Scheduler_Termination_Conditions:

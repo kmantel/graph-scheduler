@@ -38,7 +38,7 @@ context and assigned automatically, as in the following example::
     my_scheduler.add_condition(B, EveryNCalls(A, 2))
     my_scheduler.add_condition(C, EveryNCalls(B, 2))
 
-Here, ``EveryNCalls`(A, 2)`` for example, is assigned the `owner` ``B``.
+Here, ``EveryNCalls(A, 2)`` for example, is assigned the `owner` ``B``.
 
 .. _Condition_Custom:
 
@@ -1373,7 +1373,7 @@ class AfterNEnvironmentStateUpdates(Condition):
 
     Satisfied when:
 
-        - at least n `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`\\ s have occured  within one unit of time at the `TimeScale`
+        - at least n `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`\\ s have occured within one unit of time at the `TimeScale`
           specified by **time_scale**.
 
     """

@@ -153,7 +153,7 @@ class Clock:
         Returns
         -------
             the number of query_time_scale s that have occurred during the scope \
-            of the base_index th base_time_scale : int
+            of the base_index'th base_time_scale : int
         """
         if base_index is None:
             base_index = self.get_time_by_time_scale(base_time_scale)
