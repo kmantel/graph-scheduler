@@ -351,13 +351,13 @@ class Scheduler:
     Arguments
     ---------
 
-    conditions  : ConditionSet
-        set of `Conditions <Condition>` that specify when individual nodes in **graph**
-        execute and any dependencies among them.
-
     graph : Dict[object: set(object)]
         a graph specification dictionary - each entry of the dictionary must be an object,
         and the value of each entry must be a set of zero or more objects that project directly to the key.
+
+    conditions  : ConditionSet
+        set of `Conditions <Condition>` that specify when individual nodes in **graph**
+        execute and any dependencies among them.
 
     mode : SchedulingMode[STANDARD|EXACT_TIME] : SchedulingMode.STANDARD
         sets the mode of scheduling: `standard <Scheduler_Execution>` or
