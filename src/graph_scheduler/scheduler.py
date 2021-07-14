@@ -3,40 +3,30 @@
 Overview
 --------
 
-A Scheduler is used to generate the order in which the `Components <Component>` of a `Composition <Composition>` are
-executed. By default, a Scheduler executes Components in an order determined by the pattern of `Projections
-<Projection>` among the `Mechanisms <Mechanism>` in the `Composition <Composition>`, with each Mechanism executed once
-per `PASS` through the Composition. For example, in a `Composition` in which a Mechanism *A* projects to a Mechanism
-*B* that projects to a Mechanism *C*, *A* will execute first followed by *B*, and then *C* in each `PASS` through the
-Composition. However, a Scheduler can be used to implement more complex patterns of execution, by specifying
-`Conditions <Condition>` that determine when and how many times individual Components execute, and whether and how
-this depends on the execution of other Components. Any executable Component in a Composition can be assigned a
-Condition, and Conditions can be combined in arbitrary ways to generate any pattern of execution of the Components
-in a Composition that is logically possible.
-
-.. note::
-   In general, `Mechanisms <Mechanism>` are the Components of a Composition that are most commonly associated with
-   Conditions, and assigned to a Scheduler for execution.  However, in some circumstances, `Projections <Projection>`
-   can also be assigned for execution (e.g., during `learning <Process_Execution_Learning>` to insure that
-   `MappingProjections <MappingProjection>` are updated in the proper order).
+A Scheduler is used to generate the order in which the nodes of a graph are
+executed. By default, a Scheduler executes nodes in an order determined by the pattern of edges among the nodes in the graph, with each node executed once
+per `PASS` through the graph. For example, in a `graph` in which a node *A* projects to a node
+*B* that projects to a node *C*, *A* will execute first followed by *B*, and then *C* in each `PASS` through the
+graph. However, a Scheduler can be used to implement more complex patterns of execution, by specifying
+`Conditions <Condition>` that determine when and how many times individual nodes execute, and whether and how
+this depends on the execution of other nodes. Any executable node in a graph can be assigned a
+Condition, and Conditions can be combined in arbitrary ways to generate any pattern of execution of the nodes
+in a graph that is logically possible.
 
 .. _Scheduler_Creation:
 
 Creating a Scheduler
 --------------------
 
-A Scheduler can be created explicitly using its constructor.  However, more commonly it is created automatically
-for a `Composition <Composition>` when it is created.  When creating a Scheduler explicitly, the set of `Components
-<Component>` to be executed and their order must be specified in the Scheduler's constructor using one the following:
+When creating a Scheduler explicitly, the set of nodes
+to be executed and their order must be specified in the Scheduler's constructor using one the following:
 
 * a *graph specification dictionary* in the **graph** argument -
-  each entry of the dictionary must be a Component of a Composition, and the value of each entry must be a set of
-  zero or more Components that project directly to the key.  The graph must be acyclic; an error is generated if any
+  each entry of the dictionary must be a node of a graph, and the value of each entry must be a set of
+  zero or more nodes that project directly to the key.  The graph must be acyclic; an error is generated if any
   cycles (e.g., recurrent dependencies) are detected.  The Scheduler computes a `toposort` from the graph that is
   used as the default order of executions, subject to any `Condition`s that have been specified
   (see `below <Scheduler_Algorithm>`).
-
-If both a Composition and a graph are specified, the Composition takes precedence, and the graph is ignored.
 
 Conditions can be added to a Scheduler when it is created by specifying a `ConditionSet` (a set of
 `Conditions <Condition>`) in the **conditions** argument of its constructor.  Individual Conditions and/or
@@ -51,17 +41,16 @@ Algorithm
 .. _consideration_set:
 
 When a Scheduler is created, it constructs a `consideration_queue`:  a list of `consideration_sets <consideration_set>`
-that defines the order in which `Components <Component>` are eligible to be executed.  This is based on the pattern of
-`Projections <Projection>` among them specified in the `Composition`, or on the dependencies specified in the graph
-specification dictionary, whichever was provided in the Scheduler's constructor.  Each `consideration_set
-<consideration_set>` is a set of Components that are eligible to execute at the same time/`CONSIDERATION_SET_EXECUTION` (i.e.,
+that defines the order in which nodes are eligible to be executed.  This is based on the dependencies specified in the graph
+specification provided in the Scheduler's constructor.  Each `consideration_set
+<consideration_set>` is a set of nodes that are eligible to execute at the same time/`CONSIDERATION_SET_EXECUTION` (i.e.,
 that appear at the same "depth" in a sequence of dependencies, and among which there are no dependencies).  The first
-`consideration_set <consideration_set>` consists of only `ORIGIN` Mechanisms. The second consists of all Components
-that receive `Projections <Projection>` from the Mechanisms in the first `consideration_set <consideration_set>`.
-The third consists of  Components that receive Projections from Components in the first two `consideration_sets
+`consideration_set <consideration_set>` consists of only origin nodes. The second consists of all nodes
+that receive edges from the nodes in the first `consideration_set <consideration_set>`.
+The third consists of  nodes that receive edges from nodes in the first two `consideration_sets
 <consideration_set>`, and so forth.  When the Scheduler is run, it uses the `consideration_queue` to determine which
-Components are eligible to execute in each `CONSIDERATION_SET_EXECUTION` of a `PASS`, and then evaluates the `Condition <Condition>`
-associated with each Component in the current `consideration_set <consideration_set>` to determine which should
+nodes are eligible to execute in each `CONSIDERATION_SET_EXECUTION` of a `PASS`, and then evaluates the `Condition <Condition>`
+associated with each node in the current `consideration_set <consideration_set>` to determine which should
 actually be assigned for execution.
 
 Pseudocode::
@@ -105,21 +94,21 @@ Execution
     `Scheduler_Exact_Time` below for a description of
     `exact time mode <SchedulingMode.EXACT_TIME>`.
 
-When a Scheduler is run, it provides a set of Components that should be run next, based on their dependencies in the
-Composition or graph specification dictionary, and any `Conditions <Condition>`, specified in the Scheduler's
+When a Scheduler is run, it provides a set of nodes that should be run next, based on their dependencies in the
+graph specification, and any `Conditions <Condition>`, specified in the Scheduler's
 constructor. For each call to the `run <Scheduler.run>` method, the Scheduler sequentially evaluates its
 `consideration_sets <consideration_set>` in their order in the `consideration_queue`.  For each set, it  determines
-which Components in the set are allowed to execute, based on whether their associated `Condition <Condition>` has
-been met. Any Component that does not have a `Condition` explicitly specified is assigned a Condition that causes it
+which nodes in the set are allowed to execute, based on whether their associated `Condition <Condition>` has
+been met. Any node that does not have a `Condition` explicitly specified is assigned a Condition that causes it
 to be executed whenever it is `under consideration <Scheduler_Algorithm>` and all its structural parents have been
-executed at least once since the Component's last execution. All of the Components within a `consideration_set
-<consideration_set>` that are allowed to execute comprise a `CONSIDERATION_SET_EXECUTION` of execution. These Components are considered
+executed at least once since the node's last execution. All of the nodes within a `consideration_set
+<consideration_set>` that are allowed to execute comprise a `CONSIDERATION_SET_EXECUTION` of execution. These nodes are considered
 as executing simultaneously.
 
 .. note::
-    The ordering of the Components specified within a `CONSIDERATION_SET_EXECUTION` is arbitrary (and is irrelevant, as there are no
-    graph dependencies among Components within the same `consideration_set <consideration_set>`). However,
-    the execution of a Component within a `CONSIDERATION_SET_EXECUTION` may trigger the execution of another Component within its
+    The ordering of the nodes specified within a `CONSIDERATION_SET_EXECUTION` is arbitrary (and is irrelevant, as there are no
+    graph dependencies among nodes within the same `consideration_set <consideration_set>`). However,
+    the execution of a node within a `CONSIDERATION_SET_EXECUTION` may trigger the execution of another node within its
     `consideration_set <consideration_set>`, as in the example below::
 
             C
@@ -138,24 +127,21 @@ as executing simultaneously.
 
 For each `CONSIDERATION_SET_EXECUTION`, the Scheduler evaluates  whether any specified
 `termination Conditions <Scheduler_Termination_Conditions>` have been met, and terminates if so.  Otherwise,
-it returns the set of Components that should be executed in the current `CONSIDERATION_SET_EXECUTION`. Each subsequent call to the
-`run <Scheduler.run>` method returns the set of Components in the following `CONSIDERATION_SET_EXECUTION`.
+it returns the set of nodes that should be executed in the current `CONSIDERATION_SET_EXECUTION`. Each subsequent call to the
+`run <Scheduler.run>` method returns the set of nodes in the following `CONSIDERATION_SET_EXECUTION`.
 
 Processing of all of the `consideration_sets <consideration_set>` in the `consideration_queue` constitutes a `PASS` of
-execution, over which every Component in the Composition has been considered for execution. Subsequent calls to the
+execution, over which every node in the graph has been considered for execution. Subsequent calls to the
 `run <Scheduler.run>` method cycle back through the `consideration_queue`, evaluating the `consideration_sets
-<consideration_set>` in the same order as previously. Different subsets of Components within the same `consideration_set
+<consideration_set>` in the same order as previously. Different subsets of nodes within the same `consideration_set
 <consideration_set>` may be assigned to execute on each `PASS`, since different Conditions may be satisfied.
 
 The Scheduler continues to make `PASS`es through the `consideration_queue` until a `termination Condition
 <Scheduler_Termination_Conditions>` is satisfied. If no termination Conditions are specified, by default the Scheduler
-terminates an `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` when every Component has been specified for execution at least once
+terminates an `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` when every node has been specified for execution at least once
 (corresponding to the `AllHaveRun` Condition).  However, other termination Conditions can be specified,
 that may cause the Scheduler to terminate an `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` earlier  or later (e.g., when the  Condition
-for a particular Component or set of Components is met).  When the Scheduler terminates an `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`,
-the `Composition <Composition>` begins processing the next input specified in the call to its `run <Composition.run>`
-method. Thus, an `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` is defined as the scope of processing associated with a given input to the
-Composition.
+for a particular node or set of nodes is met).
 
 .. _Scheduler_Termination_Conditions:
 
@@ -164,15 +150,8 @@ Composition.
 
 Termination conditions are `Conditions <Condition>` that specify when the open-ended units of time - `ENVIRONMENT_STATE_UPDATE
 <TimeScale.ENVIRONMENT_STATE_UPDATE>` and `ENVIRONMENT_SEQUENCE` - have ended.  By default, the termination condition for an `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` is
-`AllHaveRun`, which is satisfied when all Components have run at least once within the environment state update, and the termination
-condition for an `ENVIRONMENT_SEQUENCE` is when all of its constituent environment state updates have terminated. These defaults may be overriden when
-running a Composition, by passing a dictionary mapping `TimeScales <TimeScale>` to `Conditions <Condition>` in the
-**termination_processing** argument of a call to `Composition.run` (to terminate the execution of processing)::
-
-    Composition.run(
-        ...,
-        termination_processing={TimeScale.ENVIRONMENT_STATE_UPDATE: WhenFinished(ddm)}
-        )
+`AllHaveRun`, which is satisfied when all nodes have run at least once within the environment state update, and the termination
+condition for an `ENVIRONMENT_SEQUENCE` is when all of its constituent environment state updates have terminated.
 
 
 .. _Scheduler_Absolute_Time:
@@ -181,27 +160,23 @@ Absolute Time
 -------------
 
 The scheduler supports scheduling of models of real-time systems in
-modes, both of which involve mapping real-time values to psyneulink
-`Time`. The default mode is is most compatible with standard PsyNeuLink
+modes, both of which involve mapping real-time values to
+`Time`. The default mode is is most compatible with standard
 scheduling, but can cause some unexpected behavior in certain cases
 because it is inexact. The consideration queue remains intact, but as a
 result, actions specified by fixed times of absolute-time-based
 conditions (`start <TimeInterval.start>` and `end <TimeInterval.end>` of
 `TimeInterval`, and `t` of `TimeTermination`) may not occur at exactly
 the time specified. The simplest example of this situation involves a
-linear composition with two nodes::
+linear graph with two nodes::
 
-    >>> import psyneulink as pnl
     >>> import graph_scheduler
 
-    >>> A = pnl.TransferMechanism()
-    >>> B = pnl.TransferMechanism()
+    >>> graph = {'A': set(), 'B': {'A'}}
+    >>> scheduler = graph_scheduler.Scheduler(graph=graph)
 
-    >>> comp = pnl.Composition()
-    >>> pway = comp.add_linear_processing_pathway([A, B])
-
-    >>> comp.scheduler.add_condition(A, graph_scheduler.TimeInterval(start=10))
-    >>> comp.scheduler.add_condition(B, graph_scheduler.TimeInterval(start=10))
+    >>> scheduler.add_condition('A', graph_scheduler.TimeInterval(start=10))
+    >>> scheduler.add_condition('B', graph_scheduler.TimeInterval(start=10))
 
 In standard mode, **A** and **B** are in different consideration sets,
 and so can never execute at the same time. At most one of **A** and
@@ -233,14 +208,12 @@ be executed at the same time for every consideration set execution,
 subject to the conditions specified. As a result, the guarantees in
 `standard scheduling <Scheduler_Execution>` may not apply - that is,
 that all parent nodes get a chance to execute before their children, and
-that there exist no data dependencies (Projections) between nodes in the
+that there exist no data dependencies (edges) between nodes in the
 same execution set. In exact time mode, all nodes will be in one
 [unordered] execution set. An ordering may be inferred by the original
 graph, however, using the `indices in the original consideration queue
-<Scheduler.consideration_queue_indices>`_. `Composition`\\ s will
-execute nodes in this order, however independent usages of the scheduler
-may not.  The user should be aware of this and set up defaults and
-inputs to nodes accordingly. Additionally, non-absolute conditions like
+<Scheduler.consideration_queue_indices>`_.
+Additionally, non-absolute conditions like
 `EveryNCalls` may behave unexpectedly in some cases.
 
 Examples
@@ -250,83 +223,67 @@ Please see `Condition` for a list of all supported Conditions and their behavior
 
 * Basic phasing in a linear process::
 
-    >>> import psyneulink as pnl
     >>> import graph_scheduler
 
-    >>> A = pnl.TransferMechanism(name='A')
-    >>> B = pnl.TransferMechanism(name='B')
-    >>> C = pnl.TransferMechanism(name='C')
-
-    >>> comp = pnl.Composition()
-
-    >>> pway = comp.add_linear_processing_pathway([A, B, C])
-    >>> pway.pathway
-    [(TransferMechanism A), (MappingProjection MappingProjection from A[RESULT] to B[InputPort-0]), (TransferMechanism B), (MappingProjection MappingProjection from B[RESULT] to C[InputPort-0]), (TransferMechanism C)]
+    >>> graph = {'A': set(), 'B': {'A'}, 'C': {'B'}}
+    >>> scheduler = graph_scheduler.Scheduler(graph=graph)
 
     >>> # implicit condition of Always for A
-    >>> comp.scheduler.add_condition(B, graph_scheduler.EveryNCalls(A, 2))
-    >>> comp.scheduler.add_condition(C, graph_scheduler.EveryNCalls(B, 3))
+    >>> scheduler.add_condition('B', graph_scheduler.EveryNCalls('A', 2))
+    >>> scheduler.add_condition('C', graph_scheduler.EveryNCalls('B', 3))
 
     >>> # implicit AllHaveRun Termination condition
-    >>> execution_sequence = list(comp.scheduler.run())
+    >>> execution_sequence = list(scheduler.run())
     >>> execution_sequence
-    [{(TransferMechanism A)}, {(TransferMechanism A)}, {(TransferMechanism B)}, {(TransferMechanism A)}, {(TransferMechanism A)}, {(TransferMechanism B)}, {(TransferMechanism A)}, {(TransferMechanism A)}, {(TransferMechanism B)}, {(TransferMechanism C)}]
+    [{'A'}, {'A'}, {'B'}, {'A'}, {'A'}, {'B'}, {'A'}, {'A'}, {'B'}, {'C'}]
 
 * Alternate basic phasing in a linear process::
 
-    >>> comp = pnl.Composition()
-    >>> pway = comp.add_linear_processing_pathway([A, B])
-    >>> pway.pathway
-    [(TransferMechanism A), (MappingProjection MappingProjection from A[RESULT] to B[InputPort-0]), (TransferMechanism B)]
+    >>> graph = {'A': set(), 'B': {'A'}}
+    >>> scheduler = graph_scheduler.Scheduler(graph=graph)
 
-    >>> comp.scheduler.add_condition(
-    ...     A,
+    >>> scheduler.add_condition(
+    ...     'A',
     ...     graph_scheduler.Any(
     ...         graph_scheduler.AtPass(0),
-    ...         graph_scheduler.EveryNCalls(B, 2)
+    ...         graph_scheduler.EveryNCalls('B', 2)
     ...     )
     ... )
 
-    >>> comp.scheduler.add_condition(
-    ...     B,
+    >>> scheduler.add_condition(
+    ...     'B',
     ...     graph_scheduler.Any(
-    ...         graph_scheduler.EveryNCalls(A, 1),
-    ...         graph_scheduler.EveryNCalls(B, 1)
+    ...         graph_scheduler.EveryNCalls('A', 1),
+    ...         graph_scheduler.EveryNCalls('B', 1)
     ...     )
     ... )
     >>> termination_conds = {
-    ...     graph_scheduler.TimeScale.ENVIRONMENT_STATE_UPDATE: graph_scheduler.AfterNCalls(B, 4, time_scale=graph_scheduler.TimeScale.ENVIRONMENT_STATE_UPDATE)
+    ...     graph_scheduler.TimeScale.ENVIRONMENT_STATE_UPDATE: graph_scheduler.AfterNCalls('B', 4, time_scale=graph_scheduler.TimeScale.ENVIRONMENT_STATE_UPDATE)
     ... }
-    >>> execution_sequence = list(comp.scheduler.run(termination_conds=termination_conds))
-    >>> execution_sequence # doctest: +SKIP
-    [{(TransferMechanism A)}, {(TransferMechanism B)}, {(TransferMechanism B)}, {(TransferMechanism A)}, {(TransferMechanism B)}, {(TransferMechanism B)}]
+    >>> execution_sequence = list(scheduler.run(termination_conds=termination_conds))
+    >>> execution_sequence
+    [{'A'}, {'B'}, {'B'}, {'A'}, {'B'}, {'B'}]
 
 * Basic phasing in two processes::
 
-    >>> comp = pnl.Composition()
-    >>> pway = comp.add_linear_processing_pathway([A, C])
-    >>> pway.pathway
-    [(TransferMechanism A), (MappingProjection MappingProjection from A[RESULT] to C[InputPort-0]), (TransferMechanism C)]
+    >>> graph = {'A': set(), 'B': set(), 'C': {'A', 'B'}}
+    >>> scheduler = graph_scheduler.Scheduler(graph=graph)
 
-    >>> pway = comp.add_linear_processing_pathway([B, C])
-    >>> pway.pathway
-    [(TransferMechanism B), (MappingProjection MappingProjection from B[RESULT] to C[InputPort-0]), (TransferMechanism C)]
-
-    >>> comp.scheduler.add_condition(A, graph_scheduler.EveryNPasses(1))
-    >>> comp.scheduler.add_condition(B, graph_scheduler.EveryNCalls(A, 2))
-    >>> comp.scheduler.add_condition(
-    ...     C,
+    >>> scheduler.add_condition('A', graph_scheduler.EveryNPasses(1))
+    >>> scheduler.add_condition('B', graph_scheduler.EveryNCalls('A', 2))
+    >>> scheduler.add_condition(
+    ...     'C',
     ...     graph_scheduler.Any(
-    ...         graph_scheduler.AfterNCalls(A, 3),
-    ...         graph_scheduler.AfterNCalls(B, 3)
+    ...         graph_scheduler.AfterNCalls('A', 3),
+    ...         graph_scheduler.AfterNCalls('B', 3)
     ...     )
     ... )
     >>> termination_conds = {
-    ...     graph_scheduler.TimeScale.ENVIRONMENT_STATE_UPDATE: graph_scheduler.AfterNCalls(C, 4, time_scale=graph_scheduler.TimeScale.ENVIRONMENT_STATE_UPDATE)
+    ...     graph_scheduler.TimeScale.ENVIRONMENT_STATE_UPDATE: graph_scheduler.AfterNCalls('C', 4, time_scale=graph_scheduler.TimeScale.ENVIRONMENT_STATE_UPDATE)
     ... }
-    >>> execution_sequence = list(comp.scheduler.run(termination_conds=termination_conds))
-    >>> execution_sequence  # doctest: +SKIP
-    [{(TransferMechanism A)}, {(TransferMechanism A), (TransferMechanism B)}, {(TransferMechanism A)}, {(TransferMechanism C)}, {(TransferMechanism A), (TransferMechanism B)}, {(TransferMechanism C)}, {(TransferMechanism A)}, {(TransferMechanism C)}, {(TransferMechanism A), (TransferMechanism B)}, {(TransferMechanism C)}]
+    >>> execution_sequence = list(scheduler.run(termination_conds=termination_conds))
+    >>> execution_sequence # doctest: +SKIP
+    [{'A'}, {'A', 'B'}, {'A'}, {'C'}, {'A', 'B'}, {'C'}, {'A'}, {'C'}, {'A', 'B'}, {'C'}]
 
 .. _Scheduler_Class_Reference
 
@@ -388,20 +345,19 @@ class SchedulerError(Exception):
 
 
 class Scheduler:
-    """Generates an order of execution for `Components <Component>` in a `Composition <Composition>` or graph
+    """Generates an order of execution for nodes in a graph or graph
     specification dictionary, possibly determined by a set of `Conditions <Condition>`.
 
     Arguments
     ---------
 
     conditions  : ConditionSet
-        set of `Conditions <Condition>` that specify when individual `Components` <Component>` in **composition**
+        set of `Conditions <Condition>` that specify when individual nodes in **graph**
         execute and any dependencies among them.
 
-    graph : Dict[object: set(object)], Graph
+    graph : Dict[object: set(object)]
         a graph specification dictionary - each entry of the dictionary must be an object,
         and the value of each entry must be a set of zero or more objects that project directly to the key.
-        or, a `Graph`
 
     mode : SchedulingMode[STANDARD|EXACT_TIME] : SchedulingMode.STANDARD
         sets the mode of scheduling: `standard <Scheduler_Execution>` or
@@ -647,8 +603,8 @@ class Scheduler:
         Arguments
         ---------
 
-        owner : Component
-            specifies the Component with which the **condition** should be associated. **condition**
+        owner : ``node``
+            specifies the node with which the **condition** should be associated. **condition**
             will govern the execution behavior of **owner**
 
         condition : Condition
@@ -666,11 +622,11 @@ class Scheduler:
         Arguments
         ---------
 
-        conditions : dict[`Component <Component>`: `Condition`], `ConditionSet`
+        conditions : dict[``node``: `Condition`], `ConditionSet`
             specifies collection of Conditions to be added to this ConditionSet,
 
             if a dict is provided:
-                each entry should map an owner `Component` (the `Component` whose execution behavior will be
+                each entry should map an owner node (the node whose execution behavior will be
                 governed) to a `Condition <Condition>`
 
         """
