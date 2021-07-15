@@ -13,7 +13,6 @@ from psyneulink.core.components.projections.pathway.mappingprojection import Map
 from psyneulink.core.compositions.composition import Composition, EdgeType
 from psyneulink.core.globals.keywords import VALUE
 from psyneulink.core.scheduling.condition import AfterNCalls, AfterNPasses, AfterNTrials, AfterPass, All, AllHaveRun, Always, Any, AtPass, BeforeNCalls, BeforePass, EveryNCalls, EveryNPasses, JustRan, TimeInterval, WhenFinished
-from psyneulink.core.scheduling.scheduler import Scheduler
 from psyneulink.core.scheduling.time import TimeScale
 from psyneulink.library.components.mechanisms.processing.integrator.ddm import DDM
 
@@ -69,7 +68,7 @@ class TestScheduler:
         comp1.add_node(A)
         comp2.add_node(A)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp1))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp1))
 
         sched.add_condition(A, BeforeNCalls(A, 5, time_scale=TimeScale.LIFE))
 
@@ -107,7 +106,7 @@ class TestScheduler:
         A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
         comp.add_node(A)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, BeforeNCalls(A, 5, time_scale=TimeScale.LIFE))
 
@@ -245,7 +244,7 @@ class TestLinear:
         comp.add_projection(MappingProjection(), A, B)
         comp.add_projection(MappingProjection(), B, C)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, EveryNPasses(1))
         sched.add_condition(B, EveryNCalls(A, 2))
@@ -270,7 +269,7 @@ class TestLinear:
         comp.add_projection(MappingProjection(), A, B)
         comp.add_projection(MappingProjection(), B, C)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, EveryNPasses(1))
         sched.add_condition(B, EveryNCalls(A, 2))
@@ -300,7 +299,7 @@ class TestLinear:
         comp.add_projection(MappingProjection(), A, B)
         comp.add_projection(MappingProjection(), B, C)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, EveryNPasses(1))
         sched.add_condition(B, Any(EveryNCalls(A, 2), AfterPass(1)))
@@ -330,7 +329,7 @@ class TestLinear:
         comp.add_projection(MappingProjection(), A, B)
         comp.add_projection(MappingProjection(), B, C)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, EveryNPasses(1))
         sched.add_condition(B, EveryNCalls(A, 2))
@@ -354,7 +353,7 @@ class TestLinear:
         comp.add_projection(MappingProjection(), A, B)
         comp.add_projection(MappingProjection(), B, C)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, EveryNPasses(1))
         sched.add_condition(B, EveryNCalls(A, 2))
@@ -381,7 +380,7 @@ class TestLinear:
         comp.add_projection(MappingProjection(), A, B)
         comp.add_projection(MappingProjection(), B, C)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, BeforePass(5))
         sched.add_condition(B, AfterNCalls(A, 5))
@@ -408,7 +407,7 @@ class TestLinear:
         comp.add_projection(MappingProjection(), A, B)
         comp.add_projection(MappingProjection(), B, C)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, BeforePass(5))
         sched.add_condition(B, AfterNCalls(A, 5))
@@ -439,7 +438,7 @@ class TestLinear:
             comp.add_node(m)
         comp.add_projection(MappingProjection(), A, B)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, EveryNPasses(1))
         sched.add_condition(B, EveryNCalls(A, 2))
@@ -460,7 +459,7 @@ class TestLinear:
             comp.add_node(m)
         comp.add_projection(MappingProjection(), A, B)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, EveryNPasses(1))
         sched.add_condition(B, EveryNCalls(A, 2))
@@ -481,7 +480,7 @@ class TestLinear:
             comp.add_node(m)
         comp.add_projection(MappingProjection(), A, B)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, EveryNPasses(1))
         sched.add_condition(B, WhenFinished(A))
@@ -511,7 +510,7 @@ class TestLinear:
             comp.add_node(m)
         comp.add_projection(MappingProjection(), A, B)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, EveryNPasses(1))
         sched.add_condition(B, WhenFinished(A))
@@ -534,7 +533,7 @@ class TestLinear:
             comp.add_node(m)
         comp.add_projection(MappingProjection(), A, B)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, EveryNPasses(1))
         sched.add_condition(B, Any(WhenFinished(A), AfterNCalls(A, 3)))
@@ -557,7 +556,7 @@ class TestLinear:
             comp.add_node(m)
         comp.add_projection(MappingProjection(), A, B)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, EveryNPasses(1))
         sched.add_condition(B, Any(WhenFinished(A), AfterNCalls(A, 3)))
@@ -580,7 +579,7 @@ class TestLinear:
             comp.add_node(m)
         comp.add_projection(MappingProjection(), A, B)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, EveryNPasses(1))
         sched.add_condition(B, All(WhenFinished(A), AfterNCalls(A, 3)))
@@ -603,7 +602,7 @@ class TestLinear:
             comp.add_node(m)
         comp.add_projection(MappingProjection(), A, B)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, EveryNPasses(1))
         sched.add_condition(B, All(WhenFinished(A), AfterNCalls(A, 3)))
@@ -627,7 +626,7 @@ class TestLinear:
             comp.add_node(m)
         comp.add_projection(MappingProjection(), A, B)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, EveryNPasses(1))
         sched.add_condition(B, EveryNCalls(A, 2))
@@ -648,7 +647,7 @@ class TestLinear:
             comp.add_node(m)
         comp.add_projection(MappingProjection(), A, B)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, Any(AtPass(0), EveryNCalls(B, 2)))
         sched.add_condition(B, Any(EveryNCalls(A, 1), EveryNCalls(B, 1)))
@@ -671,7 +670,7 @@ class TestLinear:
         comp.add_projection(MappingProjection(), A, B)
         comp.add_projection(MappingProjection(), B, C)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, Any(AtPass(0), EveryNCalls(C, 2)))
         sched.add_condition(B, Any(JustRan(A), JustRan(B)))
@@ -695,7 +694,7 @@ class TestLinear:
         comp.add_projection(MappingProjection(), A, B)
         comp.add_projection(MappingProjection(), B, C)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, Any(AtPass(0), EveryNCalls(C, 2)))
         sched.add_condition(B, Any(EveryNCalls(A, 1), EveryNCalls(C, 1)))
@@ -743,7 +742,7 @@ class TestBranching:
         comp.add_projection(MappingProjection(), A, B)
         comp.add_projection(MappingProjection(), A, C)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, EveryNPasses(1))
         sched.add_condition(B, EveryNCalls(A, 1))
@@ -772,7 +771,7 @@ class TestBranching:
         comp.add_projection(MappingProjection(), A, B)
         comp.add_projection(MappingProjection(), A, C)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, EveryNPasses(1))
         sched.add_condition(B, EveryNCalls(A, 1))
@@ -804,7 +803,7 @@ class TestBranching:
         comp.add_projection(MappingProjection(), A, B)
         comp.add_projection(MappingProjection(), A, C)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, EveryNPasses(1))
         sched.add_condition(B, EveryNCalls(A, 2))
@@ -833,7 +832,7 @@ class TestBranching:
         comp.add_projection(MappingProjection(), A, B)
         comp.add_projection(MappingProjection(), A, C)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, EveryNPasses(1))
         sched.add_condition(B, EveryNCalls(A, 2))
@@ -866,7 +865,7 @@ class TestBranching:
         comp.add_projection(MappingProjection(), A, B)
         comp.add_projection(MappingProjection(), A, C)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, EveryNPasses(1))
         sched.add_condition(B, EveryNCalls(A, 2))
@@ -904,7 +903,7 @@ class TestBranching:
         comp.add_projection(MappingProjection(), A, C)
         comp.add_projection(MappingProjection(), B, C)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, EveryNPasses(1))
         sched.add_condition(B, EveryNCalls(A, 2))
@@ -933,7 +932,7 @@ class TestBranching:
         comp.add_projection(MappingProjection(), A, C)
         comp.add_projection(MappingProjection(), B, C)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, EveryNPasses(1))
         sched.add_condition(B, EveryNCalls(A, 2))
@@ -968,7 +967,7 @@ class TestBranching:
         comp.add_projection(MappingProjection(), B, D)
         comp.add_projection(MappingProjection(), C, D)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, Always())
         sched.add_condition(B, Always())
@@ -997,7 +996,7 @@ class TestBranching:
         comp.add_projection(MappingProjection(), B, D)
         comp.add_projection(MappingProjection(), C, D)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, EveryNPasses(1))
         sched.add_condition(B, EveryNCalls(A, 2))
@@ -1027,7 +1026,7 @@ class TestBranching:
         comp.add_projection(MappingProjection(), B, D)
         comp.add_projection(MappingProjection(), C, D)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(A, EveryNPasses(1))
         sched.add_condition(B, EveryNCalls(A, 2))
@@ -1071,7 +1070,7 @@ class TestBranching:
         comp.add_projection(MappingProjection(), B1, C2)
         comp.add_projection(MappingProjection(), B3, C2)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         for m in comp.nodes:
             sched.add_condition(m, Always())
@@ -1107,7 +1106,7 @@ class TestBranching:
         comp.add_projection(MappingProjection(), B1, C2)
         comp.add_projection(MappingProjection(), B3, C2)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition_set({
             A1: Always(),
@@ -1154,7 +1153,7 @@ class TestTermination:
             comp.add_node(m)
         comp.add_projection(MappingProjection(), A, B)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition(B, EveryNCalls(A, 2))
 
@@ -1184,7 +1183,7 @@ class TestTermination:
             comp.add_node(m)
         comp.add_projection(MappingProjection(), A, B)
 
-        sched = Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
+        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
         sched.add_condition(B, EveryNCalls(A, 2))
         termination_conds = {TimeScale.TRIAL: AfterNCalls(B, 2)}
 
