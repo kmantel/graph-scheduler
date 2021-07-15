@@ -4,13 +4,13 @@ import numpy as np
 import psyneulink as pnl
 import pytest
 
+from graph_scheduler import Scheduler
+
 from psyneulink import _unit_registry
 from psyneulink.core.components.functions.stateful.integratorfunctions import DriftDiffusionIntegrator, SimpleIntegrator
-from psyneulink.core.components.functions.nonstateful.distributionfunctions import DriftDiffusionAnalytical
-from psyneulink.core.components.functions.nonstateful.transferfunctions import Linear, Logistic
+from psyneulink.core.components.functions.nonstateful.transferfunctions import Linear
 from psyneulink.core.components.mechanisms.processing.integratormechanism import IntegratorMechanism
 from psyneulink.core.components.mechanisms.processing.transfermechanism import TransferMechanism
-from psyneulink.core.components.projections.modulatory.controlprojection import ControlProjection
 from psyneulink.core.components.projections.pathway.mappingprojection import MappingProjection
 from psyneulink.core.compositions.composition import Composition, EdgeType
 from psyneulink.core.globals.keywords import VALUE
@@ -36,51 +36,30 @@ class TestScheduler:
         TransferMechanism.is_finished_flag = self.orig_is_finished_flag
         TransferMechanism.is_finished = self.orig_is_finished
 
-    def test_create_scheduler_from_system_StroopDemo(self):
-        Color_Input = TransferMechanism(name='Color Input', function=Linear(slope=0.2995))
-        Word_Input = TransferMechanism(name='Word Input', function=Linear(slope=0.2995))
+    stroop_paths = [
+        ['Color_Input', 'Color_Hidden', 'Output', 'Decision'],
+        ['Word_Input', 'Word_Hidden', 'Output', 'Decision'],
+        ['Reward']
+    ]
 
-        # Processing Mechanisms (Control)
-        Color_Hidden = TransferMechanism(
-            name='Colors Hidden',
-            function=Logistic(gain=(1.0, ControlProjection)),
-        )
-        Word_Hidden = TransferMechanism(
-            name='Words Hidden',
-            function=Logistic(gain=(1.0, ControlProjection)),
-        )
-        Output = TransferMechanism(
-            name='Output',
-            function=Logistic(gain=(1.0, ControlProjection)),
-        )
+    stroop_consideration_queue = [
+        {'Color_Input', 'Word_Input', 'Reward'},
+        {'Color_Hidden', 'Word_Hidden'},
+        {'Output'},
+        {'Decision'}
+    ]
 
-        # Decision Mechanisms
-        Decision = DDM(
-            function=DriftDiffusionAnalytical(
-                drift_rate=(1.0),
-                threshold=(0.1654),
-                noise=(0.5),
-                starting_point=(0),
-                t0=0.25,
+    @pytest.mark.parametrize(
+        'graph, expected_consideration_queue',
+        [
+            (
+                pytest.helpers.create_graph_from_pathways(*stroop_paths),
+                stroop_consideration_queue
             ),
-            name='Decision',
-        )
-        # Outcome Mechanism:
-        Reward = TransferMechanism(name='Reward')
-
-        myComposition = Composition(pathways=[[Color_Input, Color_Hidden, Output, Decision],
-                                              [Word_Input, Word_Hidden, Output, Decision],
-                                              [Reward]])
-
-        sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(myComposition))
-
-        expected_consideration_queue = [
-            {Color_Input, Word_Input, Reward},
-            {Color_Hidden, Word_Hidden},
-            {Output},
-            {Decision}
         ]
-
+    )
+    def test_construction(self, graph, expected_consideration_queue):
+        sched = Scheduler(graph)
         assert sched.consideration_queue == expected_consideration_queue
 
     def test_copy(self):
@@ -90,25 +69,24 @@ class TestScheduler:
         pass
 
     def test_create_multiple_contexts(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
-        comp.add_node(A)
+        graph = {'A': set()}
+        scheduler = Scheduler(graph)
 
-        comp.scheduler.get_clock(comp.scheduler.default_execution_id)._increment_time(TimeScale.ENVIRONMENT_STATE_UPDATE)
+        scheduler.get_clock(scheduler.default_execution_id)._increment_time(TimeScale.ENVIRONMENT_STATE_UPDATE)
 
         eid = 'eid'
         eid1 = 'eid1'
-        comp.scheduler._init_counts(execution_id=eid)
+        scheduler._init_counts(execution_id=eid)
 
-        assert comp.scheduler.clocks[eid].time.environment_state_update == 0
+        assert scheduler.clocks[eid].time.environment_state_update == 0
 
-        comp.scheduler.get_clock(comp.scheduler.default_execution_id)._increment_time(TimeScale.ENVIRONMENT_STATE_UPDATE)
+        scheduler.get_clock(scheduler.default_execution_id)._increment_time(TimeScale.ENVIRONMENT_STATE_UPDATE)
 
-        assert comp.scheduler.clocks[eid].time.environment_state_update == 0
+        assert scheduler.clocks[eid].time.environment_state_update == 0
 
-        comp.scheduler._init_counts(execution_id=eid1, base_execution_id=comp.scheduler.default_execution_id)
+        scheduler._init_counts(execution_id=eid1, base_execution_id=scheduler.default_execution_id)
 
-        assert comp.scheduler.clocks[eid1].time.environment_state_update == 2
+        assert scheduler.clocks[eid1].time.environment_state_update == 2
 
     def test_two_compositions_one_scheduler(self):
         comp1 = Composition()

@@ -1,3 +1,5 @@
+import types
+
 import psyneulink as pnl
 import pytest
 
@@ -22,6 +24,29 @@ def setify_expected_output(expected_output):
             except TypeError:
                 expected_output[i] = set([expected_output[i]])
     return expected_output
+
+
+@pytest.helpers.register
+def create_graph_from_pathways(*pathways):
+    dependency_dict = {}
+    for p in pathways:
+        for i in range(len(p)):
+            if p[i] not in dependency_dict:
+                dependency_dict[p[i]] = set()
+
+            try:
+                dependency_dict[p[i + 1]].add(p[i])
+            except KeyError:
+                dependency_dict[p[i + 1]] = {p[i]}
+            except IndexError:
+                pass
+
+    return dependency_dict
+
+
+@pytest.helpers.register
+def create_node(function=lambda x: x):
+    return types.SimpleNamespace(function=function)
 
 
 @pytest.fixture
