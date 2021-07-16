@@ -531,18 +531,17 @@ class Scheduler:
                 n: i for n in cs
             })
 
-    def _init_counts(self, execution_id=None, base_execution_id=None):
+    def _init_counts(self, execution_id, base_execution_id=NotImplemented):
         """
             Attributes
             ----------
 
                 execution_id
                     the execution_id to initialize counts for
-                    default : self.default_execution_id
 
                 base_execution_id
                     if specified, the counts for execution_id will be copied from the counts of base_execution_id
-                    default : None
+                    default : NotImplemented
         """
         # all counts are divided by execution_id, which provides a context for the scheduler's execution, so that
         # it can be reused in multiple contexts
@@ -552,7 +551,7 @@ class Scheduler:
         if execution_id not in self.counts_total:
             self.counts_total[execution_id] = {}
 
-            if base_execution_id is not None:
+            if base_execution_id is not NotImplemented:
                 if base_execution_id not in self.counts_total:
                     raise SchedulerError('execution_id {0} not in {1}.counts_total'.format(base_execution_id, self))
 
@@ -572,7 +571,7 @@ class Scheduler:
         if execution_id not in self.counts_useable:
             self.counts_useable[execution_id] = {}
 
-            if base_execution_id is not None:
+            if base_execution_id is not NotImplemented:
                 if base_execution_id not in self.counts_useable:
                     raise SchedulerError('execution_id {0} not in {1}.counts_useable'.format(base_execution_id, self))
 
@@ -585,7 +584,7 @@ class Scheduler:
                 }
 
         if execution_id not in self.execution_list:
-            if base_execution_id is not None:
+            if base_execution_id is not NotImplemented:
                 if base_execution_id not in self.execution_list:
                     raise SchedulerError('execution_id {0} not in {1}.execution_list'.format(base_execution_id, self))
 
@@ -595,11 +594,11 @@ class Scheduler:
 
         self._init_clock(execution_id, base_execution_id)
 
-    def _init_clock(self, execution_id=None, base_execution_id=None):
+    def _init_clock(self, execution_id, base_execution_id=NotImplemented):
         # instantiate new Clock for this execution_id if necessary
         # currently does not work with base_execution_id
         if execution_id not in self.clocks:
-            if base_execution_id is not None:
+            if base_execution_id is not NotImplemented:
                 if base_execution_id not in self.clocks:
                     raise SchedulerError('execution_id {0} not in {1}.clocks'.format(base_execution_id, self))
 
@@ -607,14 +606,14 @@ class Scheduler:
             else:
                 self.clocks[execution_id] = Clock()
 
-    def _delete_counts(self, execution_id=None):
+    def _delete_counts(self, execution_id):
         for obj in [self.counts_useable, self.counts_total, self.clocks, self.execution_list]:
             try:
                 del obj[execution_id]
             except KeyError:
                 pass
 
-    def _reset_counts_total(self, time_scale, execution_id=None):
+    def _reset_counts_total(self, time_scale, execution_id):
         for ts in TimeScale:
             # only reset the values underneath the current scope
             # this works because the enum is set so that higher granularities of time have lower values
@@ -622,7 +621,7 @@ class Scheduler:
                 for c in self.counts_total[execution_id][ts]:
                     self.counts_total[execution_id][ts][c] = 0
 
-    def _reset_counts_useable(self, execution_id=None):
+    def _reset_counts_useable(self, execution_id):
         self.counts_useable[execution_id] = {
             node: {n: 0 for n in self.nodes} for node in self.nodes
         }
