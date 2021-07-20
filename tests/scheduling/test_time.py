@@ -38,6 +38,7 @@ class TestTime:
         base._increment_by_time_scale(increment_time_scale)
         assert base == expected
 
+    @pytest.mark.psyneulink
     def test_multiple_runs(self):
         t1 = pnl.TransferMechanism()
         t2 = pnl.TransferMechanism()

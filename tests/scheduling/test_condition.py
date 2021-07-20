@@ -80,6 +80,7 @@ class TestCondition:
         assert not cond.is_satisfied(False, c=False)
         assert not cond.is_satisfied(False, c=False, extra_arg=True)
 
+    @pytest.mark.psyneulink
     class TestGeneric:
         def test_WhileNot_AtPass(self):
             comp = Composition()
@@ -113,6 +114,7 @@ class TestCondition:
             expected_output = [A, A, set(), A, A]
             assert output == pytest.helpers.setify_expected_output(expected_output)
 
+    @pytest.mark.psyneulink
     class TestRelative:
 
         def test_Any_end_before_one_finished(self):
@@ -209,6 +211,7 @@ class TestCondition:
 
             assert output == pytest.helpers.setify_expected_output(expected_output)
 
+    @pytest.mark.psyneulink
     class TestTime:
 
         def test_BeforeConsiderationSetExecution(self):
@@ -478,6 +481,7 @@ class TestCondition:
             expected_output = [set(), A, A, A, A]
             assert output == pytest.helpers.setify_expected_output(expected_output)
 
+    @pytest.mark.psyneulink
     class TestComponentBased:
 
         def test_BeforeNCalls(self):
@@ -558,6 +562,7 @@ class TestCondition:
             expected_output = [A, A, set([A, B]), set([A, B]), set([A, B])]
             assert output == pytest.helpers.setify_expected_output(expected_output)
 
+    @pytest.mark.psyneulink
     class TestConvenience:
 
         def test_AtEnvironmentStateUpdateStart(self):
@@ -577,6 +582,7 @@ class TestCondition:
             expected_output = [A, B, A, A]
             assert output == pytest.helpers.setify_expected_output(expected_output)
 
+    @pytest.mark.psyneulink
     def test_composite_condition_multi(self):
         comp = Composition()
         A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A')
@@ -611,6 +617,7 @@ class TestCondition:
         ]
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
+    @pytest.mark.psyneulink
     def test_AfterNCallsCombined(self):
         comp = Composition()
         A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A')
@@ -638,6 +645,7 @@ class TestCondition:
         ]
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
+    @pytest.mark.psyneulink
     def test_AllHaveRun(self):
         comp = Composition()
         A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A')
@@ -665,6 +673,7 @@ class TestCondition:
         ]
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
+    @pytest.mark.psyneulink
     def test_AllHaveRun_2(self):
         comp = Composition()
         A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A')
@@ -690,6 +699,8 @@ class TestCondition:
         ]
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
+
+@pytest.mark.psyneulink
 class TestWhenFinished:
 
     @classmethod
@@ -879,6 +890,7 @@ class TestWhenFinished:
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
 
+@pytest.mark.psyneulink
 class TestAbsolute:
     A = TransferMechanism(name='scheduler-pytests-A')
     B = TransferMechanism(name='scheduler-pytests-B')

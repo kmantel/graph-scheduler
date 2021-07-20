@@ -74,6 +74,7 @@ class TestScheduler:
 
         assert scheduler.clocks[eid1].time.environment_state_update == 2
 
+    @pytest.mark.psyneulink
     def test_two_compositions_one_scheduler(self):
         comp1 = Composition()
         comp2 = Composition()
@@ -114,6 +115,7 @@ class TestScheduler:
         # pprint.pprint(output)
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
+    @pytest.mark.psyneulink
     def test_one_composition_two_contexts(self):
         comp = Composition()
         A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
@@ -170,6 +172,7 @@ class TestScheduler:
         # pprint.pprint(output)
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
+    @pytest.mark.psyneulink
     def test_change_termination_condition(self):
         D = DDM(function=DriftDiffusionIntegrator(threshold=10))
         C = Composition(pathways=[D])
@@ -205,6 +208,7 @@ class TestScheduler:
                             [np.array([2.]), np.array([1.])]]
         assert np.allclose(expected_results, np.asfarray(C.results))
 
+    @pytest.mark.psyneulink
     def test_default_condition_1(self):
         A = pnl.TransferMechanism(name='A')
         B = pnl.TransferMechanism(name='B')
@@ -218,6 +222,7 @@ class TestScheduler:
         expected_output = [B, A, B, C]
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
+    @pytest.mark.psyneulink
     def test_default_condition_2(self):
         A = pnl.TransferMechanism(name='A')
         B = pnl.TransferMechanism(name='B')
@@ -231,6 +236,7 @@ class TestScheduler:
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
 
+@pytest.mark.psyneulink
 class TestLinear:
 
     @classmethod
@@ -828,6 +834,7 @@ class TestLinear:
     ########################################
 
 
+@pytest.mark.psyneulink
 class TestBranching:
     @classmethod
     def setup_class(self):
@@ -1840,6 +1847,7 @@ class TestBranching:
                 np.testing.assert_allclose(expected_output[m][i], m.get_output_values(c)[i])
 
 
+@pytest.mark.psyneulink
 class TestTermination:
     def test_termination_conditions_reset(self):
         comp = Composition()
@@ -1970,6 +1978,7 @@ def _get_feedback_source_type(graph, sender, receiver):
         return EdgeType.NON_FEEDBACK
 
 
+@pytest.mark.psyneulink
 class TestFeedback:
 
     def test_unspecified_feedback(self):
@@ -2382,6 +2391,7 @@ class TestFeedback:
         assert np.allclose(comp.results, expected_result)
 
 
+@pytest.mark.psyneulink
 class TestAbsoluteTime:
 
     @pytest.mark.parametrize(
