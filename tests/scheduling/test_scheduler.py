@@ -22,20 +22,6 @@ logger = logging.getLogger(__name__)
 
 
 class TestScheduler:
-    @classmethod
-    def setup_class(self):
-        self.orig_is_finished_flag = TransferMechanism.is_finished_flag
-        self.orig_is_finished = TransferMechanism.is_finished
-        TransferMechanism.is_finished_flag = True
-        TransferMechanism.is_finished = lambda self, context: self.is_finished_flag
-
-    @classmethod
-    def teardown_class(self):
-        del TransferMechanism.is_finished_flag
-        del TransferMechanism.is_finished
-        TransferMechanism.is_finished_flag = self.orig_is_finished_flag
-        TransferMechanism.is_finished = self.orig_is_finished
-
     stroop_paths = [
         ['Color_Input', 'Color_Hidden', 'Output', 'Decision'],
         ['Word_Input', 'Word_Hidden', 'Output', 'Decision'],
@@ -1855,21 +1841,6 @@ class TestBranching:
 
 
 class TestTermination:
-
-    @classmethod
-    def setup_class(self):
-        self.orig_is_finished_flag = TransferMechanism.is_finished_flag
-        self.orig_is_finished = TransferMechanism.is_finished
-        TransferMechanism.is_finished_flag = True
-        TransferMechanism.is_finished = lambda self, context: self.is_finished_flag
-
-    @classmethod
-    def teardown_class(self):
-        del TransferMechanism.is_finished_flag
-        del TransferMechanism.is_finished
-        TransferMechanism.is_finished_flag = self.orig_is_finished_flag
-        TransferMechanism.is_finished = self.orig_is_finished
-
     def test_termination_conditions_reset(self):
         comp = Composition()
         A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
