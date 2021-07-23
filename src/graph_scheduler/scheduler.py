@@ -58,12 +58,14 @@ Pseudocode::
     consideration_queue <- list(toposort(graph))
 
     reset TimeScale.ENVIRONMENT_STATE_UPDATE counters
-    while TimeScale.ENVIRONMENT_STATE_UPDATE termination conditions are not satisfied:
+    while TimeScale.ENVIRONMENT_STATE_UPDATE are not satisfied
+    and TimeScale.ENVIRONMENT_SEQUENCE termination conditions are not satisfied:
         reset TimeScale.PASS counters
         cur_index <- 0
 
         while TimeScale.ENVIRONMENT_STATE_UPDATE termination conditions are not satisfied
-              and cur_index < len(consideration_queue):
+        and TimeScale.ENVIRONMENT_SEQUENCE termination conditions are not satisfied
+        and cur_index < len(consideration_queue):
 
             cur_consideration_set <- consideration_queue[cur_index]
             do:
@@ -77,11 +79,14 @@ Pseudocode::
                         increment execution and time counters
             while cur_consideration_set_has_changed
 
-            if cur_consideration_set_execution is not empty:
+            if cur_consideration_set_execution is not empty or absolute time conditions are used:
                 yield cur_consideration_set_execution
 
             increment cur_index
             increment time counters
+
+        if all execution sets yielded were empty:
+            yield an empty execution set
 
 .. _Scheduler_Execution:
 
