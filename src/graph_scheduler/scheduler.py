@@ -549,8 +549,6 @@ class Scheduler:
         # stores total the number of occurrences of a node through the time scale
         # i.e. the number of times node has ran/been queued to run in a trial
         if execution_id not in self.counts_total:
-            self.counts_total[execution_id] = {}
-
             if base_execution_id is not NotImplemented:
                 if base_execution_id not in self.counts_total:
                     raise SchedulerError('execution_id {0} not in {1}.counts_total'.format(base_execution_id, self))
@@ -569,8 +567,6 @@ class Scheduler:
         # so, in the previous example B would check to see if counts_useable[A][B] >= 2, in which case B can run
         # then, counts_useable[a][b] would be reset to 0, even if it was greater than 2
         if execution_id not in self.counts_useable:
-            self.counts_useable[execution_id] = {}
-
             if base_execution_id is not NotImplemented:
                 if base_execution_id not in self.counts_useable:
                     raise SchedulerError('execution_id {0} not in {1}.counts_useable'.format(base_execution_id, self))
