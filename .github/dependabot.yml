@@ -10,7 +10,7 @@ updates:
     directory: "/" # use top dir
     schedule:
       interval: "daily"
-    target-branch: "devel"
+    target-branch: "main"
     commit-message:
       prefix: "github-actions"
       include: "scope"
@@ -21,7 +21,7 @@ updates:
     directory: "/" # use top dir
     schedule:
       interval: "daily"
-    target-branch: "devel"
+    target-branch: "main"
     commit-message:
       prefix: "requirements"
     labels:
