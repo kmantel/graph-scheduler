@@ -1,0 +1,713 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Scheduler &mdash; Graph Scheduler 0.2.0+23.gc51ef4e documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Condition" href="Condition.html" />
+    <link rel="prev" title="Graph Scheduler" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Graph Scheduler
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.2.0+23
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Graph Scheduler</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Scheduler</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#creating-a-scheduler">Creating a Scheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#algorithm">Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#execution">Execution</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#termination-conditions"><em>Termination Conditions</em></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#absolute-time">Absolute Time</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#exact-time-mode">Exact Time Mode</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#class-reference">Class Reference</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Condition.html">Condition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Time.html">Time</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Graph Scheduler</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Scheduler</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/Scheduler.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-graph_scheduler.scheduler">
+<span id="scheduler"></span><h1>Scheduler<a class="headerlink" href="#module-graph_scheduler.scheduler" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>A Scheduler is used to generate the order in which the nodes of a graph are
+executed. By default, a Scheduler executes nodes in an order determined by the pattern of edges among the nodes in the graph, with each node executed once
+per <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.PASS" title="graph_scheduler.time.TimeScale.PASS"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">PASS</span></code></a> through the graph. For example, in a <code class="docutils literal notranslate"><span class="pre">graph</span></code> in which a node <em>A</em> projects to a node
+<em>B</em> that projects to a node <em>C</em>, <em>A</em> will execute first followed by <em>B</em>, and then <em>C</em> in each <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.PASS" title="graph_scheduler.time.TimeScale.PASS"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">PASS</span></code></a> through the
+graph. However, a Scheduler can be used to implement more complex patterns of execution, by specifying
+<a class="reference internal" href="Condition.html"><span class="doc">Conditions</span></a> that determine when and how many times individual nodes execute, and whether and how
+this depends on the execution of other nodes. Any executable node in a graph can be assigned a
+Condition, and Conditions can be combined in arbitrary ways to generate any pattern of execution of the nodes
+in a graph that is logically possible.</p>
+</div>
+<div class="section" id="creating-a-scheduler">
+<span id="scheduler-creation"></span><h2>Creating a Scheduler<a class="headerlink" href="#creating-a-scheduler" title="Permalink to this headline">¶</a></h2>
+<p>When creating a Scheduler explicitly, the set of nodes
+to be executed and their order must be specified in the Scheduler’s constructor using one the following:</p>
+<ul class="simple">
+<li><p>a <em>graph specification dictionary</em> in the <strong>graph</strong> argument -
+each entry of the dictionary must be a node of a graph, and the value of each entry must be a set of
+zero or more nodes that project directly to the key.  The graph must be acyclic; an error is generated if any
+cycles (e.g., recurrent dependencies) are detected.  The Scheduler computes a <code class="xref any docutils literal notranslate"><span class="pre">toposort</span></code> from the graph that is
+used as the default order of executions, subject to any Conditions that have been specified
+(see <a class="reference internal" href="#scheduler-algorithm"><span class="std std-ref">below</span></a>).</p></li>
+</ul>
+<p>Conditions can be added to a Scheduler when it is created by specifying a <a class="reference internal" href="Condition.html#graph_scheduler.condition.ConditionSet" title="graph_scheduler.condition.ConditionSet"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ConditionSet</span></code></a> (a set of
+<a class="reference internal" href="Condition.html"><span class="doc">Conditions</span></a>) in the <strong>conditions</strong> argument of its constructor.  Individual Conditions and/or
+ConditionSets can also be added after the Scheduler has been created, using its <a class="reference internal" href="Condition.html#graph_scheduler.condition.ConditionSet.add_condition" title="graph_scheduler.condition.ConditionSet.add_condition"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">add_condition</span></code></a> and
+<a class="reference internal" href="Condition.html#graph_scheduler.condition.ConditionSet.add_condition_set" title="graph_scheduler.condition.ConditionSet.add_condition_set"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">add_condition_set</span></code></a> methods, respectively.</p>
+</div>
+<div class="section" id="algorithm">
+<span id="scheduler-algorithm"></span><h2>Algorithm<a class="headerlink" href="#algorithm" title="Permalink to this headline">¶</a></h2>
+<p id="consideration-set">When a Scheduler is created, it constructs a <a class="reference internal" href="#graph_scheduler.scheduler.Scheduler.consideration_queue" title="graph_scheduler.scheduler.Scheduler.consideration_queue"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">consideration_queue</span></code></a>:  a list of <code class="docutils literal notranslate"><span class="pre">consideration</span> <span class="pre">sets</span></code>
+that defines the order in which nodes are eligible to be executed.  This is based on the dependencies specified in the graph
+specification provided in the Scheduler’s constructor.  Each <code class="docutils literal notranslate"><span class="pre">consideration_set</span></code>
+is a set of nodes that are eligible to execute at the same time/<a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION" title="graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">CONSIDERATION_SET_EXECUTION</span></code></a> (i.e.,
+that appear at the same “depth” in a sequence of dependencies, and among which there are no dependencies).  The first
+<code class="docutils literal notranslate"><span class="pre">consideration_set</span></code> consists of only origin nodes. The second consists of all nodes
+that receive edges from the nodes in the first <code class="docutils literal notranslate"><span class="pre">consideration_set</span></code>.
+The third consists of nodes that receive edges from nodes in the first two <code class="docutils literal notranslate"><span class="pre">consideration</span> <span class="pre">sets</span></code>,
+and so forth.  When the Scheduler is run, it uses the <a class="reference internal" href="#graph_scheduler.scheduler.Scheduler.consideration_queue" title="graph_scheduler.scheduler.Scheduler.consideration_queue"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">consideration_queue</span></code></a> to determine which
+nodes are eligible to execute in each <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION" title="graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">CONSIDERATION_SET_EXECUTION</span></code></a> of a <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.PASS" title="graph_scheduler.time.TimeScale.PASS"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">PASS</span></code></a>, and then evaluates the <a class="reference internal" href="Condition.html"><span class="doc">Condition</span></a>
+associated with each node in the current <code class="docutils literal notranslate"><span class="pre">consideration_set</span></code> to determine which should
+actually be assigned for execution.</p>
+<p>Pseudocode:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>consideration_queue &lt;- list(toposort(graph))
+
+reset TimeScale.ENVIRONMENT_STATE_UPDATE counters
+while TimeScale.ENVIRONMENT_STATE_UPDATE are not satisfied
+and TimeScale.ENVIRONMENT_SEQUENCE termination conditions are not satisfied:
+    reset TimeScale.PASS counters
+    cur_index &lt;- 0
+
+    while TimeScale.ENVIRONMENT_STATE_UPDATE termination conditions are not satisfied
+    and TimeScale.ENVIRONMENT_SEQUENCE termination conditions are not satisfied
+    and cur_index &lt; len(consideration_queue):
+
+        cur_consideration_set &lt;- consideration_queue[cur_index]
+        do:
+            cur_consideration_set_has_changed &lt;- False
+            for cur_node in cur_consideration_set:
+                if  cur_node not in cur_consideration_set_execution
+                    and cur_node`s Condition is satisfied:
+
+                    cur_consideration_set_has_changed &lt;- True
+                    add cur_node to cur_consideration_set_execution
+                    increment execution and time counters
+        while cur_consideration_set_has_changed
+
+        if cur_consideration_set_execution is not empty or absolute time conditions are used:
+            yield cur_consideration_set_execution
+
+        increment cur_index
+        increment time counters
+
+    if all execution sets yielded were empty:
+        yield an empty execution set
+</pre></div>
+</div>
+</div>
+<div class="section" id="execution">
+<span id="scheduler-execution"></span><h2>Execution<a class="headerlink" href="#execution" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This section covers normal scheduler execution
+(<code class="xref any docutils literal notranslate"><span class="pre">Scheduler.mode</span> <span class="pre">=</span> <span class="pre">SchedulingMode.STANDARD</span></code>). See
+<a class="reference internal" href="#scheduler-exact-time"><span class="std std-ref">Exact Time Mode</span></a> below for a description of
+<a class="reference internal" href="#graph_scheduler.scheduler.SchedulingMode.EXACT_TIME" title="graph_scheduler.scheduler.SchedulingMode.EXACT_TIME"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">exact</span> <span class="pre">time</span> <span class="pre">mode</span></code></a>.</p>
+</div>
+<p>When a Scheduler is run, it provides a set of nodes that should be run next, based on their dependencies in the
+graph specification, and any <a class="reference internal" href="Condition.html"><span class="doc">Conditions</span></a>, specified in the Scheduler’s
+constructor. For each call to the <a class="reference internal" href="#graph_scheduler.scheduler.Scheduler.run" title="graph_scheduler.scheduler.Scheduler.run"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">run</span></code></a> method, the Scheduler sequentially evaluates its
+<a class="reference internal" href="#consideration-set"><span class="std std-ref">consideration sets</span></a> in their order in the <a class="reference internal" href="#graph_scheduler.scheduler.Scheduler.consideration_queue" title="graph_scheduler.scheduler.Scheduler.consideration_queue"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">consideration_queue</span></code></a>.  For each set, it determines
+which nodes in the set are allowed to execute, based on whether their associated <a class="reference internal" href="Condition.html"><span class="doc">Condition</span></a> has
+been met. Any node that does not have a <a class="reference internal" href="Condition.html"><span class="doc">Condition</span></a> explicitly specified is assigned a Condition that causes it
+to be executed whenever it is <a class="reference internal" href="#scheduler-algorithm"><span class="std std-ref">under consideration</span></a> and all its structural parents have been
+executed at least once since the node’s last execution. All of the nodes within a <a class="reference internal" href="#consideration-set"><span class="std std-ref">consideration_set</span></a> that are allowed to execute comprise a <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION" title="graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">CONSIDERATION_SET_EXECUTION</span></code></a> of execution. These nodes are considered
+as executing simultaneously.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The ordering of the nodes specified within a <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION" title="graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">CONSIDERATION_SET_EXECUTION</span></code></a> is arbitrary (and is irrelevant, as there are no
+graph dependencies among nodes within the same <code class="docutils literal notranslate"><span class="pre">consideration_set</span></code>). However,
+the execution of a node within a <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION" title="graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">CONSIDERATION_SET_EXECUTION</span></code></a> may trigger the execution of another node within its
+<code class="docutils literal notranslate"><span class="pre">consideration_set</span></code>, as in the example below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>   C
+  ↗ ↖
+ A   B
+
+scheduler.add_condition(B, graph_scheduler.EveryNCalls(A, 2))
+scheduler.add_condition(C, graph_scheduler.EveryNCalls(B, 1))
+
+execution sets: [{A}, {A, B}, {C}, ...]
+</pre></div>
+</div>
+<p>Since there are no graph dependencies between <code class="xref any docutils literal notranslate"><span class="pre">A</span></code> and <code class="xref any docutils literal notranslate"><span class="pre">B</span></code>, they may execute in the same <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION" title="graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">CONSIDERATION_SET_EXECUTION</span></code></a>. Morever,
+<code class="xref any docutils literal notranslate"><span class="pre">A</span></code> and <code class="xref any docutils literal notranslate"><span class="pre">B</span></code> are in the same <code class="docutils literal notranslate"><span class="pre">consideration_set</span></code>. Since <code class="xref any docutils literal notranslate"><span class="pre">B</span></code> is specified to run every two
+times <code class="xref any docutils literal notranslate"><span class="pre">A</span></code> runs, <code class="xref any docutils literal notranslate"><span class="pre">A</span></code>’s second execution in the second <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION" title="graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">CONSIDERATION_SET_EXECUTION</span></code></a> allows <code class="xref any docutils literal notranslate"><span class="pre">B</span></code> to run within that <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION" title="graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">CONSIDERATION_SET_EXECUTION</span></code></a>,
+rather than waiting for the next <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.PASS" title="graph_scheduler.time.TimeScale.PASS"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">PASS</span></code></a>.</p>
+</div>
+<p>For each <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION" title="graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">CONSIDERATION_SET_EXECUTION</span></code></a>, the Scheduler evaluates whether any specified
+<a class="reference internal" href="#scheduler-termination-conditions"><span class="std std-ref">termination Conditions</span></a> have been met, and terminates if so.  Otherwise,
+it returns the set of nodes that should be executed in the current <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION" title="graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">CONSIDERATION_SET_EXECUTION</span></code></a>. Each subsequent call to the
+<a class="reference internal" href="#graph_scheduler.scheduler.Scheduler.run" title="graph_scheduler.scheduler.Scheduler.run"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">run</span></code></a> method returns the set of nodes in the following <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION" title="graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">CONSIDERATION_SET_EXECUTION</span></code></a>.</p>
+<p>Processing of all of the <a class="reference internal" href="#consideration-set"><span class="std std-ref">consideration_sets</span></a> in the <a class="reference internal" href="#graph_scheduler.scheduler.Scheduler.consideration_queue" title="graph_scheduler.scheduler.Scheduler.consideration_queue"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">consideration_queue</span></code></a> constitutes a <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.PASS" title="graph_scheduler.time.TimeScale.PASS"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">PASS</span></code></a> of
+execution, over which every node in the graph has been considered for execution. Subsequent calls to the
+<a class="reference internal" href="#graph_scheduler.scheduler.Scheduler.run" title="graph_scheduler.scheduler.Scheduler.run"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">run</span></code></a> method cycle back through the <a class="reference internal" href="#graph_scheduler.scheduler.Scheduler.consideration_queue" title="graph_scheduler.scheduler.Scheduler.consideration_queue"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">consideration_queue</span></code></a>, evaluating the <a class="reference internal" href="#consideration-set"><span class="std std-ref">consideration_sets</span></a> in the same order as previously. Different subsets of nodes within the same <a class="reference internal" href="#consideration-set"><span class="std std-ref">consideration_set</span></a> may be assigned to execute on each <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.PASS" title="graph_scheduler.time.TimeScale.PASS"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">PASS</span></code></a>, since different Conditions may be satisfied.</p>
+<p>The Scheduler continues to make <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.PASS" title="graph_scheduler.time.TimeScale.PASS"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">PASS</span></code></a>es through the <a class="reference internal" href="#graph_scheduler.scheduler.Scheduler.consideration_queue" title="graph_scheduler.scheduler.Scheduler.consideration_queue"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">consideration_queue</span></code></a> until a <a class="reference internal" href="#scheduler-termination-conditions"><span class="std std-ref">termination Condition</span></a> is satisfied. If no termination Conditions are specified, by default the Scheduler
+terminates an <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.ENVIRONMENT_STATE_UPDATE" title="graph_scheduler.time.TimeScale.ENVIRONMENT_STATE_UPDATE"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">ENVIRONMENT_STATE_UPDATE</span></code></a> when every node has been specified for execution at least once
+(corresponding to the <a class="reference internal" href="Condition.html#graph_scheduler.condition.AllHaveRun" title="graph_scheduler.condition.AllHaveRun"><code class="xref any py py-class docutils literal notranslate"><span class="pre">AllHaveRun</span></code></a> Condition).  However, other termination Conditions can be specified,
+that may cause the Scheduler to terminate an <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.ENVIRONMENT_STATE_UPDATE" title="graph_scheduler.time.TimeScale.ENVIRONMENT_STATE_UPDATE"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">ENVIRONMENT_STATE_UPDATE</span></code></a> earlier or later (e.g., when the Condition
+for a particular node or set of nodes is met).</p>
+<div class="section" id="termination-conditions">
+<span id="scheduler-termination-conditions"></span><h3><em>Termination Conditions</em><a class="headerlink" href="#termination-conditions" title="Permalink to this headline">¶</a></h3>
+<p>Termination conditions are <a class="reference internal" href="Condition.html"><span class="doc">Conditions</span></a> that specify when the open-ended units of time - <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.ENVIRONMENT_STATE_UPDATE" title="graph_scheduler.time.TimeScale.ENVIRONMENT_STATE_UPDATE"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">ENVIRONMENT_STATE_UPDATE</span></code></a> and <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.ENVIRONMENT_SEQUENCE" title="graph_scheduler.time.TimeScale.ENVIRONMENT_SEQUENCE"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">ENVIRONMENT_SEQUENCE</span></code></a> - have ended.  By default, the termination condition for an <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.ENVIRONMENT_STATE_UPDATE" title="graph_scheduler.time.TimeScale.ENVIRONMENT_STATE_UPDATE"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">ENVIRONMENT_STATE_UPDATE</span></code></a> is
+<a class="reference internal" href="Condition.html#graph_scheduler.condition.AllHaveRun" title="graph_scheduler.condition.AllHaveRun"><code class="xref any py py-class docutils literal notranslate"><span class="pre">AllHaveRun</span></code></a>, which is satisfied when all nodes have run at least once within the environment state update, and the termination
+condition for an <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.ENVIRONMENT_SEQUENCE" title="graph_scheduler.time.TimeScale.ENVIRONMENT_SEQUENCE"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">ENVIRONMENT_SEQUENCE</span></code></a> is when all of its constituent environment state updates have terminated.</p>
+</div>
+</div>
+<div class="section" id="absolute-time">
+<span id="scheduler-absolute-time"></span><h2>Absolute Time<a class="headerlink" href="#absolute-time" title="Permalink to this headline">¶</a></h2>
+<p>The scheduler supports scheduling of models of real-time systems in
+modes, both of which involve mapping real-time values to
+<a class="reference internal" href="Time.html"><span class="doc">Time</span></a>. The default mode is is most compatible with standard
+scheduling, but can cause some unexpected behavior in certain cases
+because it is inexact. The consideration queue remains intact, but as a
+result, actions specified by fixed times of absolute-time-based
+conditions (<a class="reference internal" href="Condition.html#graph_scheduler.condition.TimeInterval.start" title="graph_scheduler.condition.TimeInterval.start"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">start</span></code></a> and <a class="reference internal" href="Condition.html#graph_scheduler.condition.TimeInterval.end" title="graph_scheduler.condition.TimeInterval.end"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">end</span></code></a> of
+<a class="reference internal" href="Condition.html#graph_scheduler.condition.TimeInterval" title="graph_scheduler.condition.TimeInterval"><code class="xref any py py-class docutils literal notranslate"><span class="pre">TimeInterval</span></code></a>, and <a class="reference internal" href="Condition.html#graph_scheduler.condition.TimeTermination.t" title="graph_scheduler.condition.TimeTermination.t"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">t</span></code></a> of <a class="reference internal" href="Condition.html#graph_scheduler.condition.TimeTermination" title="graph_scheduler.condition.TimeTermination"><code class="xref any py py-class docutils literal notranslate"><span class="pre">TimeTermination</span></code></a>) may not occur at exactly
+the time specified. The simplest example of this situation involves a
+linear graph with two nodes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">graph_scheduler</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">graph</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="nb">set</span><span class="p">(),</span> <span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;A&#39;</span><span class="p">}}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span> <span class="o">=</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">Scheduler</span><span class="p">(</span><span class="n">graph</span><span class="o">=</span><span class="n">graph</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">TimeInterval</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">TimeInterval</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>In standard mode, <strong>A</strong> and <strong>B</strong> are in different consideration sets,
+and so can never execute at the same time. At most one of <strong>A</strong> and
+<strong>B</strong> will start exactly at t=10ms, with the other starting at its next
+consideration after. There are many of these examples, and while it may
+be solveable in some cases, it is not a simple problem. So,
+<a class="reference internal" href="#scheduler-exact-time"><span class="std std-ref">Exact Time Mode</span></a> exists as an alternative
+option for these cases, though it comes with its own drawbacks.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Due to issues with floating-point precision, absolute time values in
+conditions and <a class="reference internal" href="Time.html"><span class="doc">Time</span></a> are limited to 8 decimal points. If more
+precision is needed, use
+<a class="reference external" href="https://docs.python.org/3/library/fractions.html">fractions</a>,
+where possible, or smaller units (e.g. microseconds instead of
+milliseconds).</p>
+</div>
+<div class="section" id="exact-time-mode">
+<span id="scheduler-exact-time"></span><h3>Exact Time Mode<a class="headerlink" href="#exact-time-mode" title="Permalink to this headline">¶</a></h3>
+<p>When <a class="reference internal" href="#graph_scheduler.scheduler.Scheduler.mode" title="graph_scheduler.scheduler.Scheduler.mode"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">Scheduler.mode</span></code></a> is <a class="reference internal" href="#graph_scheduler.scheduler.SchedulingMode.EXACT_TIME" title="graph_scheduler.scheduler.SchedulingMode.EXACT_TIME"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">SchedulingMode.EXACT_TIME</span></code></a>, the scheduler is
+capable of handling examples like the one
+<a class="reference internal" href="#scheduler-absolute-time"><span class="std std-ref">above</span></a>. In this mode, all nodes in the
+scheduler’s graph become members of the same consideration set, and may
+be executed at the same time for every consideration set execution,
+subject to the conditions specified. As a result, the guarantees in
+<a class="reference internal" href="#scheduler-execution"><span class="std std-ref">standard scheduling</span></a> may not apply - that is,
+that all parent nodes get a chance to execute before their children, and
+that there exist no data dependencies (edges) between nodes in the
+same execution set. In exact time mode, all nodes will be in one
+[unordered] execution set. An ordering may be inferred by the original
+graph, however, using the <a class="reference internal" href="#graph_scheduler.scheduler.Scheduler.consideration_queue_indices" title="graph_scheduler.scheduler.Scheduler.consideration_queue_indices"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">indices</span> <span class="pre">in</span> <span class="pre">the</span> <span class="pre">original</span> <span class="pre">consideration</span> <span class="pre">queue</span></code></a>.
+Additionally, non-absolute conditions like
+<a class="reference internal" href="Condition.html#graph_scheduler.condition.EveryNCalls" title="graph_scheduler.condition.EveryNCalls"><code class="xref any py py-class docutils literal notranslate"><span class="pre">EveryNCalls</span></code></a> may behave unexpectedly in some cases.</p>
+<p class="rubric">Examples</p>
+<p>Please see <a class="reference internal" href="Condition.html"><span class="doc">Condition</span></a> for a list of all supported Conditions and their behavior.</p>
+<ul>
+<li><p>Basic phasing in a linear process:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">graph_scheduler</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">graph</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="nb">set</span><span class="p">(),</span> <span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;A&#39;</span><span class="p">},</span> <span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;B&#39;</span><span class="p">}}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span> <span class="o">=</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">Scheduler</span><span class="p">(</span><span class="n">graph</span><span class="o">=</span><span class="n">graph</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># implicit condition of Always for A</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">EveryNCalls</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">EveryNCalls</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># implicit AllHaveRun Termination condition</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">execution_sequence</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">scheduler</span><span class="o">.</span><span class="n">run</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">execution_sequence</span>
+<span class="go">[{&#39;A&#39;}, {&#39;A&#39;}, {&#39;B&#39;}, {&#39;A&#39;}, {&#39;A&#39;}, {&#39;B&#39;}, {&#39;A&#39;}, {&#39;A&#39;}, {&#39;B&#39;}, {&#39;C&#39;}]</span>
+</pre></div>
+</div>
+</li>
+<li><p>Alternate basic phasing in a linear process:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">graph</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="nb">set</span><span class="p">(),</span> <span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;A&#39;</span><span class="p">}}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span> <span class="o">=</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">Scheduler</span><span class="p">(</span><span class="n">graph</span><span class="o">=</span><span class="n">graph</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s1">&#39;A&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">Any</span><span class="p">(</span>
+<span class="gp">... </span>        <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">AtPass</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+<span class="gp">... </span>        <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">EveryNCalls</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s1">&#39;B&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">Any</span><span class="p">(</span>
+<span class="gp">... </span>        <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">EveryNCalls</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+<span class="gp">... </span>        <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">EveryNCalls</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">termination_conds</span> <span class="o">=</span> <span class="p">{</span>
+<span class="gp">... </span>    <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">TimeScale</span><span class="o">.</span><span class="n">ENVIRONMENT_STATE_UPDATE</span><span class="p">:</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">AfterNCalls</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">time_scale</span><span class="o">=</span><span class="n">graph_scheduler</span><span class="o">.</span><span class="n">TimeScale</span><span class="o">.</span><span class="n">ENVIRONMENT_STATE_UPDATE</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">execution_sequence</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">scheduler</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">termination_conds</span><span class="o">=</span><span class="n">termination_conds</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">execution_sequence</span>
+<span class="go">[{&#39;A&#39;}, {&#39;B&#39;}, {&#39;B&#39;}, {&#39;A&#39;}, {&#39;B&#39;}, {&#39;B&#39;}]</span>
+</pre></div>
+</div>
+</li>
+<li><p>Basic phasing in two processes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">graph</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="nb">set</span><span class="p">(),</span> <span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="nb">set</span><span class="p">(),</span> <span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">}}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span> <span class="o">=</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">Scheduler</span><span class="p">(</span><span class="n">graph</span><span class="o">=</span><span class="n">graph</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">EveryNPasses</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">EveryNCalls</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s1">&#39;C&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">Any</span><span class="p">(</span>
+<span class="gp">... </span>        <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">AfterNCalls</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+<span class="gp">... </span>        <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">AfterNCalls</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">termination_conds</span> <span class="o">=</span> <span class="p">{</span>
+<span class="gp">... </span>    <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">TimeScale</span><span class="o">.</span><span class="n">ENVIRONMENT_STATE_UPDATE</span><span class="p">:</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">AfterNCalls</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">time_scale</span><span class="o">=</span><span class="n">graph_scheduler</span><span class="o">.</span><span class="n">TimeScale</span><span class="o">.</span><span class="n">ENVIRONMENT_STATE_UPDATE</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">execution_sequence</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">scheduler</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">termination_conds</span><span class="o">=</span><span class="n">termination_conds</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">execution_sequence</span> 
+<span class="go">[{&#39;A&#39;}, {&#39;A&#39;, &#39;B&#39;}, {&#39;A&#39;}, {&#39;C&#39;}, {&#39;A&#39;, &#39;B&#39;}, {&#39;C&#39;}, {&#39;A&#39;}, {&#39;C&#39;}, {&#39;A&#39;, &#39;B&#39;}, {&#39;C&#39;}]</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<div class="section" id="class-reference">
+<h4>Class Reference<a class="headerlink" href="#class-reference" title="Permalink to this headline">¶</a></h4>
+<dl class="py class">
+<dt class="sig sig-object py" id="graph_scheduler.scheduler.Scheduler">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.scheduler.</span></span><span class="sig-name descname"><span class="pre">Scheduler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">graph</span></em>, <em class="sig-param"><span class="pre">conditions=None</span></em>, <em class="sig-param"><span class="pre">termination_conds=None</span></em>, <em class="sig-param"><span class="pre">default_execution_id=None</span></em>, <em class="sig-param"><span class="pre">mode=SchedulingMode.STANDARD</span></em>, <em class="sig-param"><span class="pre">default_absolute_time_unit=&lt;Quantity(1</span></em>, <em class="sig-param"><span class="pre">'millisecond')&gt;</span></em>, <em class="sig-param"><span class="pre">**kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.scheduler.Scheduler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates an order of execution for nodes in a graph or graph
+specification dictionary, possibly determined by a set of <a class="reference internal" href="Condition.html"><span class="doc">Conditions</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>graph</strong> (Dict[object: set(object)], <a class="reference external" href="https://networkx.org/documentation/stable/reference/classes/digraph.html#networkx.DiGraph" title="(in NetworkX v2.6.2)"><code class="xref any docutils literal notranslate"><span class="pre">networkx.DiGraph</span></code></a>) – a graph specification dictionary - each entry of the dictionary must be an object,
+and the value of each entry must be a set of zero or more objects that project directly to the key.</p></li>
+<li><p><strong>conditions</strong> (<a class="reference internal" href="Condition.html#graph_scheduler.condition.ConditionSet" title="graph_scheduler.condition.ConditionSet"><em>ConditionSet</em></a>) – set of <a class="reference internal" href="Condition.html"><span class="doc">Conditions</span></a> that specify when individual nodes in <strong>graph</strong>
+execute and any dependencies among them.</p></li>
+<li><p><strong>mode</strong> (<a class="reference internal" href="#graph_scheduler.scheduler.SchedulingMode" title="graph_scheduler.scheduler.SchedulingMode"><em>SchedulingMode</em></a><em>[</em><em>STANDARD</em><em>|</em><em>EXACT_TIME</em><em>] </em><em>: SchedulingMode.STANDARD</em>) – sets the mode of scheduling: <a class="reference internal" href="#scheduler-execution"><span class="std std-ref">standard</span></a> or
+<a class="reference internal" href="#scheduler-exact-time"><span class="std std-ref">exact time</span></a></p></li>
+<li><p><strong>default_absolute_time_unit</strong> (<a class="reference external" href="https://pint.readthedocs.io/en/stable/developers_reference.html#pint.Quantity" title="(in pint v0.17)"><code class="xref any docutils literal notranslate"><span class="pre">pint.Quantity</span></code></a> : <code class="docutils literal notranslate"><span class="pre">1ms</span></code>) – if not otherwise determined by any absolute <strong>conditions</strong>,
+specifies the absolute duration of a <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION" title="graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">CONSIDERATION_SET_EXECUTION</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="graph_scheduler.scheduler.Scheduler.conditions">
+<span class="sig-name descname"><span class="pre">conditions</span></span><a class="headerlink" href="#graph_scheduler.scheduler.Scheduler.conditions" title="Permalink to this definition">¶</a></dt>
+<dd><p>the set of Conditions the Scheduler uses when running</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="Condition.html#graph_scheduler.condition.ConditionSet" title="graph_scheduler.condition.ConditionSet">ConditionSet</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="graph_scheduler.scheduler.Scheduler.default_execution_id">
+<span class="sig-name descname"><span class="pre">default_execution_id</span></span><a class="headerlink" href="#graph_scheduler.scheduler.Scheduler.default_execution_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>the execution_id to use if none is supplied to <a class="reference internal" href="#graph_scheduler.scheduler.Scheduler.run" title="graph_scheduler.scheduler.Scheduler.run"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">run</span></code></a>; a unique
+identifier to allow multiple schedulings independently. Must be
+hashable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="graph_scheduler.scheduler.Scheduler.execution_list">
+<span class="sig-name descname"><span class="pre">execution_list</span></span><a class="headerlink" href="#graph_scheduler.scheduler.Scheduler.execution_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>the full history of consideration set executions the Scheduler has produced</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="graph_scheduler.scheduler.Scheduler.consideration_queue">
+<span class="sig-name descname"><span class="pre">consideration_queue</span></span><a class="headerlink" href="#graph_scheduler.scheduler.Scheduler.consideration_queue" title="Permalink to this definition">¶</a></dt>
+<dd><p>a list form of the Scheduler’s toposort ordering of its nodes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="graph_scheduler.scheduler.Scheduler.consideration_queue_indices">
+<span class="sig-name descname"><span class="pre">consideration_queue_indices</span></span><a class="headerlink" href="#graph_scheduler.scheduler.Scheduler.consideration_queue_indices" title="Permalink to this definition">¶</a></dt>
+<dd><p>a dict mapping <strong>nodes</strong> to their position in the <a class="reference internal" href="#graph_scheduler.scheduler.Scheduler.consideration_queue" title="graph_scheduler.scheduler.Scheduler.consideration_queue"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">consideration_queue</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="graph_scheduler.scheduler.Scheduler.termination_conds">
+<span class="sig-name descname"><span class="pre">termination_conds</span></span><a class="headerlink" href="#graph_scheduler.scheduler.Scheduler.termination_conds" title="Permalink to this definition">¶</a></dt>
+<dd><p>a mapping from <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale" title="graph_scheduler.time.TimeScale"><code class="xref any py py-class docutils literal notranslate"><span class="pre">TimeScales</span></code></a> to <a class="reference internal" href="Condition.html"><span class="doc">Conditions</span></a> that, when met, terminate the execution
+of the specified <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale" title="graph_scheduler.time.TimeScale"><code class="xref any py py-class docutils literal notranslate"><span class="pre">TimeScale</span></code></a>. On set, update only for the
+<a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale" title="graph_scheduler.time.TimeScale"><code class="xref any py py-class docutils literal notranslate"><span class="pre">TimeScale</span></code></a>s specified in the argument.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Dict[TimeScale: Condition]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="graph_scheduler.scheduler.Scheduler.mode">
+<span class="sig-name descname"><span class="pre">mode</span></span><a class="headerlink" href="#graph_scheduler.scheduler.Scheduler.mode" title="Permalink to this definition">¶</a></dt>
+<dd><p>sets the mode of scheduling: <a class="reference internal" href="#scheduler-execution"><span class="std std-ref">standard</span></a> or
+<a class="reference internal" href="#scheduler-exact-time"><span class="std std-ref">exact time</span></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#graph_scheduler.scheduler.SchedulingMode" title="graph_scheduler.scheduler.SchedulingMode">SchedulingMode</a></p>
+</dd>
+<dt class="field-even">Default</dt>
+<dd class="field-even"><p><a class="reference internal" href="#graph_scheduler.scheduler.SchedulingMode.STANDARD" title="graph_scheduler.scheduler.SchedulingMode.STANDARD"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">SchedulingMode.STANDARD</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="graph_scheduler.scheduler.Scheduler.default_absolute_time_unit">
+<span class="sig-name descname"><span class="pre">default_absolute_time_unit</span></span><a class="headerlink" href="#graph_scheduler.scheduler.Scheduler.default_absolute_time_unit" title="Permalink to this definition">¶</a></dt>
+<dd><p>if not otherwise determined by any absolute <strong>conditions</strong>,
+specifies the absolute duration of a <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION" title="graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">CONSIDERATION_SET_EXECUTION</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pint.readthedocs.io/en/stable/developers_reference.html#pint.Quantity" title="(in pint v0.17)"><code class="xref any docutils literal notranslate"><span class="pre">pint.Quantity</span></code></a></p>
+</dd>
+<dt class="field-even">Default</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">1ms</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="graph_scheduler.scheduler.Scheduler._init_counts">
+<span class="sig-name descname"><span class="pre">_init_counts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">execution_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_execution_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">NotImplemented</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.scheduler.Scheduler._init_counts" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="graph_scheduler.scheduler.Scheduler.execution_id">
+<span class="sig-name descname"><span class="pre">execution_id</span></span><a class="headerlink" href="#graph_scheduler.scheduler.Scheduler.execution_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>the execution_id to initialize counts for</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="graph_scheduler.scheduler.Scheduler.base_execution_id">
+<span class="sig-name descname"><span class="pre">base_execution_id</span></span><a class="headerlink" href="#graph_scheduler.scheduler.Scheduler.base_execution_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>if specified, the counts for execution_id will be copied from the counts of base_execution_id
+default : NotImplemented</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="graph_scheduler.scheduler.Scheduler.add_condition">
+<span class="sig-name descname"><span class="pre">add_condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">owner</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">condition</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.scheduler.Scheduler.add_condition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a <a class="reference internal" href="Condition.html"><span class="doc">Condition</span></a> to the Scheduler. If <strong>owner</strong> already has a Condition, it is overwritten
+with the new one. If you want to add multiple conditions to a single owner, use the
+<a class="reference internal" href="Condition.html#conditions-composite"><span class="std std-ref">composite Conditions</span></a> to accurately specify the desired behavior.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>owner</strong> (<code class="docutils literal notranslate"><span class="pre">node</span></code>) – specifies the node with which the <strong>condition</strong> should be associated. <strong>condition</strong>
+will govern the execution behavior of <strong>owner</strong></p></li>
+<li><p><strong>condition</strong> (<a class="reference internal" href="Condition.html#graph_scheduler.condition.Condition" title="graph_scheduler.condition.Condition"><em>Condition</em></a>) – specifies the Condition, associated with the <strong>owner</strong> to be added to the ConditionSet.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="graph_scheduler.scheduler.Scheduler.add_condition_set">
+<span class="sig-name descname"><span class="pre">add_condition_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conditions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.scheduler.Scheduler.add_condition_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a set of <a class="reference internal" href="Condition.html"><span class="doc">Conditions</span></a> (in the form of a dict or another ConditionSet) to the Scheduler.
+Any Condition added here will overwrite an existing Condition for a given owner.
+If you want to add multiple conditions to a single owner, add a single <a class="reference internal" href="Condition.html#conditions-composite"><span class="std std-ref">Composite Condition</span></a>
+to accurately specify the desired behavior.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>conditions</strong> (dict[<code class="docutils literal notranslate"><span class="pre">node</span></code>: <a class="reference internal" href="Condition.html"><span class="doc">Condition</span></a>], <a class="reference internal" href="Condition.html#graph_scheduler.condition.ConditionSet" title="graph_scheduler.condition.ConditionSet"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ConditionSet</span></code></a>) – <p>specifies collection of Conditions to be added to this ConditionSet,</p>
+<dl class="simple">
+<dt>if a dict is provided:</dt><dd><p>each entry should map an owner node (the node whose execution behavior will be
+governed) to a <a class="reference internal" href="Condition.html"><span class="doc">Condition</span></a></p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="graph_scheduler.scheduler.Scheduler.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">termination_conds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">execution_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_execution_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_environment_state_update_time_increment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.scheduler.Scheduler.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>run is a python generator, that when iterated over provides the next <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION" title="graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">CONSIDERATION_SET_EXECUTION</span></code></a> of
+executions at each iteration</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>termination_conds</strong> – (dict) - a mapping from <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale" title="graph_scheduler.time.TimeScale"><code class="xref any py py-class docutils literal notranslate"><span class="pre">TimeScale</span></code></a>s to <a class="reference internal" href="Condition.html"><span class="doc">Condition</span></a>s that when met
+terminate the execution of the specified <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale" title="graph_scheduler.time.TimeScale"><code class="xref any py py-class docutils literal notranslate"><span class="pre">TimeScale</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="graph_scheduler.scheduler.Scheduler._get_absolute_consideration_set_execution_unit">
+<span class="sig-name descname"><span class="pre">_get_absolute_consideration_set_execution_unit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">termination_conds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.scheduler.Scheduler._get_absolute_consideration_set_execution_unit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the time length of the gap between two consideration set executions</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="graph_scheduler.scheduler.SchedulingMode">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.scheduler.</span></span><span class="sig-name descname"><span class="pre">SchedulingMode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.scheduler.SchedulingMode" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="graph_scheduler.scheduler.SchedulingMode.STANDARD">
+<span class="sig-name descname"><span class="pre">STANDARD</span></span><a class="headerlink" href="#graph_scheduler.scheduler.SchedulingMode.STANDARD" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#scheduler-execution"><span class="std std-ref">Standard Mode</span></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="graph_scheduler.scheduler.SchedulingMode.EXACT_TIME">
+<span class="sig-name descname"><span class="pre">EXACT_TIME</span></span><a class="headerlink" href="#graph_scheduler.scheduler.SchedulingMode.EXACT_TIME" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#scheduler-exact-time"><span class="std std-ref">Exact time Mode</span></a></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="Condition.html" class="btn btn-neutral float-right" title="Condition" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Graph Scheduler" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Princeton University.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
