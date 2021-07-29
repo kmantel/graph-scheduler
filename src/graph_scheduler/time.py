@@ -59,9 +59,9 @@ class TimeScale(enum.Enum):
         executed simultaneously.
 
     PASS
-        a full iteration through all of the consideration sets in a Scheduler's <Scheduler>
+        a full iteration through all of the consideration sets in a `Scheduler's <graph_scheduler.scheduler.Scheduler>`
         `consideration_queue`, consisting of one or more `CONSIDERATION_SET_EXECUTIONs <CONSIDERATION_SET_EXECUTION>`, over which every node
-        specified to a Scheduler <Scheduler_Creation>` is considered for execution at least once.
+        specified to a `Scheduler <Scheduler_Creation>` is considered for execution at least once.
 
     ENVIRONMENT_STATE_UPDATE
         an open-ended unit of time consisting of all actions that occurs within the scope of a single
