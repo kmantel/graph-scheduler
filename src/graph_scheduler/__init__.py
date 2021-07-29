@@ -1,7 +1,14 @@
 """
-This module provides utilities used to schedule the execution of psyneulink components
+A graph scheduler generates the order in which the nodes of a directed
+acyclic graph (DAG) are executed using the structure of the graph and
+expressive conditions. Specifically, a scheduler uses a topological
+ordering of the nodes as a base sequence of execution and further
+restricts execution based on predefined or custom conditions provided by
+the user. Patterns of execution are linked to abstract units of time and
+may optionally be mapped to real time units using pint.
 
-https://princetonuniversity.github.io/PsyNeuLink/Scheduling.html
+Source: https://github.com/kmantel/graph-scheduler
+Documentation: https://kmantel.github.io/graph-scheduler/
 """
 
 import pint
