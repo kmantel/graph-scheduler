@@ -1,7 +1,5 @@
 networkx <2.7
-# below is the required psyneulink tag, but circular dependencies prevent inclusion
-# psyneulink @ git+https://github.com/PrincetonUniversity/PsyNeuLink@scheduler-extracted
-psyneulink
+psyneulink >=0.9.1.0, <0.9.2.0
 pytest <6.3
 pytest-benchmark <3.4.2
 pytest-cov <2.12.2
