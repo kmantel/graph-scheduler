@@ -54,9 +54,6 @@ jobs:
     - name: Install package
       run: python -m pip install -e .[dev]
 
-    - name: Install psyneulink at required tag
-      run: python -m pip install git+https://github.com/PrincetonUniversity/PsyNeuLink@scheduler-extracted
-
     - name: Lint with flake8
       shell: bash
       run: |
