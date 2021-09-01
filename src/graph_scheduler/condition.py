@@ -579,7 +579,7 @@ class _DependencyValidation:
     def owner(self, value):
         try:
             # "dependencies" is always the first positional argument
-            if not isinstance(self.args[0], collections.abc.Iterable):
+            if not isinstance(self.args[0], collections.abc.Iterable) or isinstance(self.args[0], str):
                 dependencies = [self.args[0]]
             else:
                 dependencies = self.args[0]
