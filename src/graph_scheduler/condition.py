@@ -578,7 +578,7 @@ class _DependencyValidation:
     @Condition.owner.setter
     def owner(self, value):
         try:
-            # "dependencies" is always the first positional argument
+            # "dependency" or "dependencies" is always the first positional argument
             if not isinstance(self.args[0], collections.abc.Iterable) or isinstance(self.args[0], str):
                 dependencies = [self.args[0]]
             else:
@@ -1464,31 +1464,31 @@ class BeforeNCalls(_DependencyValidation, Condition):
 
     Parameters:
 
-        dependencies(node):  the node on which the Condition depends
+        dependency(node):  the node on which the Condition depends
 
-        n(int): the number of executions of **dependencies** before which the Condition is satisfied
+        n(int): the number of executions of **dependency** before which the Condition is satisfied
 
-        time_scale(TimeScale): the TimeScale used as basis for counting executions of **dependencies**
+        time_scale(TimeScale): the TimeScale used as basis for counting executions of **dependency**
         (default: TimeScale.ENVIRONMENT_STATE_UPDATE)
 
     Satisfied when:
 
-        - the node specified in **dependencies** has executed at most n-1 times
+        - the node specified in **dependency** has executed at most n-1 times
           within one unit of time at the `TimeScale` specified by **time_scale**.
 
     """
-    def __init__(self, dependencies, n, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE):
+    def __init__(self, dependency, n, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE):
         self.time_scale = time_scale
 
-        def func(dependencies, n, scheduler=None, execution_id=None):
+        def func(dependency, n, scheduler=None, execution_id=None):
             try:
-                num_calls = scheduler.counts_total[execution_id][time_scale][dependencies]
-                logger.debug('{0} has reached {1} num_calls in {2}'.format(dependencies, num_calls, time_scale.name))
+                num_calls = scheduler.counts_total[execution_id][time_scale][dependency]
+                logger.debug('{0} has reached {1} num_calls in {2}'.format(dependency, num_calls, time_scale.name))
                 return num_calls < n
             except AttributeError as e:
                 raise ConditionError(f'{type(self).__name__}: scheduler must be supplied to is_satisfied: {e}.')
 
-        super().__init__(func, dependencies, n)
+        super().__init__(func, dependency, n)
 
 # NOTE:
 # The behavior of AtNCalls is not desired (i.e. depending on the order nodes are checked, B running AtNCalls(A, x))
@@ -1502,31 +1502,31 @@ class AtNCalls(_DependencyValidation, Condition):
 
     Parameters:
 
-        dependencies(node):  the node on which the Condition depends
+        dependency(node):  the node on which the Condition depends
 
-        n(int): the number of executions of **dependencies** at which the Condition is satisfied
+        n(int): the number of executions of **dependency** at which the Condition is satisfied
 
-        time_scale(TimeScale): the TimeScale used as basis for counting executions of **dependencies**
+        time_scale(TimeScale): the TimeScale used as basis for counting executions of **dependency**
         (default: TimeScale.ENVIRONMENT_STATE_UPDATE)
 
     Satisfied when:
 
-        - the node specified in **dependencies** has executed exactly n times
+        - the node specified in **dependency** has executed exactly n times
           within one unit of time at the `TimeScale` specified by **time_scale**.
 
     """
-    def __init__(self, dependencies, n, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE):
+    def __init__(self, dependency, n, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE):
         self.time_scale = time_scale
 
-        def func(dependencies, n, scheduler=None, execution_id=None):
+        def func(dependency, n, scheduler=None, execution_id=None):
             try:
-                num_calls = scheduler.counts_total[execution_id][time_scale][dependencies]
-                logger.debug('{0} has reached {1} num_calls in {2}'.format(dependencies, num_calls, time_scale.name))
+                num_calls = scheduler.counts_total[execution_id][time_scale][dependency]
+                logger.debug('{0} has reached {1} num_calls in {2}'.format(dependency, num_calls, time_scale.name))
                 return num_calls == n
             except AttributeError as e:
                 raise ConditionError(f'{type(self).__name__}: scheduler must be supplied to is_satisfied: {e}.')
 
-        super().__init__(func, dependencies, n)
+        super().__init__(func, dependency, n)
 
 
 class AfterCall(_DependencyValidation, Condition):
@@ -1534,29 +1534,29 @@ class AfterCall(_DependencyValidation, Condition):
 
     Parameters:
 
-        dependencies(node):  the node on which the Condition depends
+        dependency(node):  the node on which the Condition depends
 
-        n(int): the number of executions of **dependencies** after which the Condition is satisfied
+        n(int): the number of executions of **dependency** after which the Condition is satisfied
 
-        time_scale(TimeScale): the TimeScale used as basis for counting executions of **dependencies**
+        time_scale(TimeScale): the TimeScale used as basis for counting executions of **dependency**
         (default: TimeScale.ENVIRONMENT_STATE_UPDATE)
 
     Satisfied when:
 
-        - the node specified in **dependencies** has executed at least n+1 times
+        - the node specified in **dependency** has executed at least n+1 times
           within one unit of time at the `TimeScale` specified by **time_scale**.
 
     """
-    def __init__(self, dependencies, n, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE):
-        def func(dependencies, n, scheduler=None, execution_id=None):
+    def __init__(self, dependency, n, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE):
+        def func(dependency, n, scheduler=None, execution_id=None):
             try:
-                num_calls = scheduler.counts_total[execution_id][time_scale][dependencies]
-                logger.debug('{0} has reached {1} num_calls in {2}'.format(dependencies, num_calls, time_scale.name))
+                num_calls = scheduler.counts_total[execution_id][time_scale][dependency]
+                logger.debug('{0} has reached {1} num_calls in {2}'.format(dependency, num_calls, time_scale.name))
                 return num_calls > n
             except AttributeError as e:
                 raise ConditionError(f'{type(self).__name__}: scheduler must be supplied to is_satisfied: {e}.')
 
-        super().__init__(func, dependencies, n)
+        super().__init__(func, dependency, n)
 
 
 class AfterNCalls(_DependencyValidation, Condition):
@@ -1564,31 +1564,31 @@ class AfterNCalls(_DependencyValidation, Condition):
 
     Parameters:
 
-        dependencies(node):  the node on which the Condition depends
+        dependency(node):  the node on which the Condition depends
 
-        n(int): the number of executions of **dependencies** after which the Condition is satisfied
+        n(int): the number of executions of **dependency** after which the Condition is satisfied
 
-        time_scale(TimeScale): the TimeScale used as basis for counting executions of **dependencies**
+        time_scale(TimeScale): the TimeScale used as basis for counting executions of **dependency**
         (default: TimeScale.ENVIRONMENT_STATE_UPDATE)
 
     Satisfied when:
 
-        - the node specified in **dependencies** has executed at least n times
+        - the node specified in **dependency** has executed at least n times
           within one unit of time at the `TimeScale` specified by **time_scale**.
 
     """
-    def __init__(self, dependencies, n, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE):
+    def __init__(self, dependency, n, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE):
         self.time_scale = time_scale
 
-        def func(dependencies, n, scheduler=None, execution_id=None):
+        def func(dependency, n, scheduler=None, execution_id=None):
             try:
-                num_calls = scheduler.counts_total[execution_id][time_scale][dependencies]
-                logger.debug('{0} has reached {1} num_calls in {2}'.format(dependencies, num_calls, time_scale.name))
+                num_calls = scheduler.counts_total[execution_id][time_scale][dependency]
+                logger.debug('{0} has reached {1} num_calls in {2}'.format(dependency, num_calls, time_scale.name))
                 return num_calls >= n
             except AttributeError as e:
                 raise ConditionError(f'{type(self).__name__}: scheduler must be supplied to is_satisfied: {e}.')
 
-        super().__init__(func, dependencies, n)
+        super().__init__(func, dependency, n)
 
 
 class AfterNCallsCombined(_DependencyValidation, Condition):
@@ -1601,7 +1601,7 @@ class AfterNCallsCombined(_DependencyValidation, Condition):
         n(int): the number of combined executions of all nodes specified in **dependencies** after which the
         Condition is satisfied (default: None)
 
-        time_scale(TimeScale): the TimeScale used as basis for counting executions of **dependencies**
+        time_scale(TimeScale): the TimeScale used as basis for counting executions of **dependency**
         (default: TimeScale.ENVIRONMENT_STATE_UPDATE)
 
 
@@ -1635,14 +1635,14 @@ class EveryNCalls(_DependencyValidation, Condition):
 
     Parameters:
 
-        dependencies(node):  the node on which the Condition depends
+        dependency(node):  the node on which the Condition depends
 
-        n(int): the frequency of executions of **dependencies** at which the Condition is satisfied
+        n(int): the frequency of executions of **dependency** at which the Condition is satisfied
 
 
     Satisfied when:
 
-        - the node specified in **dependencies** has executed at least n times since the last time the
+        - the node specified in **dependency** has executed at least n times since the last time the
           Condition's owner executed.
 
         COMMENT:
@@ -1666,16 +1666,16 @@ class EveryNCalls(_DependencyValidation, Condition):
           node runs
 
     """
-    def __init__(self, dependencies, n):
-        def func(dependencies, n, scheduler=None, execution_id=None):
+    def __init__(self, dependency, n):
+        def func(dependency, n, scheduler=None, execution_id=None):
             try:
-                num_calls = scheduler.counts_useable[execution_id][dependencies][self.owner]
-                logger.debug('{0} has reached {1} num_calls'.format(dependencies, num_calls))
+                num_calls = scheduler.counts_useable[execution_id][dependency][self.owner]
+                logger.debug('{0} has reached {1} num_calls'.format(dependency, num_calls))
                 return num_calls >= n
             except AttributeError as e:
                 raise ConditionError(f'{type(self).__name__}: scheduler must be supplied to is_satisfied: {e}.')
 
-        super().__init__(func, dependencies, n)
+        super().__init__(func, dependency, n)
 
 
 class JustRan(_DependencyValidation, Condition):
@@ -1683,11 +1683,11 @@ class JustRan(_DependencyValidation, Condition):
 
     Parameters:
 
-        dependencies(node):  the node on which the Condition depends
+        dependency(node):  the node on which the Condition depends
 
     Satisfied when:
 
-        - the node specified in **dependencies** executed in the previous `CONSIDERATION_SET_EXECUTION`.
+        - the node specified in **dependency** executed in the previous `CONSIDERATION_SET_EXECUTION`.
 
     Notes:
 
@@ -1696,14 +1696,14 @@ class JustRan(_DependencyValidation, Condition):
           JustRan(A) is satisfied at the beginning of the next `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>`.
 
     """
-    def __init__(self, dependencies):
-        def func(dependencies, scheduler=None, execution_id=None):
-            logger.debug(f'checking if {dependencies} in previous execution step set')
+    def __init__(self, dependency):
+        def func(dependency, scheduler=None, execution_id=None):
+            logger.debug(f'checking if {dependency} in previous execution step set')
             try:
-                return dependencies in scheduler.execution_list[execution_id][-1]
+                return dependency in scheduler.execution_list[execution_id][-1]
             except TypeError:
-                return dependencies == scheduler.execution_list[execution_id][-1]
-        super().__init__(func, dependencies)
+                return dependency == scheduler.execution_list[execution_id][-1]
+        super().__init__(func, dependency)
 
 
 class AllHaveRun(_DependencyValidation, Condition):
@@ -1713,7 +1713,7 @@ class AllHaveRun(_DependencyValidation, Condition):
 
         *nodes(nodes):  an iterable of nodes on which the Condition depends
 
-        time_scale(TimeScale): the TimeScale used as basis for counting executions of **dependencies**
+        time_scale(TimeScale): the TimeScale used as basis for counting executions of **dependency**
         (default: TimeScale.ENVIRONMENT_STATE_UPDATE)
 
     Satisfied when:
@@ -1747,7 +1747,7 @@ class WhenFinished(_DependencyValidation, Condition):
 
     Parameters:
 
-        dependencies(node):  the node on which the Condition depends
+        dependency(node):  the node on which the Condition depends
 
     Satisfied when:
 
@@ -1760,14 +1760,14 @@ class WhenFinished(_DependencyValidation, Condition):
           this Condition) can vary arbitrarily in time.
 
     """
-    def __init__(self, dependencies):
-        def func(dependencies, execution_id=None):
+    def __init__(self, dependency):
+        def func(dependency, execution_id=None):
             try:
-                return dependencies.is_finished(execution_id)
+                return dependency.is_finished(execution_id)
             except AttributeError as e:
-                raise ConditionError(f'WhenFinished: Unsupported dependencies type: {type(dependencies)}; ({e}).')
+                raise ConditionError(f'WhenFinished: Unsupported dependency type: {type(dependency)}; ({e}).')
 
-        super().__init__(func, dependencies)
+        super().__init__(func, dependency)
 
 
 class WhenFinishedAny(_DependencyValidation, Condition):
@@ -1801,7 +1801,7 @@ class WhenFinishedAny(_DependencyValidation, Condition):
                     if d.is_finished(execution_id):
                         return True
                 except AttributeError as e:
-                    raise ConditionError(f'WhenFinishedAny: Unsupported dependencies type: {type(d)}; ({e}).')
+                    raise ConditionError(f'WhenFinishedAny: Unsupported dependency type: {type(d)}; ({e}).')
             return False
 
         super().__init__(func, *dependencies)
@@ -1838,7 +1838,7 @@ class WhenFinishedAll(_DependencyValidation, Condition):
                     if not d.is_finished(execution_id):
                         return False
                 except AttributeError as e:
-                    raise ConditionError(f'WhenFinishedAll: Unsupported dependencies type: {type(d)}; ({e})')
+                    raise ConditionError(f'WhenFinishedAll: Unsupported dependency type: {type(d)}; ({e})')
             return True
 
         super().__init__(func, *dependencies)
