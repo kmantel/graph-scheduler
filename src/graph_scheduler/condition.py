@@ -1444,7 +1444,7 @@ class AfterEnvironmentSequence(Condition):
 
 
 class AfterNEnvironmentSequences(Condition):
-    """AfterNEnvironmentStateUpdates
+    """AfterNEnvironmentSequences
 
     Parameters:
 
