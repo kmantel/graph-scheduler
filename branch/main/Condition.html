@@ -1,77 +1,37 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Condition &mdash; Graph Scheduler 1.0.0rc2+5.g1656508 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>Condition &mdash; Graph Scheduler 1.0.0rc2+6.gc3f7af3 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Time" href="Time.html" />
     <link rel="prev" title="Scheduler" href="Scheduler.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> Graph Scheduler
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                1.0.0rc2+5
+                1.0.0rc2+6
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -79,18 +39,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Graph Scheduler</a></li>
@@ -113,75 +62,34 @@
 <li class="toctree-l1"><a class="reference internal" href="Time.html">Time</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">Graph Scheduler</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>Condition</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/Condition.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="module-graph_scheduler.condition">
-<span id="condition"></span><h1>Condition<a class="headerlink" href="#module-graph_scheduler.condition" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="overview">
-<span id="condition-overview"></span><h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+             
+  <section id="module-graph_scheduler.condition">
+<span id="condition"></span><h1>Condition<a class="headerlink" href="#module-graph_scheduler.condition" title="Permalink to this headline"></a></h1>
+<section id="overview">
+<span id="condition-overview"></span><h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline"></a></h2>
 <p><a class="reference internal" href="#graph_scheduler.condition.Condition" title="graph_scheduler.condition.Condition"><code class="xref py py-class docutils literal notranslate"><span class="pre">Conditions</span></code></a> are used to specify when nodes are allowed to execute.  Conditions
 can be used to specify a variety of required conditions for execution, including the state of the node
 itself (e.g., how many times it has already executed, or the value of one of its attributes), the state of the
@@ -190,11 +98,11 @@ nodes in a graph (e.g., whether or how many times they have executed). This pack
 <a class="reference internal" href="#condition-pre-specified"><span class="std std-ref">pre-specified Conditions</span></a> that can be parametrized (e.g., how many times a node should
 be executed). <a class="reference internal" href="#condition-custom"><span class="std std-ref">Custom conditions</span></a> can also be created, by assigning a function to a Condition that
 can reference any node or its attributes, thus providing considerable flexibility for scheduling.</p>
-</div>
-<div class="section" id="creating-conditions">
-<span id="condition-creation"></span><h2>Creating Conditions<a class="headerlink" href="#creating-conditions" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="pre-specified-conditions">
-<span id="condition-pre-specified"></span><h3><em>Pre-specified Conditions</em><a class="headerlink" href="#pre-specified-conditions" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="creating-conditions">
+<span id="condition-creation"></span><h2>Creating Conditions<a class="headerlink" href="#creating-conditions" title="Permalink to this headline"></a></h2>
+<section id="pre-specified-conditions">
+<span id="condition-pre-specified"></span><h3><em>Pre-specified Conditions</em><a class="headerlink" href="#pre-specified-conditions" title="Permalink to this headline"></a></h3>
 <p><a class="reference internal" href="#condition-pre-specified-list"><span class="std std-ref">Pre-specified Conditions</span></a> can be instantiated and added to a <a class="reference internal" href="Scheduler.html#graph_scheduler.scheduler.Scheduler" title="graph_scheduler.scheduler.Scheduler"><code class="xref py py-class docutils literal notranslate"><span class="pre">Scheduler</span></code></a> at any time,
 and take effect immediately for the execution of that Scheduler. Most pre-specified Conditions have one or more
 arguments that must be specified to achieve the desired behavior. Many Conditions are also associated with an
@@ -210,9 +118,9 @@ context and assigned automatically, as in the following example:</p>
 </pre></div>
 </div>
 <p>Here, <code class="docutils literal notranslate"><span class="pre">EveryNCalls(A,</span> <span class="pre">2)</span></code> for example, is assigned the <a class="reference internal" href="#graph_scheduler.condition.Condition.owner" title="graph_scheduler.condition.Condition.owner"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">owner</span></code></a> <code class="docutils literal notranslate"><span class="pre">B</span></code>.</p>
-</div>
-<div class="section" id="custom-conditions">
-<span id="condition-custom"></span><h3><em>Custom Conditions</em><a class="headerlink" href="#custom-conditions" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="custom-conditions">
+<span id="condition-custom"></span><h3><em>Custom Conditions</em><a class="headerlink" href="#custom-conditions" title="Permalink to this headline"></a></h3>
 <p>Custom Conditions can be created by calling the constructor for the base class (<a class="reference internal" href="#graph_scheduler.condition.Condition" title="graph_scheduler.condition.Condition"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Condition()</span></code></a>) or one of the
 <a class="reference internal" href="#conditions-generic"><span class="std std-ref">generic classes</span></a>,  and assigning a function to the <strong>func</strong> argument and any arguments it
 requires to the <strong>args</strong> and/or <strong>kwargs</strong> arguments (for formal or keyword arguments, respectively). The function
@@ -237,10 +145,10 @@ a node (which reports the change in its <code class="docutils literal notranslat
 the standard <a class="reference internal" href="#graph_scheduler.condition.Condition" title="graph_scheduler.condition.Condition"><code class="xref py py-class docutils literal notranslate"><span class="pre">Condition</span></code></a> with <code class="docutils literal notranslate"><span class="pre">node_A</span></code> and <code class="docutils literal notranslate"><span class="pre">epsilon</span></code> as its arguments, and <a class="reference internal" href="#conditions-composite"><span class="std std-ref">composite Condition</span></a>
 <a class="reference internal" href="#graph_scheduler.condition.NWhen" title="graph_scheduler.condition.NWhen"><code class="xref any py py-class docutils literal notranslate"><span class="pre">NWhen</span></code></a> (which is satisfied the first N times after its condition becomes true),  The Condition is assigned to <code class="docutils literal notranslate"><span class="pre">node_B</span></code>,
 thus scheduling it to execute one time when all of the elements of <code class="docutils literal notranslate"><span class="pre">node_A</span></code> have changed by less than <code class="docutils literal notranslate"><span class="pre">epsilon</span></code>.</p>
-</div>
-</div>
-<div class="section" id="structure">
-<span id="condition-structure"></span><h2>Structure<a class="headerlink" href="#structure" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="structure">
+<span id="condition-structure"></span><h2>Structure<a class="headerlink" href="#structure" title="Permalink to this headline"></a></h2>
 <p>The <a class="reference internal" href="Scheduler.html#graph_scheduler.scheduler.Scheduler" title="graph_scheduler.scheduler.Scheduler"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Scheduler</span></code></a> associates every node with a Condition.  If a node has not been explicitly assigned a
 Condition, it is assigned a Condition that causes it to be executed whenever it is <a class="reference internal" href="Scheduler.html#scheduler-algorithm"><span class="std std-ref">under consideration</span></a>
 and all its structural parents have been executed at least once since the node’s last execution.
@@ -259,8 +167,8 @@ evaluates to <code class="xref any docutils literal notranslate"><span class="pr
 <li><p><a class="reference internal" href="#conditions-convenience"><span class="std std-ref">Convenience</span></a> - based on other Conditions, condensed for convenience</p></li>
 </ul>
 </div></blockquote>
-<div class="section" id="list-of-pre-specified-conditions">
-<span id="condition-pre-specified-list"></span><h3><em>List of Pre-specified Conditions</em><a class="headerlink" href="#list-of-pre-specified-conditions" title="Permalink to this headline">¶</a></h3>
+<section id="list-of-pre-specified-conditions">
+<span id="condition-pre-specified-list"></span><h3><em>List of Pre-specified Conditions</em><a class="headerlink" href="#list-of-pre-specified-conditions" title="Permalink to this headline"></a></h3>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The optional <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale" title="graph_scheduler.time.TimeScale"><code class="xref any py py-class docutils literal notranslate"><span class="pre">TimeScale</span></code></a> argument in many <a class="reference internal" href="#"><span class="doc">Conditions</span></a> specifies the unit of time over which the
@@ -385,21 +293,21 @@ satisfied at the beginning of an <a class="reference internal" href="Time.html#g
 satisfied on <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.ENVIRONMENT_STATE_UPDATE" title="graph_scheduler.time.TimeScale.ENVIRONMENT_STATE_UPDATE"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">ENVIRONMENT_STATE_UPDATE</span></code></a> 0 of the specified <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.ENVIRONMENT_SEQUENCE" title="graph_scheduler.time.TimeScale.ENVIRONMENT_SEQUENCE"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">ENVIRONMENT_SEQUENCE</span></code></a> counted using ‘TimeScale`</p></li>
 </ul>
 </div></blockquote>
-</div>
-</div>
-<div class="section" id="execution">
-<h2>Execution<a class="headerlink" href="#execution" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="execution">
+<h2>Execution<a class="headerlink" href="#execution" title="Permalink to this headline"></a></h2>
 <p>When the <a class="reference internal" href="Scheduler.html"><span class="doc">Scheduler</span></a> <code class="xref any docutils literal notranslate"><span class="pre">runs</span></code>, it makes a sequential <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.PASS" title="graph_scheduler.time.TimeScale.PASS"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">PASS</span></code></a> through its <a class="reference internal" href="Scheduler.html#graph_scheduler.scheduler.Scheduler.consideration_queue" title="graph_scheduler.scheduler.Scheduler.consideration_queue"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">consideration_queue</span></code></a>,
 evaluating each <a class="reference internal" href="Scheduler.html#consideration-set"><span class="std std-ref">consideration_set</span></a> in the queue to determine which nodes should be assigned
 to execute. It evaluates the nodes in each set by calling the <a class="reference internal" href="#graph_scheduler.condition.Condition.is_satisfied" title="graph_scheduler.condition.Condition.is_satisfied"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">is_satisfied</span></code></a> method of the Condition associated
 with each of those nodes.  If it returns <code class="xref any docutils literal notranslate"><span class="pre">True</span></code>, then the node is assigned to the execution set for the
 <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION" title="graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">CONSIDERATION_SET_EXECUTION</span></code></a> of execution generated by that <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.PASS" title="graph_scheduler.time.TimeScale.PASS"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">PASS</span></code></a>.  Otherwise, the node is not executed.</p>
-</div>
-<div class="section" id="class-reference">
-<span id="condition-class-reference"></span><h2>Class Reference<a class="headerlink" href="#class-reference" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="class-reference">
+<span id="condition-class-reference"></span><h2>Class Reference<a class="headerlink" href="#class-reference" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.AfterCall">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AfterCall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dependencies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AfterCall" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AfterCall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dependencies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AfterCall" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -421,7 +329,7 @@ within one unit of time at the <a class="reference internal" href="Time.html#gra
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.AfterNCalls">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AfterNCalls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dependencies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AfterNCalls" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AfterNCalls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dependencies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AfterNCalls" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -443,7 +351,7 @@ within one unit of time at the <a class="reference internal" href="Time.html#gra
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.AfterNCallsCombined">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AfterNCallsCombined</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">dependencies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AfterNCallsCombined" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AfterNCallsCombined</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">dependencies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AfterNCallsCombined" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -466,7 +374,7 @@ within one unit of time at the <a class="reference internal" href="Time.html#gra
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.AfterNPasses">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AfterNPasses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AfterNPasses" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AfterNPasses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AfterNPasses" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -485,7 +393,7 @@ within one unit of time at the <a class="reference internal" href="Time.html#gra
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.AfterNConsiderationSetExecutions">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AfterNConsiderationSetExecutions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AfterNConsiderationSetExecutions" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AfterNConsiderationSetExecutions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AfterNConsiderationSetExecutions" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -504,7 +412,7 @@ within one unit of time at the <a class="reference internal" href="Time.html#gra
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.AfterNEnvironmentStateUpdates">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AfterNEnvironmentStateUpdates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_SEQUENCE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AfterNEnvironmentStateUpdates" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AfterNEnvironmentStateUpdates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_SEQUENCE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AfterNEnvironmentStateUpdates" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -525,7 +433,7 @@ specified by <strong>time_scale</strong>.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.AfterPass">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AfterPass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AfterPass" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AfterPass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AfterPass" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -549,7 +457,7 @@ specified by <strong>time_scale</strong>.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.AtEnvironmentSequence">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AtEnvironmentSequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AtEnvironmentSequence" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AtEnvironmentSequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AtEnvironmentSequence" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>n</strong> (<em>int</em>) – the <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.ENVIRONMENT_SEQUENCE" title="graph_scheduler.time.TimeScale.ENVIRONMENT_SEQUENCE"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">ENVIRONMENT_SEQUENCE</span></code></a> at which the Condition is satisfied</p>
@@ -565,7 +473,7 @@ specified by <strong>time_scale</strong>.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.AfterEnvironmentSequence">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AfterEnvironmentSequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AfterEnvironmentSequence" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AfterEnvironmentSequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AfterEnvironmentSequence" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>n</strong> (<em>int</em>) – the <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.ENVIRONMENT_SEQUENCE" title="graph_scheduler.time.TimeScale.ENVIRONMENT_SEQUENCE"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">ENVIRONMENT_SEQUENCE</span></code></a> after which the Condition is satisfied</p>
@@ -581,7 +489,7 @@ specified by <strong>time_scale</strong>.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.AfterNEnvironmentSequences">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AfterNEnvironmentSequences</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AfterNEnvironmentSequences" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AfterNEnvironmentSequences</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AfterNEnvironmentSequences" title="Permalink to this definition"></a></dt>
 <dd><p>AfterNEnvironmentStateUpdates</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -598,7 +506,7 @@ specified by <strong>time_scale</strong>.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.AfterConsiderationSetExecution">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AfterConsiderationSetExecution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AfterConsiderationSetExecution" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AfterConsiderationSetExecution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AfterConsiderationSetExecution" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -622,7 +530,7 @@ specified by <strong>time_scale</strong>.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.AfterEnvironmentStateUpdate">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AfterEnvironmentStateUpdate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_SEQUENCE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AfterEnvironmentStateUpdate" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AfterEnvironmentStateUpdate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_SEQUENCE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AfterEnvironmentStateUpdate" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -649,7 +557,7 @@ has occurred and thereafter (i.e., in <a class="reference internal" href="Time.h
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.All">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">All</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">dependencies</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.All" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">All</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">dependencies</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.All" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>args</strong> – one or more <a class="reference internal" href="#"><span class="doc">Conditions</span></a></p>
@@ -677,7 +585,7 @@ has occurred and thereafter (i.e., in <a class="reference internal" href="Time.h
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.AllHaveRun">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AllHaveRun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">dependencies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AllHaveRun" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AllHaveRun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">dependencies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AllHaveRun" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -698,7 +606,7 @@ within one unit of time at the <a class="reference internal" href="Time.html#gra
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.Always">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">Always</span></span><a class="headerlink" href="#graph_scheduler.condition.Always" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">Always</span></span><a class="headerlink" href="#graph_scheduler.condition.Always" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>none</strong> – </p>
@@ -714,13 +622,13 @@ within one unit of time at the <a class="reference internal" href="Time.html#gra
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="graph_scheduler.condition.And">
-<span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">And</span></span><a class="headerlink" href="#graph_scheduler.condition.And" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">And</span></span><a class="headerlink" href="#graph_scheduler.condition.And" title="Permalink to this definition"></a></dt>
 <dd><p>alias of <a class="reference internal" href="#graph_scheduler.condition.All" title="graph_scheduler.condition.All"><code class="xref py py-class docutils literal notranslate"><span class="pre">graph_scheduler.condition.All</span></code></a></p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.Any">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">Any</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">dependencies</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.Any" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">Any</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">dependencies</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.Any" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>args</strong> – one or more <a class="reference internal" href="#"><span class="doc">Conditions</span></a></p>
@@ -748,7 +656,7 @@ within one unit of time at the <a class="reference internal" href="Time.html#gra
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.AtNCalls">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AtNCalls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dependencies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AtNCalls" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AtNCalls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dependencies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AtNCalls" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -770,7 +678,7 @@ within one unit of time at the <a class="reference internal" href="Time.html#gra
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.AtPass">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AtPass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AtPass" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AtPass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AtPass" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -795,7 +703,7 @@ when two <a class="reference internal" href="Time.html#graph_scheduler.time.Time
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.AtEnvironmentSequenceStart">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AtEnvironmentSequenceStart</span></span><a class="headerlink" href="#graph_scheduler.condition.AtEnvironmentSequenceStart" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AtEnvironmentSequenceStart</span></span><a class="headerlink" href="#graph_scheduler.condition.AtEnvironmentSequenceStart" title="Permalink to this definition"></a></dt>
 <dd><p>Satisfied when:</p>
 <blockquote>
 <div><ul class="simple">
@@ -810,7 +718,7 @@ when two <a class="reference internal" href="Time.html#graph_scheduler.time.Time
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.AtEnvironmentSequenceNStart">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AtEnvironmentSequenceNStart</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AtEnvironmentSequenceNStart" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AtEnvironmentSequenceNStart</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AtEnvironmentSequenceNStart" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>n</strong> (<em>int</em>) – the <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.ENVIRONMENT_SEQUENCE" title="graph_scheduler.time.TimeScale.ENVIRONMENT_SEQUENCE"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">ENVIRONMENT_SEQUENCE</span></code></a> on which the Condition is satisfied</p>
@@ -830,7 +738,7 @@ when two <a class="reference internal" href="Time.html#graph_scheduler.time.Time
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.AtConsiderationSetExecution">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AtConsiderationSetExecution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AtConsiderationSetExecution" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AtConsiderationSetExecution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AtConsiderationSetExecution" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -855,7 +763,7 @@ when two <a class="reference internal" href="Time.html#graph_scheduler.time.Time
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.AtEnvironmentStateUpdate">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AtEnvironmentStateUpdate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_SEQUENCE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AtEnvironmentStateUpdate" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AtEnvironmentStateUpdate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_SEQUENCE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AtEnvironmentStateUpdate" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -882,7 +790,7 @@ the second <a class="reference internal" href="Time.html#graph_scheduler.time.Ti
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.AtEnvironmentStateUpdateStart">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AtEnvironmentStateUpdateStart</span></span><a class="headerlink" href="#graph_scheduler.condition.AtEnvironmentStateUpdateStart" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AtEnvironmentStateUpdateStart</span></span><a class="headerlink" href="#graph_scheduler.condition.AtEnvironmentStateUpdateStart" title="Permalink to this definition"></a></dt>
 <dd><p>Satisfied when:</p>
 <blockquote>
 <div><ul class="simple">
@@ -897,7 +805,7 @@ the second <a class="reference internal" href="Time.html#graph_scheduler.time.Ti
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.AtEnvironmentStateUpdateNStart">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AtEnvironmentStateUpdateNStart</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_SEQUENCE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AtEnvironmentStateUpdateNStart" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AtEnvironmentStateUpdateNStart</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_SEQUENCE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AtEnvironmentStateUpdateNStart" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -921,7 +829,7 @@ the second <a class="reference internal" href="Time.html#graph_scheduler.time.Ti
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.BeforeNCalls">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">BeforeNCalls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dependencies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.BeforeNCalls" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">BeforeNCalls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dependencies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.BeforeNCalls" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -943,7 +851,7 @@ within one unit of time at the <a class="reference internal" href="Time.html#gra
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.BeforePass">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">BeforePass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.BeforePass" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">BeforePass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.BeforePass" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -967,7 +875,7 @@ so, <code class="xref any docutils literal notranslate"><span class="pre">Before
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.BeforeConsiderationSetExecution">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">BeforeConsiderationSetExecution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.BeforeConsiderationSetExecution" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">BeforeConsiderationSetExecution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.BeforeConsiderationSetExecution" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -991,7 +899,7 @@ so, <code class="xref any docutils literal notranslate"><span class="pre">Before
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.BeforeEnvironmentStateUpdate">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">BeforeEnvironmentStateUpdate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_SEQUENCE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.BeforeEnvironmentStateUpdate" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">BeforeEnvironmentStateUpdate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_SEQUENCE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.BeforeEnvironmentStateUpdate" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1018,7 +926,7 @@ and <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.Condition">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">Condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.Condition" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">Condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.Condition" title="Permalink to this definition"></a></dt>
 <dd><p>Used in conjunction with a <code class="xref py py-class docutils literal notranslate"><span class="pre">Scheduler</span></code> to specify the condition under which a node should be
 allowed to execute.</p>
 <dl class="field-list simple">
@@ -1032,13 +940,13 @@ allowed to execute.</p>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="graph_scheduler.condition.Condition.owner">
-<span class="sig-name descname"><span class="pre">owner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.Condition.owner" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">owner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.Condition.owner" title="Permalink to this definition"></a></dt>
 <dd><p>the node with which the Condition is associated, and the execution of which it determines.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="graph_scheduler.condition.Condition.is_satisfied">
-<span class="sig-name descname"><span class="pre">is_satisfied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">execution_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.Condition.is_satisfied" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">is_satisfied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">execution_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.Condition.is_satisfied" title="Permalink to this definition"></a></dt>
 <dd><p>the function called to determine satisfaction of this Condition.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1061,14 +969,14 @@ these are added to the <strong>kwargs</strong> specified at instantiation of thi
 
 <dl class="py property">
 <dt class="sig sig-object py" id="graph_scheduler.condition.Condition.absolute_intervals">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">absolute_intervals</span></span><a class="headerlink" href="#graph_scheduler.condition.Condition.absolute_intervals" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">absolute_intervals</span></span><a class="headerlink" href="#graph_scheduler.condition.Condition.absolute_intervals" title="Permalink to this definition"></a></dt>
 <dd><p>In absolute time, repeated intervals for satisfaction or
 unsatisfaction of this Condition or those it contains</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="graph_scheduler.condition.Condition.absolute_fixed_points">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">absolute_fixed_points</span></span><a class="headerlink" href="#graph_scheduler.condition.Condition.absolute_fixed_points" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">absolute_fixed_points</span></span><a class="headerlink" href="#graph_scheduler.condition.Condition.absolute_fixed_points" title="Permalink to this definition"></a></dt>
 <dd><p>In absolute time, specific time points for satisfaction or
 unsatisfaction of this Condition or those it contains</p>
 </dd></dl>
@@ -1077,7 +985,7 @@ unsatisfaction of this Condition or those it contains</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.ConditionSet">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">ConditionSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conditions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.ConditionSet" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">ConditionSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conditions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.ConditionSet" title="Permalink to this definition"></a></dt>
 <dd><p>Used in conjunction with a <a class="reference internal" href="Scheduler.html#graph_scheduler.scheduler.Scheduler" title="graph_scheduler.scheduler.Scheduler"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Scheduler</span></code></a> to store the <a class="reference internal" href="#"><span class="doc">Conditions</span></a> associated with a node.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1087,7 +995,7 @@ with each.</p>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="graph_scheduler.condition.ConditionSet.conditions">
-<span class="sig-name descname"><span class="pre">conditions</span></span><a class="headerlink" href="#graph_scheduler.condition.ConditionSet.conditions" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">conditions</span></span><a class="headerlink" href="#graph_scheduler.condition.ConditionSet.conditions" title="Permalink to this definition"></a></dt>
 <dd><p>the key of each entry is a node, and its value is the <a class="reference internal" href="#"><span class="doc">Condition</span></a> associated
 with that node.  Conditions can be added to the
 ConditionSet using the ConditionSet’s <a class="reference internal" href="#graph_scheduler.condition.ConditionSet.add_condition" title="graph_scheduler.condition.ConditionSet.add_condition"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">add_condition</span></code></a> method.</p>
@@ -1100,7 +1008,7 @@ ConditionSet using the ConditionSet’s <a class="reference internal" href="#gra
 
 <dl class="py method">
 <dt class="sig sig-object py" id="graph_scheduler.condition.ConditionSet.add_condition">
-<span class="sig-name descname"><span class="pre">add_condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">owner</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">condition</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.ConditionSet.add_condition" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">owner</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">condition</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.ConditionSet.add_condition" title="Permalink to this definition"></a></dt>
 <dd><p>Adds a <a class="reference internal" href="#"><span class="doc">Condition</span></a> to the ConditionSet. If <strong>owner</strong> already has a Condition, it is overwritten
 with the new one. If you want to add multiple conditions to a single owner, use the
 <a class="reference internal" href="#conditions-composite"><span class="std std-ref">composite Conditions</span></a> to accurately specify the desired behavior.</p>
@@ -1117,7 +1025,7 @@ will govern the execution behavior of <strong>owner</strong></p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="graph_scheduler.condition.ConditionSet.add_condition_set">
-<span class="sig-name descname"><span class="pre">add_condition_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conditions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.ConditionSet.add_condition_set" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_condition_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conditions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.ConditionSet.add_condition_set" title="Permalink to this definition"></a></dt>
 <dd><p>Adds a set of <a class="reference internal" href="#"><span class="doc">Conditions</span></a> (in the form of a dict or another ConditionSet) to the ConditionSet.
 Any Condition added here will overwrite an existing Condition for a given owner.
 If you want to add multiple conditions to a single owner, add a single <a class="reference internal" href="#conditions-composite"><span class="std std-ref">Composite Condition</span></a>
@@ -1139,7 +1047,7 @@ governed) to a <a class="reference internal" href="#"><span class="doc">Conditio
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.EveryNCalls">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">EveryNCalls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dependencies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.EveryNCalls" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">EveryNCalls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dependencies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.EveryNCalls" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1164,7 +1072,7 @@ node runs</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.EveryNPasses">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">EveryNPasses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.EveryNPasses" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">EveryNPasses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.EveryNPasses" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1185,7 +1093,7 @@ node runs</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.JustRan">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">JustRan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dependencies</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.JustRan" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">JustRan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dependencies</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.JustRan" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>dependencies</strong> (<em>node</em>) – the node on which the Condition depends</p>
@@ -1207,7 +1115,7 @@ JustRan(A) is satisfied at the beginning of the next <a class="reference interna
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.Never">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">Never</span></span><a class="headerlink" href="#graph_scheduler.condition.Never" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">Never</span></span><a class="headerlink" href="#graph_scheduler.condition.Never" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>none</strong> – </p>
@@ -1223,7 +1131,7 @@ JustRan(A) is satisfied at the beginning of the next <a class="reference interna
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.Not">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">Not</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">condition</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.Not" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">Not</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">condition</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.Not" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>condition</strong> (<a class="reference internal" href="#graph_scheduler.condition.Condition" title="graph_scheduler.condition.Condition"><em>Condition</em></a>) – a <a class="reference internal" href="#"><span class="doc">Condition</span></a></p>
@@ -1239,7 +1147,7 @@ JustRan(A) is satisfied at the beginning of the next <a class="reference interna
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.NWhen">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">NWhen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">condition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.NWhen" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">NWhen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">condition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.NWhen" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1258,13 +1166,13 @@ JustRan(A) is satisfied at the beginning of the next <a class="reference interna
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="graph_scheduler.condition.Or">
-<span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">Or</span></span><a class="headerlink" href="#graph_scheduler.condition.Or" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">Or</span></span><a class="headerlink" href="#graph_scheduler.condition.Or" title="Permalink to this definition"></a></dt>
 <dd><p>alias of <a class="reference internal" href="#graph_scheduler.condition.Any" title="graph_scheduler.condition.Any"><code class="xref py py-class docutils literal notranslate"><span class="pre">graph_scheduler.condition.Any</span></code></a></p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.WhenFinished">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">WhenFinished</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dependencies</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.WhenFinished" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">WhenFinished</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dependencies</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.WhenFinished" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>dependencies</strong> (<em>node</em>) – the node on which the Condition depends</p>
@@ -1286,7 +1194,7 @@ this Condition) can vary arbitrarily in time.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.WhenFinishedAll">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">WhenFinishedAll</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">dependencies</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.WhenFinishedAll" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">WhenFinishedAll</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">dependencies</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.WhenFinishedAll" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>*nodes</strong> (<em>nodes</em>) – zero or more nodes on which the Condition depends</p>
@@ -1311,7 +1219,7 @@ this Condition) can vary arbitrarily in time.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.WhenFinishedAny">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">WhenFinishedAny</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">dependencies</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.WhenFinishedAny" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">WhenFinishedAny</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">dependencies</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.WhenFinishedAny" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>*nodes</strong> (<em>nodes</em>) – zero or more nodes on which the Condition depends</p>
@@ -1336,13 +1244,13 @@ this Condition) can vary arbitrarily in time.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="graph_scheduler.condition.While">
-<span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">While</span></span><a class="headerlink" href="#graph_scheduler.condition.While" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">While</span></span><a class="headerlink" href="#graph_scheduler.condition.While" title="Permalink to this definition"></a></dt>
 <dd><p>alias of <a class="reference internal" href="#graph_scheduler.condition.Condition" title="graph_scheduler.condition.Condition"><code class="xref py py-class docutils literal notranslate"><span class="pre">graph_scheduler.condition.Condition</span></code></a></p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.WhileNot">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">WhileNot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.WhileNot" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">WhileNot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.WhileNot" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1365,38 +1273,38 @@ specifies keyword arguments to pass to <code class="xref any docutils literal no
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.TimeInterval">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">TimeInterval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">repeat=None</span></em>, <em class="sig-param"><span class="pre">start=None</span></em>, <em class="sig-param"><span class="pre">end=None</span></em>, <em class="sig-param"><span class="pre">unit=&lt;Unit('millisecond')&gt;</span></em>, <em class="sig-param"><span class="pre">start_inclusive=True</span></em>, <em class="sig-param"><span class="pre">end_inclusive=True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.TimeInterval" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">TimeInterval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">repeat=None</span></em>, <em class="sig-param"><span class="pre">start=None</span></em>, <em class="sig-param"><span class="pre">end=None</span></em>, <em class="sig-param"><span class="pre">unit=&lt;Unit('millisecond')&gt;</span></em>, <em class="sig-param"><span class="pre">start_inclusive=True</span></em>, <em class="sig-param"><span class="pre">end_inclusive=True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.TimeInterval" title="Permalink to this definition"></a></dt>
 <dd><dl class="py attribute">
 <dt class="sig sig-object py" id="graph_scheduler.condition.TimeInterval.repeat">
-<span class="sig-name descname"><span class="pre">repeat</span></span><a class="headerlink" href="#graph_scheduler.condition.TimeInterval.repeat" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">repeat</span></span><a class="headerlink" href="#graph_scheduler.condition.TimeInterval.repeat" title="Permalink to this definition"></a></dt>
 <dd><p>the interval between <a href="#id33"><span class="problematic" id="id34">*</span></a>unit*s where this condition can be
 satisfied</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="graph_scheduler.condition.TimeInterval.start">
-<span class="sig-name descname"><span class="pre">start</span></span><a class="headerlink" href="#graph_scheduler.condition.TimeInterval.start" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">start</span></span><a class="headerlink" href="#graph_scheduler.condition.TimeInterval.start" title="Permalink to this definition"></a></dt>
 <dd><p>the time at/after which this condition can be
 satisfied</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="graph_scheduler.condition.TimeInterval.end">
-<span class="sig-name descname"><span class="pre">end</span></span><a class="headerlink" href="#graph_scheduler.condition.TimeInterval.end" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">end</span></span><a class="headerlink" href="#graph_scheduler.condition.TimeInterval.end" title="Permalink to this definition"></a></dt>
 <dd><p>the time at/fter which this condition can be
 satisfied</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="graph_scheduler.condition.TimeInterval.unit">
-<span class="sig-name descname"><span class="pre">unit</span></span><a class="headerlink" href="#graph_scheduler.condition.TimeInterval.unit" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">unit</span></span><a class="headerlink" href="#graph_scheduler.condition.TimeInterval.unit" title="Permalink to this definition"></a></dt>
 <dd><p>the <a class="reference external" href="https://pint.readthedocs.io/en/stable/developers_reference.html#pint.Unit" title="(in pint v0.17)"><code class="xref any docutils literal notranslate"><span class="pre">pint.Unit</span></code></a> to use for scalar values of <em>repeat</em>,
 <em>start</em>, and <em>end</em></p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="graph_scheduler.condition.TimeInterval.start_inclusive">
-<span class="sig-name descname"><span class="pre">start_inclusive</span></span><a class="headerlink" href="#graph_scheduler.condition.TimeInterval.start_inclusive" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">start_inclusive</span></span><a class="headerlink" href="#graph_scheduler.condition.TimeInterval.start_inclusive" title="Permalink to this definition"></a></dt>
 <dd><p>if True, <em>start</em> allows satisfaction exactly at the time
 corresponding to <em>start</em>. if False, satisfaction can occur
 only after <em>start</em></p>
@@ -1404,7 +1312,7 @@ only after <em>start</em></p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="graph_scheduler.condition.TimeInterval.end_inclusive">
-<span class="sig-name descname"><span class="pre">end_inclusive</span></span><a class="headerlink" href="#graph_scheduler.condition.TimeInterval.end_inclusive" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">end_inclusive</span></span><a class="headerlink" href="#graph_scheduler.condition.TimeInterval.end_inclusive" title="Permalink to this definition"></a></dt>
 <dd><p>if True, <em>end</em> allows satisfaction exactly until the time
 corresponding to <em>end</em>. if False, satisfaction can occur
 only before <em>end</em></p>
@@ -1428,14 +1336,14 @@ this will do the opposite and be true only and always until time
 expected. See <a class="reference internal" href="Scheduler.html#scheduler-exact-time"><span class="std std-ref">Exact Time Mode</span></a> for more info.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="graph_scheduler.condition.TimeInterval.absolute_intervals">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">absolute_intervals</span></span><a class="headerlink" href="#graph_scheduler.condition.TimeInterval.absolute_intervals" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">absolute_intervals</span></span><a class="headerlink" href="#graph_scheduler.condition.TimeInterval.absolute_intervals" title="Permalink to this definition"></a></dt>
 <dd><p>In absolute time, repeated intervals for satisfaction or
 unsatisfaction of this Condition or those it contains</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="graph_scheduler.condition.TimeInterval.absolute_fixed_points">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">absolute_fixed_points</span></span><a class="headerlink" href="#graph_scheduler.condition.TimeInterval.absolute_fixed_points" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">absolute_fixed_points</span></span><a class="headerlink" href="#graph_scheduler.condition.TimeInterval.absolute_fixed_points" title="Permalink to this definition"></a></dt>
 <dd><p>In absolute time, specific time points for satisfaction or
 unsatisfaction of this Condition or those it contains</p>
 </dd></dl>
@@ -1444,23 +1352,23 @@ unsatisfaction of this Condition or those it contains</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.TimeTermination">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">TimeTermination</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">t</span></em>, <em class="sig-param"><span class="pre">inclusive=True</span></em>, <em class="sig-param"><span class="pre">unit=&lt;Unit('millisecond')&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.TimeTermination" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">TimeTermination</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">t</span></em>, <em class="sig-param"><span class="pre">inclusive=True</span></em>, <em class="sig-param"><span class="pre">unit=&lt;Unit('millisecond')&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.TimeTermination" title="Permalink to this definition"></a></dt>
 <dd><dl class="py attribute">
 <dt class="sig sig-object py" id="graph_scheduler.condition.TimeTermination.t">
-<span class="sig-name descname"><span class="pre">t</span></span><a class="headerlink" href="#graph_scheduler.condition.TimeTermination.t" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">t</span></span><a class="headerlink" href="#graph_scheduler.condition.TimeTermination.t" title="Permalink to this definition"></a></dt>
 <dd><p>the time at/after which this condition is satisfied</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="graph_scheduler.condition.TimeTermination.unit">
-<span class="sig-name descname"><span class="pre">unit</span></span><a class="headerlink" href="#graph_scheduler.condition.TimeTermination.unit" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">unit</span></span><a class="headerlink" href="#graph_scheduler.condition.TimeTermination.unit" title="Permalink to this definition"></a></dt>
 <dd><p>the <a class="reference external" href="https://pint.readthedocs.io/en/stable/developers_reference.html#pint.Unit" title="(in pint v0.17)"><code class="xref any docutils literal notranslate"><span class="pre">pint.Unit</span></code></a> to use for scalar values of <em>t</em>, <em>start</em>,
 and <em>end</em></p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="graph_scheduler.condition.TimeTermination.start_inclusive">
-<span class="sig-name descname"><span class="pre">start_inclusive</span></span><a class="headerlink" href="#graph_scheduler.condition.TimeTermination.start_inclusive" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">start_inclusive</span></span><a class="headerlink" href="#graph_scheduler.condition.TimeTermination.start_inclusive" title="Permalink to this definition"></a></dt>
 <dd><p>if True, the condition is satisfied exactly at the time
 corresponding to <em>t</em>. if False, satisfaction can occur
 only after <em>t</em></p>
@@ -1472,62 +1380,45 @@ only after <em>t</em></p>
 </div></blockquote>
 <dl class="py property">
 <dt class="sig sig-object py" id="graph_scheduler.condition.TimeTermination.absolute_fixed_points">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">absolute_fixed_points</span></span><a class="headerlink" href="#graph_scheduler.condition.TimeTermination.absolute_fixed_points" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">absolute_fixed_points</span></span><a class="headerlink" href="#graph_scheduler.condition.TimeTermination.absolute_fixed_points" title="Permalink to this definition"></a></dt>
 <dd><p>In absolute time, specific time points for satisfaction or
 unsatisfaction of this Condition or those it contains</p>
 </dd></dl>
 
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="Time.html" class="btn btn-neutral float-right" title="Time" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="Scheduler.html" class="btn btn-neutral float-left" title="Scheduler" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Time.html" class="btn btn-neutral float-right" title="Time" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, Princeton University.
-
-    </p>
+    <p>&#169; Copyright 2021, Princeton University.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>
