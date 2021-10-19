@@ -30,8 +30,9 @@ jobs:
       run: git fetch origin +refs/tags/*:refs/tags/*
 
     - name: Download branch docs
-      uses: actions/download-artifact@v2
+      uses: dawidd6/action-download-artifact@v2
       with:
+        workflow: ci-docs-build.yml
         name: Documentation-${{ matrix.os }}-${{ matrix.python-version }}-x64
         path: _built_docs/${{ github.ref }}
       if: github.ref == 'refs/heads/main'
