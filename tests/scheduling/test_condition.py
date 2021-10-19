@@ -975,6 +975,38 @@ class TestAbsolute:
                 },
                 {TimeScale.ENVIRONMENT_STATE_UPDATE: TimeInterval(start=597)}
             ),
+            (
+                {
+                    A: TimeInterval(repeat=10, start=100, start_inclusive=False),
+                    B: TimeInterval(repeat=10, start=300),
+                    C: TimeInterval(repeat=10, start=400)
+                },
+                {TimeScale.ENVIRONMENT_STATE_UPDATE: TimeInterval(start=500)}
+            ),
+            (
+                {
+                    A: TimeInterval(repeat=10, start=100, start_inclusive=False),
+                    B: TimeInterval(repeat=10, start=300),
+                    C: TimeInterval(repeat=10, start=400)
+                },
+                {TimeScale.ENVIRONMENT_STATE_UPDATE: TimeInterval(start=500, start_inclusive=False)}
+            ),
+            (
+                {
+                    A: TimeInterval(repeat=10, start=100),
+                    B: TimeInterval(repeat=10, start=100, end=200),
+                    C: TimeInterval(repeat=10, start=400)
+                },
+                {TimeScale.ENVIRONMENT_STATE_UPDATE: TimeInterval(start=500, start_inclusive=False)}
+            ),
+            (
+                {
+                    A: TimeInterval(repeat=10, start=100),
+                    B: TimeInterval(repeat=10, start=100, end=200, end_inclusive=False),
+                    C: TimeInterval(repeat=10, start=400)
+                },
+                {TimeScale.ENVIRONMENT_STATE_UPDATE: TimeInterval(start=500)}
+            ),
         ]
     )
     def test_TimeInterval_no_dependencies(self, conditions, termination_conds):
@@ -1005,6 +1037,16 @@ class TestAbsolute:
                     assert cond.start in executions
                 else:
                     assert cond.start + consideration_set_execution_abs_value in executions
+
+        # this test only runs a single ENVIRONMENT_STATE_UPDATE, so this
+        # timestamp corresponds to its last
+        final_timestamp = comp.scheduler.execution_timestamps[comp.default_execution_id][-1].absolute
+        term_cond = termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE]
+
+        if term_cond.start_inclusive:
+            assert term_cond.start - consideration_set_execution_abs_value == final_timestamp
+        else:
+            assert term_cond.start == final_timestamp
 
     @pytest.mark.parametrize(
         'repeat, unit, expected_repeat',
