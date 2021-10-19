@@ -1,6 +1,7 @@
 # Graph Scheduler
 
 [![CI](https://github.com/kmantel/graph-scheduler/actions/workflows/ci.yml/badge.svg)](https://github.com/kmantel/graph-scheduler/actions/workflows/ci.yml)
+[![Coverage Status](https://coveralls.io/repos/github/kmantel/graph-scheduler/badge.svg)](https://coveralls.io/github/kmantel/graph-scheduler)
 
 A graph scheduler generates the order in which the nodes of a directed
 acyclic graph (DAG) are executed using the structure of the graph and

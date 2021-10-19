@@ -75,6 +75,18 @@ jobs:
         retention-days: 5
       if: success() || failure()
 
+    - name: Convert coverage file
+      if: ${{ matrix.python-version == 3.9 && matrix.os == 'ubuntu-latest' }}
+      run: |
+        coveragepy-lcov --data_file_path .coverage --output_file_path lcov.info
+
+    - name: Upload to Coveralls
+      if: ${{ matrix.python-version == 3.9 && matrix.os == 'ubuntu-latest' }}
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        path-to-lcov: lcov.info
+
     - name: Build dist
       run: |
         pip install setuptools wheel
