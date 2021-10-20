@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Scheduler &mdash; Graph Scheduler 1.0.0rc2+16.g78892b0 documentation</title>
+  <title>Scheduler &mdash; Graph Scheduler 1.0.0rc2+17.g9e29281 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             <a href="index.html" class="icon icon-home"> Graph Scheduler
           </a>
               <div class="version">
-                1.0.0rc2+16
+                1.0.0rc2+17
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -488,6 +488,17 @@ specifies the absolute duration of a <a class="reference internal" href="Time.ht
 default : NotImplemented</p>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="graph_scheduler.scheduler.Scheduler.end_environment_sequence">
+<span class="sig-name descname"><span class="pre">end_environment_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">execution_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">NotImplemented</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.scheduler.Scheduler.end_environment_sequence" title="Permalink to this definition"></a></dt>
+<dd><p>Signals that an <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.ENVIRONMENT_SEQUENCE" title="graph_scheduler.time.TimeScale.ENVIRONMENT_SEQUENCE"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">ENVIRONMENT_SEQUENCE</span></code></a> has completed</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>execution_id</strong> (<em>optional</em>) – Defaults to <a class="reference internal" href="#graph_scheduler.scheduler.Scheduler.default_execution_id" title="graph_scheduler.scheduler.Scheduler.default_execution_id"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">Scheduler.default_execution_id</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
