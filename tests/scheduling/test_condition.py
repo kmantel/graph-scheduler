@@ -1,5 +1,6 @@
 import logging
 
+import graph_scheduler
 import pytest
 from psyneulink import _unit_registry
 from psyneulink.core.components.functions.nonstateful.transferfunctions import Linear
@@ -212,7 +213,7 @@ class TestCondition:
             assert output == pytest.helpers.setify_expected_output(expected_output)
 
     @pytest.mark.psyneulink
-    class TestTime:
+    class TestTimePNL:
 
         def test_BeforeConsiderationSetExecution(self):
             comp = Composition()
@@ -480,6 +481,121 @@ class TestCondition:
 
             expected_output = [set(), A, A, A, A]
             assert output == pytest.helpers.setify_expected_output(expected_output)
+
+    class TestTime:
+
+        @pytest.mark.parametrize(
+            'node_condition, termination_conditions, expected_output',
+            [
+                pytest.param(
+                    graph_scheduler.AfterNPasses(1),
+                    {
+                        TimeScale.ENVIRONMENT_SEQUENCE: graph_scheduler.AfterNEnvironmentStateUpdates(1),
+                        TimeScale.ENVIRONMENT_STATE_UPDATE: graph_scheduler.AfterConsiderationSetExecution(4)
+                    },
+                    [set(), 'A', 'A', 'A', 'A'],
+                    id='AfterConsiderationSetExecution'
+                ),
+                pytest.param(
+                    graph_scheduler.AfterNPasses(1),
+                    {
+                        TimeScale.ENVIRONMENT_SEQUENCE: graph_scheduler.AfterNEnvironmentStateUpdates(1),
+                        TimeScale.ENVIRONMENT_STATE_UPDATE: graph_scheduler.AfterNConsiderationSetExecutions(5)
+                    },
+                    [set(), 'A', 'A', 'A', 'A'],
+                    id='AfterNConsiderationSetExecutions'
+                ),
+            ]
+        )
+        def test_single_node(
+            self, node_condition, termination_conditions, expected_output
+        ):
+            graph = {'A': set()}
+
+            sched = graph_scheduler.Scheduler(graph)
+            sched.add_condition('A', node_condition)
+            output = list(sched.run(termination_conds=termination_conditions))
+
+            assert output == pytest.helpers.setify_expected_output(expected_output)
+
+        @pytest.mark.parametrize(
+            'node_condition, termination_conditions, expected_output, n_sequences, n_state_updates_per_sequence',
+            [
+                pytest.param(
+                    graph_scheduler.AtEnvironmentStateUpdateNStart(2),
+                    {TimeScale.ENVIRONMENT_STATE_UPDATE: graph_scheduler.AfterNPasses(1)},
+                    [[set(), set(), 'A', set()]],
+                    1,
+                    4,
+                    id='AtEnvironmentStateUpdateNStart'
+                ),
+                pytest.param(
+                    graph_scheduler.AtEnvironmentSequence(4),
+                    {TimeScale.ENVIRONMENT_STATE_UPDATE: graph_scheduler.AfterNPasses(1)},
+                    [[set()], [set()], [set()], [set()], ['A'], [set()]],
+                    6,
+                    1,
+                    id='AtEnvironmentSequence'
+                ),
+                pytest.param(
+                    graph_scheduler.AfterEnvironmentSequence(3),
+                    {TimeScale.ENVIRONMENT_STATE_UPDATE: graph_scheduler.AfterNPasses(1)},
+                    [[set()], [set()], [set()], [set()], ['A'], ['A']],
+                    6,
+                    1,
+                    id='AfterEnvironmentSequence'
+                ),
+                pytest.param(
+                    graph_scheduler.AfterNEnvironmentSequences(4),
+                    {TimeScale.ENVIRONMENT_STATE_UPDATE: graph_scheduler.AfterNPasses(1)},
+                    [[set()], [set()], [set()], [set()], ['A'], ['A']],
+                    6,
+                    1,
+                    id='AfterNEnvironmentSequences'
+                ),
+                pytest.param(
+                    graph_scheduler.AtEnvironmentSequenceStart(),
+                    {TimeScale.ENVIRONMENT_STATE_UPDATE: graph_scheduler.AfterNPasses(1)},
+                    [['A', set()], ['A', set()]],
+                    2,
+                    2,
+                    id='AtEnvironmentSequenceStart'
+                ),
+                pytest.param(
+                    graph_scheduler.AtEnvironmentSequenceNStart(1),
+                    {TimeScale.ENVIRONMENT_STATE_UPDATE: graph_scheduler.AfterNPasses(1)},
+                    [[set(), set()], ['A', set()], [set(), set()]],
+                    3,
+                    2,
+                    id='AtEnvironmentSequenceNStart'
+                ),
+            ]
+        )
+        def test_single_node_n_sequences(
+            self,
+            node_condition,
+            termination_conditions,
+            expected_output,
+            n_sequences,
+            n_state_updates_per_sequence
+        ):
+            graph = {'A': set()}
+
+            sched = graph_scheduler.Scheduler(graph)
+            sched.add_condition('A', node_condition)
+            output = []
+
+            for _ in range(n_sequences):
+                su = []
+                for i in range(n_state_updates_per_sequence):
+                    su.extend(
+                        list(sched.run(termination_conds=termination_conditions))
+                    )
+                output.append(su)
+                sched.end_environment_sequence()
+
+            for i in range(n_sequences):
+                assert output[i] == pytest.helpers.setify_expected_output(expected_output[i]), f'ENVIRONMENT_SEQUENCE {i}'
 
     @pytest.mark.psyneulink
     class TestComponentBased:
