@@ -1398,6 +1398,12 @@ class AtEnvironmentSequence(Condition):
 
         - exactly n `ENVIRONMENT_SEQUENCE`\\ s have occurred.
 
+    Notes:
+        - `ENVIRONMENT_SEQUENCE`\\ s are managed by the environment \
+        using the Scheduler (e.g. \
+        `end_environment_sequence <Scheduler.end_environment_sequence>`\
+        ) and are not automatically updated by this package.
+
     """
     def __init__(self, n):
         def func(n, scheduler=None, execution_id=None):
@@ -1420,6 +1426,12 @@ class AfterEnvironmentSequence(Condition):
 
         - at least n+1 `ENVIRONMENT_SEQUENCE`\\ s have occurred.
 
+    Notes:
+        - `ENVIRONMENT_SEQUENCE`\\ s are managed by the environment \
+        using the Scheduler (e.g. \
+        `end_environment_sequence <Scheduler.end_environment_sequence>`\
+        ) and are not automatically updated by this package.
+
     """
     def __init__(self, n):
         def func(n, scheduler=None, execution_id=None):
@@ -1441,6 +1453,12 @@ class AfterNEnvironmentSequences(Condition):
     Satisfied when:
 
         - at least n `ENVIRONMENT_SEQUENCE`\\ s have occured.
+
+    Notes:
+        - `ENVIRONMENT_SEQUENCE`\\ s are managed by the environment \
+        using the Scheduler (e.g. \
+        `end_environment_sequence <Scheduler.end_environment_sequence>`\
+        ) and are not automatically updated by this package.
 
     """
 

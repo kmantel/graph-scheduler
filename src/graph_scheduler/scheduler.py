@@ -607,6 +607,17 @@ class Scheduler:
         else:
             return termination_conds
 
+    def end_environment_sequence(self, execution_id=NotImplemented):
+        """Signals that an `ENVIRONMENT_SEQUENCE` has completed
+
+        Args:
+            execution_id (optional): Defaults to `Scheduler.default_execution_id`
+        """
+        if execution_id is NotImplemented:
+            execution_id = self.default_execution_id
+
+        self._increment_time(TimeScale.ENVIRONMENT_SEQUENCE, execution_id)
+
     ################################################################################
     # Wrapper methods
     #   to allow the user to ignore the ConditionSet internals
