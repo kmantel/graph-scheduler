@@ -257,6 +257,45 @@ class TestScheduler:
         assert sched.execution_list[sched.default_execution_id] == [{'A', 'B'}]
         assert sched.execution_timestamps[sched.default_execution_id][0].absolute == 1 * graph_scheduler._unit_registry.ms
 
+    def test_delete_counts(self):
+        sched = Scheduler(
+            {
+                'A': set(),
+                'B': {'A'},
+                'C': {'A'},
+                'D': {'C', 'B'}
+            }
+        )
+
+        sched.add_condition_set(
+            {
+                'A': graph_scheduler.EveryNPasses(2),
+                'B': graph_scheduler.EveryNCalls('A', 2),
+                'C': graph_scheduler.EveryNCalls('A', 3),
+                'D': graph_scheduler.AfterNCallsCombined('B', 'C', n=6)
+            }
+        )
+
+        eid_delete = 'eid'
+        eid_repeat = 'eid2'
+
+        del_run_1 = list(sched.run(execution_id=eid_delete))
+        repeat_run_1 = list(sched.run(execution_id=eid_repeat))
+
+        sched._delete_counts(eid_delete)
+
+        del_run_2 = list(sched.run(execution_id=eid_delete))
+        repeat_run_2 = list(sched.run(execution_id=eid_repeat))
+
+        assert del_run_1 == repeat_run_1
+        assert del_run_2 == repeat_run_2
+
+        assert del_run_1 == del_run_2
+        assert repeat_run_1 == repeat_run_2
+
+        assert sched.execution_list[eid_delete] == del_run_1
+        assert sched.execution_list[eid_repeat] == repeat_run_1 + repeat_run_2
+
 
 @pytest.mark.psyneulink
 class TestLinear:
