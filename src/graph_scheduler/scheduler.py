@@ -553,7 +553,13 @@ class Scheduler:
                 self.clocks[execution_id] = Clock()
 
     def _delete_counts(self, execution_id):
-        for obj in [self.counts_useable, self.counts_total, self.clocks, self.execution_list]:
+        for obj in [
+            self.counts_useable,
+            self.counts_total,
+            self.clocks,
+            self.execution_list,
+            self.execution_timestamps
+        ]:
             try:
                 del obj[execution_id]
             except KeyError:
