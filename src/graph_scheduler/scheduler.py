@@ -892,15 +892,12 @@ class Scheduler:
         try:
             return self.clocks[execution_id.default_execution_id]
         except AttributeError:
-            try:
-                return self.clocks[execution_id]
-            except AttributeError:
-                if execution_id not in self.clocks:
-                    self._init_clock(execution_id)
-
-                return self.clocks[execution_id]
+            if execution_id not in self.clocks:
+                self._init_clock(execution_id)
+            return self.clocks[execution_id]
         except KeyError:
-            raise
+            self._init_clock(execution_id.default_execution_id)
+            return self.clocks[execution_id.default_execution_id]
 
     @property
     def termination_conds(self):

@@ -4,6 +4,7 @@ import networkx as nx
 import numpy as np
 import psyneulink as pnl
 import pytest
+import types
 
 import graph_scheduler
 from graph_scheduler import Scheduler
@@ -256,6 +257,18 @@ class TestScheduler:
         assert sched.mode == graph_scheduler.SchedulingMode.EXACT_TIME
         assert sched.execution_list[sched.default_execution_id] == [{'A', 'B'}]
         assert sched.execution_timestamps[sched.default_execution_id][0].absolute == 1 * graph_scheduler._unit_registry.ms
+
+    def test_run_with_new_execution_id(self):
+        sched = Scheduler({'A': set()})
+        sched.add_condition('A', graph_scheduler.AtPass(1))
+
+        output = list(sched.run(execution_id='eid'))
+
+        assert output == [set(), {'A'}]
+        assert 'eid' in sched.execution_list
+        assert sched.execution_list['eid'] == output
+
+        assert sched.get_clock('eid') == sched.get_clock(types.SimpleNamespace(default_execution_id='eid'))
 
 
 @pytest.mark.psyneulink
