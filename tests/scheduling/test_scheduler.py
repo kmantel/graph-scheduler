@@ -5,6 +5,7 @@ import numpy as np
 import psyneulink as pnl
 import pytest
 
+import graph_scheduler
 from graph_scheduler import Scheduler
 
 from psyneulink import _unit_registry
@@ -239,6 +240,22 @@ class TestScheduler:
         output = list(comp.scheduler.run())
         expected_output = [A, B, {C, A}]
         assert output == pytest.helpers.setify_expected_output(expected_output)
+
+    def test_exact_time_mode(self):
+        sched = Scheduler(
+            {'A': set(), 'B': {'A'}},
+            mode=graph_scheduler.SchedulingMode.EXACT_TIME
+        )
+
+        # these cannot run at same execution set unless in EXACT_TIME
+        sched.add_condition('A', TimeInterval(start=1))
+        sched.add_condition('B', TimeInterval(start=1))
+
+        list(sched.run())
+
+        assert sched.mode == graph_scheduler.SchedulingMode.EXACT_TIME
+        assert sched.execution_list[sched.default_execution_id] == [{'A', 'B'}]
+        assert sched.execution_timestamps[sched.default_execution_id][0].absolute == 1 * graph_scheduler._unit_registry.ms
 
 
 @pytest.mark.psyneulink
