@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Condition &mdash; Graph Scheduler 1.0.0rc2+27.g27aa33b documentation</title>
+  <title>Condition &mdash; Graph Scheduler 1.0.0rc2+30.g5b1e355 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             <a href="index.html" class="icon icon-home"> Graph Scheduler
           </a>
               <div class="version">
-                1.0.0rc2+27
+                1.0.0rc2+30
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -273,11 +273,11 @@ satisfied if the specified node was assigned to run in the previous <a class="re
 <li><p><a class="reference internal" href="#graph_scheduler.condition.AllHaveRun" title="graph_scheduler.condition.AllHaveRun"><code class="xref any py py-class docutils literal notranslate"><span class="pre">AllHaveRun</span></code></a> (<a href="#id15"><span class="problematic" id="id16">*</span></a>nodes)
 satisfied when all of the specified nodes have executed at least once.</p></li>
 <li><p><a class="reference internal" href="#graph_scheduler.condition.WhenFinished" title="graph_scheduler.condition.WhenFinished"><code class="xref any py py-class docutils literal notranslate"><span class="pre">WhenFinished</span></code></a> (node)
-satisfied when the specified node has set its <code class="xref any docutils literal notranslate"><span class="pre">is_finished</span></code> attribute to <code class="xref any docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+satisfied when the <code class="xref any docutils literal notranslate"><span class="pre">is_finished</span></code> method of the specified node,       given <a class="reference internal" href="Scheduler.html#graph_scheduler.scheduler.Scheduler.execution_id" title="graph_scheduler.scheduler.Scheduler.execution_id"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">execution_id</span></code></a> returns <code class="xref any docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
 <li><p><a class="reference internal" href="#graph_scheduler.condition.WhenFinishedAny" title="graph_scheduler.condition.WhenFinishedAny"><code class="xref any py py-class docutils literal notranslate"><span class="pre">WhenFinishedAny</span></code></a> (<a href="#id17"><span class="problematic" id="id18">*</span></a>nodes)
-satisfied when any of the specified nodes has set their <code class="xref any docutils literal notranslate"><span class="pre">is_finished</span></code> attribute to <code class="xref any docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+satisfied when the <code class="xref any docutils literal notranslate"><span class="pre">is_finished</span></code> method of any of the specified       nodes, given <a class="reference internal" href="Scheduler.html#graph_scheduler.scheduler.Scheduler.execution_id" title="graph_scheduler.scheduler.Scheduler.execution_id"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">execution_id</span></code></a> returns <code class="xref any docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
 <li><p><a class="reference internal" href="#graph_scheduler.condition.WhenFinishedAll" title="graph_scheduler.condition.WhenFinishedAll"><code class="xref any py py-class docutils literal notranslate"><span class="pre">WhenFinishedAll</span></code></a> (<a href="#id19"><span class="problematic" id="id20">*</span></a>nodes)
-satisfied when all of the specified nodes have set their <code class="xref any docutils literal notranslate"><span class="pre">is_finished</span></code> attributes to <code class="xref any docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+satisfied when the <code class="xref any docutils literal notranslate"><span class="pre">is_finished</span></code> method of all of the specified       nodes, given <a class="reference internal" href="Scheduler.html#graph_scheduler.scheduler.Scheduler.execution_id" title="graph_scheduler.scheduler.Scheduler.execution_id"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">execution_id</span></code></a> returns <code class="xref any docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
 </ul>
 </div></blockquote>
 <p id="conditions-convenience"><strong>Convenience Conditions</strong> (based on other Conditions, condensed for convenience)</p>
@@ -498,8 +498,7 @@ specified by <strong>time_scale</strong>.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.AfterNEnvironmentSequences">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">AfterNEnvironmentSequences</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.AfterNEnvironmentSequences" title="Permalink to this definition"></a></dt>
-<dd><p>AfterNEnvironmentStateUpdates</p>
-<dl class="field-list simple">
+<dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>n</strong> (<em>int</em>) – the number of <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.ENVIRONMENT_SEQUENCE" title="graph_scheduler.time.TimeScale.ENVIRONMENT_SEQUENCE"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">ENVIRONMENT_SEQUENCE</span></code></a>s after which the Condition is satisfied</p>
 </dd>
@@ -1201,6 +1200,7 @@ JustRan(A) is satisfied at the beginning of the next <a class="reference interna
 <li><p>This is a dynamic Condition: Each node is responsible for managing its finished status on its
 own, which can occur independently of the execution of other nodes.  Therefore the satisfaction of
 this Condition) can vary arbitrarily in time.</p></li>
+<li><p>The is_finished method is called with <a class="reference internal" href="Scheduler.html#graph_scheduler.scheduler.Scheduler.execution_id" title="graph_scheduler.scheduler.Scheduler.execution_id"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">execution_id</span></code></a> as its           sole positional argument</p></li>
 </ul>
 </dd></dl>
 
@@ -1226,6 +1226,7 @@ If no nodes are specified, the condition will default to checking all of schedul
 <li><p>This is a dynamic Condition: Each node is responsible for managing its finished status on its
 own, which can occur independently of the execution of other nodes.  Therefore the satisfaction of
 this Condition) can vary arbitrarily in time.</p></li>
+<li><p>The is_finished method is called with <a class="reference internal" href="Scheduler.html#graph_scheduler.scheduler.Scheduler.execution_id" title="graph_scheduler.scheduler.Scheduler.execution_id"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">execution_id</span></code></a> as its           sole positional argument</p></li>
 </ul>
 </dd></dl>
 
@@ -1251,6 +1252,7 @@ If no nodes are specified, the condition will default to checking all of schedul
 <li><p>This is a dynamic Condition: Each node is responsible for managing its finished status on its
 own, which can occur independently of the execution of other nodes.  Therefore the satisfaction of
 this Condition) can vary arbitrarily in time.</p></li>
+<li><p>The is_finished method is called with <a class="reference internal" href="Scheduler.html#graph_scheduler.scheduler.Scheduler.execution_id" title="graph_scheduler.scheduler.Scheduler.execution_id"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">execution_id</span></code></a> as its           sole positional argument</p></li>
 </ul>
 </dd></dl>
 
