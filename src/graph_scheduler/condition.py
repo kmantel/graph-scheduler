@@ -237,13 +237,16 @@ specified `TimeScale` or `Time <Scheduler_Absolute_Time>`):
       satisfied when all of the specified nodes have executed at least once.
 
     * `WhenFinished` (node)
-      satisfied when the specified node has set its `is_finished` attribute to `True`.
+      satisfied when the `is_finished` method of the specified node, \
+      given `execution_id` returns `True`.
 
     * `WhenFinishedAny` (*nodes)
-      satisfied when any of the specified nodes has set their `is_finished` attribute to `True`.
+      satisfied when the `is_finished` method of any of the specified \
+      nodes, given `execution_id` returns `True`.
 
     * `WhenFinishedAll` (*nodes)
-      satisfied when all of the specified nodes have set their `is_finished` attributes to `True`.
+      satisfied when the `is_finished` method of all of the specified \
+      nodes, given `execution_id` returns `True`.
 
 .. _Conditions_Convenience:
 
@@ -1444,7 +1447,7 @@ class AfterEnvironmentSequence(Condition):
 
 
 class AfterNEnvironmentSequences(Condition):
-    """AfterNEnvironmentStateUpdates
+    """AfterNEnvironmentSequences
 
     Parameters:
 
@@ -1777,6 +1780,9 @@ class WhenFinished(_DependencyValidation, Condition):
           own, which can occur independently of the execution of other nodes.  Therefore the satisfaction of
           this Condition) can vary arbitrarily in time.
 
+        - The is_finished method is called with `execution_id` as its \
+          sole positional argument
+
     """
     def __init__(self, dependency):
         def func(dependency, execution_id=None):
@@ -1808,6 +1814,9 @@ class WhenFinishedAny(_DependencyValidation, Condition):
         - This is a dynamic Condition: Each node is responsible for managing its finished status on its
           own, which can occur independently of the execution of other nodes.  Therefore the satisfaction of
           this Condition) can vary arbitrarily in time.
+
+        - The is_finished method is called with `execution_id` as its \
+          sole positional argument
 
     """
     def __init__(self, *dependencies):
@@ -1845,6 +1854,9 @@ class WhenFinishedAll(_DependencyValidation, Condition):
         - This is a dynamic Condition: Each node is responsible for managing its finished status on its
           own, which can occur independently of the execution of other nodes.  Therefore the satisfaction of
           this Condition) can vary arbitrarily in time.
+
+        - The is_finished method is called with `execution_id` as its \
+          sole positional argument
 
     """
     def __init__(self, *dependencies):
