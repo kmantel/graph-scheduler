@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Time &mdash; Graph Scheduler 1.0.0+3.gdee38db documentation</title>
+  <title>Time &mdash; Graph Scheduler 1.0.0+4.g3618533 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -29,7 +29,7 @@
             <a href="index.html" class="icon icon-home"> Graph Scheduler
           </a>
               <div class="version">
-                1.0.0+3
+                1.0.0+4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -81,7 +81,7 @@
 <p><a class="reference internal" href="Scheduler.html"><span class="doc">Scheduler</span></a>s maintain <a class="reference internal" href="#graph_scheduler.time.Clock" title="graph_scheduler.time.Clock"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Clock</span></code></a> objects to track time. The current time in relation to a <a class="reference internal" href="Scheduler.html"><span class="doc">Scheduler</span></a> is stored in <a class="reference internal" href="#graph_scheduler.time.Time" title="graph_scheduler.time.Time"><code class="xref py py-class docutils literal notranslate"><span class="pre">Clock.time</span></code></a> or <a class="reference internal" href="#graph_scheduler.time.SimpleTime" title="graph_scheduler.time.SimpleTime"><code class="xref py py-class docutils literal notranslate"><span class="pre">Clock.simple_time</span></code></a></p>
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.time.Clock">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.time.</span></span><span class="sig-name descname"><span class="pre">Clock</span></span><a class="headerlink" href="#graph_scheduler.time.Clock" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.time.</span></span><span class="sig-name descname"><span class="pre">Clock</span></span><a class="headerlink" href="#graph_scheduler.time.Clock" title="Permalink to this definition"></a></dt>
 <dd><p>Stores a history of <a class="reference internal" href="#graph_scheduler.time.TimeScale" title="graph_scheduler.time.TimeScale"><code class="xref py py-class docutils literal notranslate"><span class="pre">TimeScale</span></code></a>s that have occurred, and keep track of a     current <a class="reference internal" href="#"><span class="doc">Time</span></a>. Used in relation to a <a class="reference internal" href="Scheduler.html"><span class="doc">Scheduler</span></a></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="graph_scheduler.time.Clock.history">
@@ -152,7 +152,7 @@ should be returned</p></li>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="graph_scheduler.time.Clock.time">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">time</span></span><a class="headerlink" href="#graph_scheduler.time.Clock.time" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">time</span></span><a class="headerlink" href="#graph_scheduler.time.Clock.time" title="Permalink to this definition"></a></dt>
 <dd><p><a class="reference internal" href="#"><span class="doc">Time</span></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -163,7 +163,7 @@ should be returned</p></li>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="graph_scheduler.time.Clock.previous_time">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">previous_time</span></span><a class="headerlink" href="#graph_scheduler.time.Clock.previous_time" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">previous_time</span></span><a class="headerlink" href="#graph_scheduler.time.Clock.previous_time" title="Permalink to this definition"></a></dt>
 <dd><p><a class="reference internal" href="#"><span class="doc">Time</span></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -176,7 +176,7 @@ should be returned</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.time.TimeScale">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.time.</span></span><span class="sig-name descname"><span class="pre">TimeScale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.time.TimeScale" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.time.</span></span><span class="sig-name descname"><span class="pre">TimeScale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.time.TimeScale" title="Permalink to this definition"></a></dt>
 <dd><p>Represents divisions of time used by the <a class="reference internal" href="Scheduler.html"><span class="doc">Scheduler</span></a> and <a class="reference internal" href="Condition.html"><span class="doc">Conditions</span></a>.</p>
 <p>The values of TimeScale are defined as follows (in order of increasingly coarse granularity):</p>
 <dl class="py attribute">
@@ -217,7 +217,7 @@ environment using the Scheduler.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="graph_scheduler.time.TimeScale.get_parent">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">get_parent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_scale</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.time.TimeScale.get_parent" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_parent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_scale</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.time.TimeScale.get_parent" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p><strong>the TimeScale one level wider in scope than time_scale</strong></p>
@@ -230,7 +230,7 @@ environment using the Scheduler.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="graph_scheduler.time.TimeScale.get_child">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">get_child</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_scale</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.time.TimeScale.get_child" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_child</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_scale</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.time.TimeScale.get_child" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p><strong>the TimeScale one level smaller in scope than time_scale</strong></p>
@@ -245,7 +245,7 @@ environment using the Scheduler.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.time.Time">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.time.</span></span><span class="sig-name descname"><span class="pre">Time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">consideration_set_execution=0</span></em>, <em class="sig-param"><span class="pre">pass_=0</span></em>, <em class="sig-param"><span class="pre">environment_state_update=0</span></em>, <em class="sig-param"><span class="pre">environment_sequence=0</span></em>, <em class="sig-param"><span class="pre">life=0</span></em>, <em class="sig-param"><span class="pre">absolute=&lt;Quantity(0</span></em>, <em class="sig-param"><span class="pre">'millisecond')&gt;</span></em>, <em class="sig-param"><span class="pre">absolute_interval=&lt;Quantity(1</span></em>, <em class="sig-param"><span class="pre">'millisecond')&gt;</span></em>, <em class="sig-param"><span class="pre">absolute_time_unit_scale=TimeScale.CONSIDERATION_SET_EXECUTION</span></em>, <em class="sig-param"><span class="pre">absolute_enabled=False</span></em>, <em class="sig-param"><span class="pre">**alias_time_values</span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.time.Time" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.time.</span></span><span class="sig-name descname"><span class="pre">Time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">consideration_set_execution=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pass_=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">environment_state_update=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">environment_sequence=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">life=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">absolute=&lt;Quantity(0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'millisecond')&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">absolute_interval=&lt;Quantity(1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'millisecond')&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">absolute_time_unit_scale=TimeScale.CONSIDERATION_SET_EXECUTION</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">absolute_enabled=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**alias_time_values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.time.Time" title="Permalink to this definition"></a></dt>
 <dd><p>Represents an instance of time, having values for each <a class="reference internal" href="#graph_scheduler.time.TimeScale" title="graph_scheduler.time.TimeScale"><code class="xref py py-class docutils literal notranslate"><span class="pre">TimeScale</span></code></a></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="graph_scheduler.time.Time.life">
@@ -392,14 +392,14 @@ TimeScale.PASS and TimeScale.CONSIDERATION_SET_EXECUTION to 0</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.time.SimpleTime">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.time.</span></span><span class="sig-name descname"><span class="pre">SimpleTime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_ref</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.time.SimpleTime" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.time.</span></span><span class="sig-name descname"><span class="pre">SimpleTime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_ref</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.time.SimpleTime" title="Permalink to this definition"></a></dt>
 <dd><p>A subset class of <a class="reference internal" href="#"><span class="doc">Time</span></a>, used to provide simple access to only
 <a class="reference internal" href="#graph_scheduler.time.Time.environment_sequence" title="graph_scheduler.time.Time.environment_sequence"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">environment_sequence</span></code></a>, <a class="reference internal" href="#graph_scheduler.time.Time.environment_state_update" title="graph_scheduler.time.Time.environment_state_update"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">environment_state_update</span></code></a>, and <a class="reference internal" href="#graph_scheduler.time.Time.consideration_set_execution" title="graph_scheduler.time.Time.consideration_set_execution"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">consideration_set_execution</span></code></a></p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.time.TimeHistoryTree">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.time.</span></span><span class="sig-name descname"><span class="pre">TimeHistoryTree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.LIFE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_current_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.time.TimeHistoryTree" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.time.</span></span><span class="sig-name descname"><span class="pre">TimeHistoryTree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.LIFE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TimeScale.ENVIRONMENT_STATE_UPDATE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_current_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.time.TimeHistoryTree" title="Permalink to this definition"></a></dt>
 <dd><p>A tree object that stores a history of time that has occurred at various
 <a class="reference internal" href="#graph_scheduler.time.TimeScale" title="graph_scheduler.time.TimeScale"><code class="xref py py-class docutils literal notranslate"><span class="pre">TimeScale</span></code></a>s, typically used in conjunction with a <a class="reference internal" href="#graph_scheduler.time.Clock" title="graph_scheduler.time.Clock"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Clock</span></code></a></p>
 <dl class="py attribute">
