@@ -63,7 +63,7 @@ jobs:
       run: make -C docs html
 
     - name: Upload Documentation
-      uses: actions/upload-artifact@v2.2.4
+      uses: actions/upload-artifact@v2.3.0
       with:
         name: Documentation-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.python-architecture }}
         retention-days: 1
