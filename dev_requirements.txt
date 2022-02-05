@@ -1,7 +1,7 @@
 coveragepy-lcov <0.2.0; python_version >= '3.8'
 networkx <2.7
 psyneulink >=0.9.1.0, <0.10.1.0
-pytest <6.3
+pytest <7.1
 pytest-benchmark <3.4.2
 pytest-cov <3.0.1
 pytest-helpers-namespace <2021.12.30
