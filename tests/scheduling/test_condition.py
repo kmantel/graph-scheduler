@@ -900,6 +900,38 @@ class TestCondition:
 
         assert d.parameters['a'] == 3
 
+    @pytest.mark.psyneulink
+    @pytest.mark.parametrize(
+        'comparator, increment, threshold, atol, rtol, expected_results',
+        [
+            ('==', 1, 10, 1, 0.1, [[[8]]]),
+            ('==', 1, 10, 1, 0, [[[9]]]),
+            ('==', 1, 10, 0, 0.1, [[[9]]]),
+            ('!=', 1, 2, 1, 0.5, [[[5]]]),
+            ('!=', 1, 1, 1, 0, [[[3]]]),
+            ('!=', 1, 1, 0, 1, [[[3]]]),
+            ('!=', -1, -2, 1, 0.5, [[[-5]]]),
+            ('!=', -1, -1, 1, 0, [[[-3]]]),
+            ('!=', -1, -1, 0, 1, [[[-3]]]),
+        ]
+    )
+    def test_Threshold_tolerances(
+        self, comparator, increment, threshold, atol, rtol, expected_results
+    ):
+        A = TransferMechanism(
+            integrator_mode=True,
+            integrator_function=pnl.AccumulatorIntegrator(rate=1, increment=increment),
+        )
+        comp = Composition(pathways=[A])
+
+        comp.termination_processing = {
+            TimeScale.TRIAL: graph_scheduler.Threshold(A, 'value', threshold, comparator, atol=atol, rtol=rtol)
+        }
+
+        comp.run(inputs={A: np.ones(A.defaults.variable.shape)})
+
+        np.testing.assert_array_equal(comp.results, expected_results)
+
 
 @pytest.mark.psyneulink
 class TestWhenFinished:
