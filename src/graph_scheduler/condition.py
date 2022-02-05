@@ -287,6 +287,7 @@ Class Reference
 import collections
 import itertools
 import logging
+import operator
 import typing
 import warnings
 
@@ -302,7 +303,7 @@ __all__ = [
     'AtNCalls','AtPass', 'AtEnvironmentSequenceStart', 'AtEnvironmentSequenceNStart', 'AtConsiderationSetExecution', 'AtEnvironmentStateUpdate',
     'AtEnvironmentStateUpdateStart', 'AtEnvironmentStateUpdateNStart', 'BeforeNCalls', 'BeforePass', 'BeforeConsiderationSetExecution', 'BeforeEnvironmentStateUpdate',
     'Condition','ConditionError', 'ConditionSet', 'EveryNCalls', 'EveryNPasses',
-    'JustRan', 'Never', 'Not', 'NWhen', 'Or', 'WhenFinished', 'WhenFinishedAll', 'WhenFinishedAny', 'While', 'WhileNot', 'TimeInterval', 'TimeTermination'
+    'JustRan', 'Never', 'Not', 'NWhen', 'Or', 'WhenFinished', 'WhenFinishedAll', 'WhenFinishedAny', 'While', 'WhileNot', 'TimeInterval', 'TimeTermination', 'Threshold'
 ]
 
 logger = logging.getLogger(__name__)
@@ -315,6 +316,15 @@ _pint_all_time_units = sorted(
     ]),
     reverse=True
 )
+
+comparison_operators = {
+    '<': operator.lt,
+    '<=': operator.le,
+    '>': operator.gt,
+    '>=': operator.ge,
+    '==': operator.eq,
+    '!=': operator.ne
+}
 
 
 def _quantity_as_integer(q):
@@ -1956,3 +1966,108 @@ class AtEnvironmentSequenceNStart(All):
     """
     def __init__(self, n):
         return super().__init__(AtEnvironmentStateUpdate(0), AtEnvironmentSequence(n))
+
+
+class Threshold(_DependencyValidation, Condition):
+    """Threshold
+
+    Attributes:
+
+        dependency
+            the node on which the Condition depends
+
+        parameter
+            the name of the parameter of **dependency** whose value is
+            to be compared to **threshold**
+
+        threshold
+            the fixed value compared to the value of the **parameter**
+
+        comparator
+            the string comparison operator determining the direction or
+            type of comparison of the value of the **parameter**
+            relative to **threshold**
+
+        indices
+            if specified, a series of indices that reach the desired
+            number given an iterable value for **parameter**
+
+        custom_parameter_getter
+            if specified, a function that returns the value of
+            **parameter** for **dependency**; to support class
+            structures other than <**dependency**>.<**parameter**>
+            without subclassing
+
+        custom_parameter_validator
+            if specified, a function that throws an exception if there
+            is no **parameter** for **dependency**; to support class
+            structures other than <**dependency**>.<**parameter**>
+            without subclassing
+
+    Satisfied when:
+
+        The comparison between the value of the **parameter** and
+        **threshold** using **comparator** is true
+
+    Notes:
+
+        The comparison must be done with scalars. If the value of
+        **parameter** contains more than one item, **indices** must be
+        specified.
+    """
+
+    def __init__(
+        self,
+        dependency,
+        parameter,
+        threshold,
+        comparator,
+        indices=None,
+        custom_parameter_getter=None,
+        custom_parameter_validator=None,
+    ):
+        self.validate_parameter(dependency, parameter, custom_parameter_validator)
+
+        if comparator not in comparison_operators:
+            raise ConditionError(f'Operator must be one of {list(comparison_operators.keys())}')
+
+        if isinstance(indices, TimeScale):
+            indices = [indices.value]
+        elif indices is not None and not isinstance(indices, collections.abc.Iterable):
+            indices = [indices]
+
+        def func(threshold, comparator, indices, execution_id):
+            param_value = self.get_parameter_value(execution_id)
+            if indices is not None:
+                for i in indices:
+                    param_value = param_value[i]
+
+            return comparison_operators[comparator](float(param_value), threshold)
+
+        super().__init__(
+            func,
+            dependency=dependency,
+            parameter=parameter,
+            threshold=threshold,
+            comparator=comparator,
+            indices=indices,
+            custom_parameter_getter=custom_parameter_getter,
+        )
+
+    def get_parameter_value(self, execution_id=None):
+        if self.custom_parameter_getter is not None:
+            return call_with_pruned_args(
+                self.custom_parameter_getter,
+                self.dependency,
+                self.parameter,
+                execution_id=execution_id
+            )
+        else:
+            return getattr(self.dependency, self.parameter)
+
+    def validate_parameter(self, dependency, parameter, custom_parameter_validator=None):
+        if custom_parameter_validator is not None:
+            custom_parameter_validator(dependency, parameter)
+        else:
+            if not hasattr(dependency, parameter):
+                raise ConditionError(f'{dependency} has no {parameter} attribute')

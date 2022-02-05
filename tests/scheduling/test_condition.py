@@ -1,6 +1,8 @@
 import logging
 
 import graph_scheduler
+import numpy as np
+import psyneulink as pnl
 import pytest
 from psyneulink import _unit_registry
 from psyneulink.core.components.functions.nonstateful.transferfunctions import Linear
@@ -814,6 +816,89 @@ class TestCondition:
             A, A, B, A, A, B, C
         ]
         assert output == pytest.helpers.setify_expected_output(expected_output)
+
+    @pytest.mark.psyneulink
+    @pytest.mark.parametrize(
+        'parameter, indices, default_variable, integration_rate, expected_results',
+        [
+            ('value', None, None, 1, [[[10]]]),
+            ('value', (0, 0), [[0, 0]], [1, 2], [[[10, 20]]]),
+            ('value', (0, 1), [[0, 0]], [1, 2], [[[5, 10]]]),
+            ('num_executions', TimeScale.TRIAL, None, 1, [[[10]]]),
+        ]
+    )
+    @pytest.mark.parametrize('threshold', [10, 10.0])
+    def test_Threshold_parameters(
+        self, parameter, indices, default_variable, integration_rate, expected_results, threshold,
+    ):
+
+        A = TransferMechanism(
+            default_variable=default_variable,
+            integrator_mode=True,
+            integrator_function=pnl.SimpleIntegrator,
+            integration_rate=integration_rate,
+        )
+        comp = Composition(pathways=[A])
+
+        comp.termination_processing = {
+            TimeScale.TRIAL: graph_scheduler.Threshold(A, parameter, threshold, '>=', indices=indices)
+        }
+
+        comp.run(inputs={A: np.ones(A.defaults.variable.shape)})
+
+        np.testing.assert_array_equal(comp.results, expected_results)
+
+    @pytest.mark.psyneulink
+    @pytest.mark.parametrize(
+        'comparator, increment, threshold, expected_results',
+        [
+            ('>', 1, 5, [[[6]]]),
+            ('>=', 1, 5, [[[5]]]),
+            ('<', -1, -5, [[[-6]]]),
+            ('<=', -1, -5, [[[-5]]]),
+            ('==', 1, 5, [[[5]]]),
+            ('!=', 1, 0, [[[1]]]),
+            ('!=', -1, 0, [[[-1]]]),
+        ]
+    )
+    def test_Threshold_comparators(
+        self, comparator, increment, threshold, expected_results
+    ):
+        A = TransferMechanism(
+            integrator_mode=True,
+            integrator_function=pnl.AccumulatorIntegrator(rate=1, increment=increment),
+        )
+        comp = Composition(pathways=[A])
+
+        comp.termination_processing = {
+            TimeScale.TRIAL: graph_scheduler.Threshold(A, 'value', threshold, comparator)
+        }
+
+        comp.run(inputs={A: np.ones(A.defaults.variable.shape)})
+
+        np.testing.assert_array_equal(comp.results, expected_results)
+
+    def test_Threshold_custom_methods(self):
+        class CustomDependency:
+            def __init__(self, **parameters):
+                self.parameters = parameters
+
+            def has_parameter(self, parameter):
+                return parameter in self.parameters
+
+        d = CustomDependency(a=0, b=5)
+        cond = graph_scheduler.Threshold(
+            d, 'a', 2, '>',
+            custom_parameter_getter=lambda o, p: o.parameters[p],
+            custom_parameter_validator=lambda o, p: o.has_parameter(p)
+        )
+        scheduler = graph_scheduler.Scheduler({d: set()}, {})
+        for _ in scheduler.run(
+            termination_conds={graph_scheduler.TimeScale.ENVIRONMENT_STATE_UPDATE: cond}
+        ):
+            d.parameters['a'] += 1
+
+        assert d.parameters['a'] == 3
 
 
 @pytest.mark.psyneulink
