@@ -263,6 +263,22 @@ class Time(types.SimpleNamespace):
         ts_str = self._time_repr(exclusions={TimeScale.LIFE})
         return f'Time({abs_str}{ts_str})'
 
+    def __getitem__(self, item):
+        try:
+            item = TimeScale(item)
+        except ValueError:
+            pass
+
+        return self._get_by_time_scale(item)
+
+    def __setitem__(self, item, value):
+        try:
+            item = TimeScale(item)
+        except ValueError:
+            pass
+
+        return self._set_by_time_scale(item, value)
+
     def _time_repr(self, exclusions=()):
         ts_strs = []
 
@@ -352,6 +368,12 @@ class SimpleTime:
         abs_str = f'{self.absolute}, ' if self._time_ref.absolute_enabled else ''
         ts_str = self._time_ref._time_repr(exclusions={TimeScale.LIFE, TimeScale.PASS})
         return f'Time({abs_str}{ts_str})'
+
+    def __getitem__(self, item):
+        return self._time_ref[item]
+
+    def __setitem__(self, item, value):
+        self._time_ref[item] = value
 
     @property
     def absolute(self):

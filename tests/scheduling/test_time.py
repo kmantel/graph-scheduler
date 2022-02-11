@@ -51,6 +51,42 @@ class TestTime:
         C.run(inputs={t1: [[4.0], [5.0], [6.0]]})
         assert C.scheduler.get_clock(C).time == pnl.Time(run=2, trial=0, pass_=0, time_step=0)
 
+    def test_get_set_item_time(self):
+        t = Time(run=1, trial=2, pass_=3, time_step=4)
+        st = SimpleTime(t)
+
+        assert t[0] == 4
+        assert t[1] == 3
+        assert t[2] == 2
+        assert t[3] == 1
+        assert t[4] == 0
+
+        assert st[0] == 4
+        assert st[2] == 2
+        assert st[3] == 1
+
+        t[3] = 5
+        assert t[0] == 4
+        assert t[1] == 3
+        assert t[2] == 2
+        assert t[3] == 5
+        assert t[4] == 0
+
+        assert st[0] == 4
+        assert st[2] == 2
+        assert st[3] == 5
+
+        st[0] = 6
+        assert t[0] == 6
+        assert t[1] == 3
+        assert t[2] == 2
+        assert t[3] == 5
+        assert t[4] == 0
+
+        assert st[0] == 6
+        assert st[2] == 2
+        assert st[3] == 5
+
 
 class TestTimeHistoryTree:
     def test_defaults(self):
