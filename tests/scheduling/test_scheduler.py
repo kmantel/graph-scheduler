@@ -181,7 +181,13 @@ class TestScheduler:
 
     @pytest.mark.psyneulink
     def test_change_termination_condition(self):
-        D = DDM(function=DriftDiffusionIntegrator(threshold=10))
+        D = DDM(
+            function=DriftDiffusionIntegrator(
+                threshold=10, time_step_size=1.0
+            ),
+            execute_until_finished=False,
+            reset_stateful_function_when=pnl.Never()
+        )
         C = Composition(pathways=[D])
 
         D.set_log_conditions(VALUE)
@@ -2385,10 +2391,12 @@ class TestFeedback:
     @pytest.mark.usefixtures("comp_mode_no_llvm")
     def test_scheduler_conditions(self, comp_mode, condition, scale, expected_result):
         decisionMaker = pnl.DDM(
-                        function=pnl.DriftDiffusionIntegrator(starting_point=0,
+                        function=pnl.DriftDiffusionIntegrator(starting_value=0,
                                                               threshold=1,
-                                                              noise=0.0),
+                                                              noise=0.0,
+                                                              time_step_size=1.0),
                         reset_stateful_function_when=pnl.AtTrialStart(),
+                        execute_until_finished=False,
                         output_ports=[pnl.DECISION_VARIABLE, pnl.RESPONSE_TIME],
                         name='DDM')
 

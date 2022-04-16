@@ -1,6 +1,6 @@
 coveragepy-lcov; python_version >= '3.8'
 networkx
-psyneulink >=0.9.1.0, <0.10.1.0
+psyneulink >=0.9.1.0
 pytest
 pytest-benchmark
 pytest-cov
