@@ -1,3 +1,3 @@
-numpy <1.22.4
-pint <0.19
-toposort <1.8
+numpy
+pint
+toposort
