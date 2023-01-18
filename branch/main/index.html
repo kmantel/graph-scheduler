@@ -1,36 +1,79 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Graph Scheduler &mdash; Graph Scheduler 1.1.1+1.g238e2ca documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+  <title>Graph Scheduler &mdash; Graph Scheduler 1.1.1+4.ga31bd21 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
-    <script src="_static/js/theme.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Scheduler" href="Scheduler.html" /> 
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
+
+   
   <div class="wy-grid-for-nav">
+    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
+          
+
+          
             <a href="#" class="icon icon-home"> Graph Scheduler
+          
+
+          
           </a>
+
+          
+            
+            
               <div class="version">
-                1.1.1+1
+                1.1.1+4
               </div>
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -38,7 +81,18 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Graph Scheduler</a></li>
@@ -47,32 +101,73 @@
 <li class="toctree-l1"><a class="reference internal" href="Time.html">Time</a></li>
 </ul>
 
+            
+          
         </div>
+        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="#">Graph Scheduler</a>
+        
       </nav>
 
+
       <div class="wy-nav-content">
+        
         <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
+    
       <li><a href="#" class="icon icon-home"></a> &raquo;</li>
+        
       <li>Graph Scheduler</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
+        
+          
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+            
   <section id="graph-scheduler">
-<h1>Graph Scheduler<a class="headerlink" href="#graph-scheduler" title="Permalink to this headline"></a></h1>
+<h1>Graph Scheduler<a class="headerlink" href="#graph-scheduler" title="Permalink to this heading">¶</a></h1>
 <a class="reference external image-reference" href="https://github.com/kmantel/graph-scheduler/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/kmantel/graph-scheduler/actions/workflows/ci.yml/badge.svg" /></a>
 <a class="reference external image-reference" href="https://coveralls.io/github/kmantel/graph-scheduler"><img alt="Coverage Status" src="https://coveralls.io/repos/github/kmantel/graph-scheduler/badge.svg" /></a>
 <p>A graph scheduler generates the order in which the nodes of a directed
@@ -91,14 +186,14 @@ branch</a>. For
 prior releases, go to
 <code class="docutils literal notranslate"><span class="pre">https://kmantel.github.io/graph-scheduler/tag/&lt;tag_name&gt;</span></code>.</p>
 <section id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline"></a></h2>
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h2>
 <p>Install from pypi:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip install graph-scheduler
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>graph-scheduler
 </pre></div>
 </div>
 </section>
 <section id="example">
-<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline"></a></h2>
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this heading">¶</a></h2>
 <p>The graph is specified here in dependency dictionary format, but
 <a class="reference external" href="https://github.com/networkx/networkx">networkx</a> Digraphs are also
 supported.</p>
@@ -129,6 +224,8 @@ supported.</p>
 <li class="toctree-l2"><a class="reference internal" href="Scheduler.html#algorithm">Algorithm</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Scheduler.html#execution">Execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Scheduler.html#absolute-time">Absolute Time</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Scheduler.html#graph_scheduler.scheduler.Scheduler"><code class="docutils literal notranslate"><span class="pre">Scheduler</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Scheduler.html#graph_scheduler.scheduler.SchedulingMode"><code class="docutils literal notranslate"><span class="pre">SchedulingMode</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="Condition.html">Condition</a><ul>
@@ -137,10 +234,63 @@ supported.</p>
 <li class="toctree-l2"><a class="reference internal" href="Condition.html#structure">Structure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Condition.html#execution">Execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Condition.html#class-reference">Class Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.AfterCall"><code class="docutils literal notranslate"><span class="pre">AfterCall</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.AfterNCalls"><code class="docutils literal notranslate"><span class="pre">AfterNCalls</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.AfterNCallsCombined"><code class="docutils literal notranslate"><span class="pre">AfterNCallsCombined</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.AfterNPasses"><code class="docutils literal notranslate"><span class="pre">AfterNPasses</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.AfterNConsiderationSetExecutions"><code class="docutils literal notranslate"><span class="pre">AfterNConsiderationSetExecutions</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.AfterNEnvironmentStateUpdates"><code class="docutils literal notranslate"><span class="pre">AfterNEnvironmentStateUpdates</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.AfterPass"><code class="docutils literal notranslate"><span class="pre">AfterPass</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.AtEnvironmentSequence"><code class="docutils literal notranslate"><span class="pre">AtEnvironmentSequence</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.AfterEnvironmentSequence"><code class="docutils literal notranslate"><span class="pre">AfterEnvironmentSequence</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.AfterNEnvironmentSequences"><code class="docutils literal notranslate"><span class="pre">AfterNEnvironmentSequences</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.AfterConsiderationSetExecution"><code class="docutils literal notranslate"><span class="pre">AfterConsiderationSetExecution</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.AfterEnvironmentStateUpdate"><code class="docutils literal notranslate"><span class="pre">AfterEnvironmentStateUpdate</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.All"><code class="docutils literal notranslate"><span class="pre">All</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.AllHaveRun"><code class="docutils literal notranslate"><span class="pre">AllHaveRun</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.Always"><code class="docutils literal notranslate"><span class="pre">Always</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.And"><code class="docutils literal notranslate"><span class="pre">And</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.Any"><code class="docutils literal notranslate"><span class="pre">Any</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.AtNCalls"><code class="docutils literal notranslate"><span class="pre">AtNCalls</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.AtPass"><code class="docutils literal notranslate"><span class="pre">AtPass</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.AtEnvironmentSequenceStart"><code class="docutils literal notranslate"><span class="pre">AtEnvironmentSequenceStart</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.AtEnvironmentSequenceNStart"><code class="docutils literal notranslate"><span class="pre">AtEnvironmentSequenceNStart</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.AtConsiderationSetExecution"><code class="docutils literal notranslate"><span class="pre">AtConsiderationSetExecution</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.AtEnvironmentStateUpdate"><code class="docutils literal notranslate"><span class="pre">AtEnvironmentStateUpdate</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.AtEnvironmentStateUpdateStart"><code class="docutils literal notranslate"><span class="pre">AtEnvironmentStateUpdateStart</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.AtEnvironmentStateUpdateNStart"><code class="docutils literal notranslate"><span class="pre">AtEnvironmentStateUpdateNStart</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.BeforeNCalls"><code class="docutils literal notranslate"><span class="pre">BeforeNCalls</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.BeforePass"><code class="docutils literal notranslate"><span class="pre">BeforePass</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.BeforeConsiderationSetExecution"><code class="docutils literal notranslate"><span class="pre">BeforeConsiderationSetExecution</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.BeforeEnvironmentStateUpdate"><code class="docutils literal notranslate"><span class="pre">BeforeEnvironmentStateUpdate</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.Condition"><code class="docutils literal notranslate"><span class="pre">Condition</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.ConditionSet"><code class="docutils literal notranslate"><span class="pre">ConditionSet</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.EveryNCalls"><code class="docutils literal notranslate"><span class="pre">EveryNCalls</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.EveryNPasses"><code class="docutils literal notranslate"><span class="pre">EveryNPasses</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.JustRan"><code class="docutils literal notranslate"><span class="pre">JustRan</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.Never"><code class="docutils literal notranslate"><span class="pre">Never</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.Not"><code class="docutils literal notranslate"><span class="pre">Not</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.NWhen"><code class="docutils literal notranslate"><span class="pre">NWhen</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.Or"><code class="docutils literal notranslate"><span class="pre">Or</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.WhenFinished"><code class="docutils literal notranslate"><span class="pre">WhenFinished</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.WhenFinishedAll"><code class="docutils literal notranslate"><span class="pre">WhenFinishedAll</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.WhenFinishedAny"><code class="docutils literal notranslate"><span class="pre">WhenFinishedAny</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.While"><code class="docutils literal notranslate"><span class="pre">While</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.WhileNot"><code class="docutils literal notranslate"><span class="pre">WhileNot</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.TimeInterval"><code class="docutils literal notranslate"><span class="pre">TimeInterval</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.TimeTermination"><code class="docutils literal notranslate"><span class="pre">TimeTermination</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.Threshold"><code class="docutils literal notranslate"><span class="pre">Threshold</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="Time.html">Time</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="Time.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Time.html#graph_scheduler.time.Clock"><code class="docutils literal notranslate"><span class="pre">Clock</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale"><code class="docutils literal notranslate"><span class="pre">TimeScale</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Time.html#graph_scheduler.time.Time"><code class="docutils literal notranslate"><span class="pre">Time</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Time.html#graph_scheduler.time.SimpleTime"><code class="docutils literal notranslate"><span class="pre">SimpleTime</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Time.html#graph_scheduler.time.TimeHistoryTree"><code class="docutils literal notranslate"><span class="pre">TimeHistoryTree</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Time.html#graph_scheduler.time.set_time_scale_alias"><code class="docutils literal notranslate"><span class="pre">set_time_scale_alias()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Time.html#graph_scheduler.time.remove_time_scale_alias"><code class="docutils literal notranslate"><span class="pre">remove_time_scale_alias()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -148,7 +298,7 @@ supported.</p>
 </section>
 </section>
 <section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline"></a></h1>
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading">¶</a></h1>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
@@ -158,32 +308,49 @@ supported.</p>
 
 
            </div>
+           
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
         <a href="Scheduler.html" class="btn btn-neutral float-right" title="Scheduler" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021, Princeton University.</p>
-  </div>
+    <p>
+        &#169; Copyright 2021, Princeton University.
 
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
         </div>
       </div>
+
     </section>
+
   </div>
-  <script>
+  
+
+  <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>
