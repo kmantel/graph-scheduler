@@ -1,4 +1,3 @@
-coveragepy-lcov; python_version >= '3.8'
 networkx
 psyneulink >=0.9.1.0
 pytest
