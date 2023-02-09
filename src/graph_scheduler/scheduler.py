@@ -313,7 +313,7 @@ from graph_scheduler.condition import (
     All, AllHaveRun, Always, Condition, ConditionSet, EveryNCalls, Never,
     _parse_absolute_unit, _quantity_as_integer,
 )
-from graph_scheduler.time import Clock, TimeScale
+from graph_scheduler.time import _get_pint_unit, Clock, TimeScale
 
 __all__ = [
     'Scheduler', 'SchedulerError', 'SchedulingMode',
@@ -419,7 +419,7 @@ class Scheduler:
         termination_conds=None,
         default_execution_id=None,
         mode: SchedulingMode = SchedulingMode.STANDARD,
-        default_absolute_time_unit: typing.Union[str, pint.Quantity] = 1 * _unit_registry.ms,
+        default_absolute_time_unit: typing.Union[str, pint.Quantity] = _get_pint_unit(1, 'ms'),
         **kwargs
     ):
         """

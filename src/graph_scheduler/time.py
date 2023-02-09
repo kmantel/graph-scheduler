@@ -34,6 +34,14 @@ _alias_docs_warning_str = """
 """
 
 
+# use a cached call because each call to getattr on a pint unit_registry
+# creates new instances of Unit, and this becomes a significant time
+# cost compared even to deepcopying
+@functools.lru_cache()
+def _get_pint_unit(num, unit):
+    return num * getattr(_unit_registry, unit)
+
+
 class TimeScaleError(Exception):
 
     def __init__(self, error_value):
@@ -232,8 +240,8 @@ class Time(types.SimpleNamespace):
         environment_state_update=0,
         environment_sequence=0,
         life=0,
-        absolute=0 * _unit_registry.ms,
-        absolute_interval=1 * _unit_registry.ms,
+        absolute=_get_pint_unit(0, 'ms'),
+        absolute_interval=_get_pint_unit(1, 'ms'),
         absolute_time_unit_scale=TimeScale.CONSIDERATION_SET_EXECUTION,
         absolute_enabled=False,
         **alias_time_values,
@@ -252,8 +260,8 @@ class Time(types.SimpleNamespace):
             **{
                 _time_scale_to_attr_str(ts): v for ts, v in time_scale_values.items()
             },
-            absolute=0 * _unit_registry.ms,
-            absolute_interval=1 * _unit_registry.ms,
+            absolute=_get_pint_unit(0, 'ms'),
+            absolute_interval=_get_pint_unit(1, 'ms'),
             absolute_time_unit_scale=TimeScale.CONSIDERATION_SET_EXECUTION,
             absolute_enabled=False,
         )
