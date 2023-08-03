@@ -465,6 +465,12 @@ class ConditionSet(object):
             specifies the Condition, associated with the **owner** to be added to the ConditionSet.
         """
         condition.owner = owner
+        try:
+            old_condition = self.conditions[owner]
+        except KeyError:
+            pass
+        else:
+            warnings.warn(f'Replacing condition for {owner}. old: {old_condition} new: {condition}')
         self.conditions[owner] = condition
 
     def add_condition_set(self, conditions):
