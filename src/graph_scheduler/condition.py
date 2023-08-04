@@ -552,6 +552,9 @@ class Condition:
             type(self).__name__, _get_condition_args_str(self.args, self.kwargs)
         )
 
+    def _validate_owner(self, value):
+        pass
+
     @property
     def owner(self):
         return self._owner
@@ -559,6 +562,7 @@ class Condition:
     @owner.setter
     def owner(self, value):
         logger.debug('Condition ({0}) setting owner to {1}'.format(type(self).__name__, value))
+        self._validate_owner(value)
         self._owner = value
 
     def is_satisfied(self, *args, execution_id=None, **kwargs):
@@ -620,8 +624,7 @@ class AbsoluteCondition(Condition):
 
 
 class _DependencyValidation:
-    @Condition.owner.setter
-    def owner(self, value):
+    def _validate_owner(self, value):
         try:
             # "dependency" or "dependencies" is always the first positional argument
             if not isinstance(self.args[0], collections.abc.Iterable) or isinstance(self.args[0], str):
@@ -637,8 +640,6 @@ class _DependencyValidation:
                     ' This may result in infinite loops or unknown behavior.',
                     stacklevel=5
                 )
-
-        self._owner = value
 
 
 #########################################################################################################
