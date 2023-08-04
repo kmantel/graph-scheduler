@@ -30,7 +30,7 @@ for k, v in condition.__dict__.items():
         (
             k[0] != '_'
             and inspect.isclass(v)
-            and issubclass(v, condition.Condition)
+            and issubclass(v, condition.ConditionBase)
         )
         or k in condition._additional__all__
     ):

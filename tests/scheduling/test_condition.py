@@ -1,4 +1,6 @@
+import inspect
 import logging
+import warnings
 
 import numpy as np
 import pytest
@@ -8,6 +10,49 @@ import graph_scheduler as gs
 logger = logging.getLogger(__name__)
 
 SimpleTestNode = pytest.helpers.get_test_node()
+
+
+test_graphs = {
+    'five_node_hub': {'A': set(), 'B': set(), 'C': {'A', 'B'}, 'D': {'C'}, 'E': {'C'}},
+    'nine_node_multi': {
+        'A': set(),
+        'B': set(),
+        'C': {'A', 'B'},
+        'D': {'A', 'C'},
+        'E': {'C', 'H'},
+        'F': {'D', 'E'},
+        'G': set(),
+        'H': {'G'},
+        'I': {'H'}
+    },
+}
+
+
+def all_single_pairs_parametrization(graph_name):
+    graph = test_graphs[graph_name]
+    return [(graph_name, a, b) for b in graph for a in graph if a != b]
+
+
+def verify_operation(operation, test_neighbors, source_neighbors, subject_neighbors):
+    print(operation)
+    if operation is gs.Operation.KEEP:
+        assert test_neighbors == source_neighbors
+    elif operation is gs.Operation.INTERSECTION:
+        assert test_neighbors == subject_neighbors.intersection(source_neighbors)
+    elif operation is gs.Operation.MERGE:
+        assert test_neighbors == subject_neighbors.union(source_neighbors)
+    elif operation is gs.Operation.REPLACE:
+        assert test_neighbors == subject_neighbors
+    elif operation is gs.Operation.DISCARD:
+        assert test_neighbors == set()
+    elif operation == gs.Operation.DIFFERENCE:
+        assert test_neighbors == source_neighbors.difference(subject_neighbors)
+    elif operation == gs.Operation.SYMMETRIC_DIFFERENCE:
+        assert test_neighbors == source_neighbors.symmetric_difference(subject_neighbors)
+    elif operation == gs.Operation.INVERSE_DIFFERENCE:
+        assert test_neighbors == subject_neighbors.difference(source_neighbors)
+    else:
+        assert False, f"Unrecognized operation {operation}"
 
 
 class TestConditionSet:
@@ -1118,3 +1163,697 @@ class TestAbsolute:
         list(sched.run())
 
         assert sched.get_clock(sched.default_execution_id).time.absolute == last_time
+
+
+class TestGraphStructureCondition:
+    class TestBaseManipulateGraph:
+        @pytest.mark.parametrize(
+            'graph_name, owner, subjects, owner_senders, owner_receivers, subject_senders, subject_receivers, expected_graph',
+            [
+                (
+                    'nine_node_multi',
+                    'E',
+                    ['D'],
+                    gs.Operation.DIFFERENCE,
+                    gs.Operation.REPLACE,
+                    gs.Operation.INTERSECTION,
+                    gs.Operation.SYMMETRIC_DIFFERENCE,
+                    {
+                        'A': set(),
+                        'B': set(),
+                        'C': {'A', 'B'},
+                        'D': {'C'},
+                        'E': {'H'},
+                        'F': {'E'},
+                        'G': set(),
+                        'H': {'G'},
+                        'I': {'H'}
+                    },
+                ),
+                (
+                    'nine_node_multi',
+                    'E',
+                    ['D'],
+                    gs.Operation.INTERSECTION,
+                    gs.Operation.DISCARD,
+                    gs.Operation.MERGE,
+                    gs.Operation.INTERSECTION,
+                    {
+                        'A': set(),
+                        'B': set(),
+                        'C': {'A', 'B'},
+                        'D': {'A', 'C', 'H'},
+                        'E': {'C'},
+                        'F': {'D'},
+                        'G': set(),
+                        'H': {'G'},
+                        'I': {'H'},
+                    },
+                ),
+                (
+                    'nine_node_multi',
+                    'C',
+                    ['H', 'I'],
+                    gs.Operation.KEEP,
+                    gs.Operation.INTERSECTION,
+                    {'H': gs.Operation.SYMMETRIC_DIFFERENCE, 'I': gs.Operation.MERGE},
+                    gs.Operation.MERGE,
+                    {
+                        'A': set(),
+                        'B': set(),
+                        'C': {'A', 'B'},
+                        'D': {'A', 'H', 'I'},
+                        'E': {'C', 'H', 'I'},
+                        'F': {'D', 'E'},
+                        'G': set(),
+                        'H': {'A', 'B', 'G'},
+                        'I': {'A', 'B', 'H'},
+                    },
+                ),
+                (
+                    'nine_node_multi',
+                    'C',
+                    ['H', 'I'],
+                    gs.Operation.INTERSECTION,
+                    gs.Operation.DISCARD,
+                    {'H': gs.Operation.MERGE, 'I': gs.Operation.REPLACE},
+                    {'H': gs.Operation.INTERSECTION, 'I': gs.Operation.INVERSE_DIFFERENCE},
+                    {
+                        'A': set(),
+                        'B': set(),
+                        'C': set(),
+                        'D': {'A', 'I'},
+                        'E': {'H', 'I'},
+                        'F': {'D', 'E'},
+                        'G': set(),
+                        'H': {'A', 'B', 'G'},
+                        'I': {'A', 'B'},
+                    },
+                ),
+            ],
+        )
+        def test_single_operation(
+            self,
+            graph_name,
+            owner,
+            subjects,
+            owner_senders,
+            owner_receivers,
+            subject_senders,
+            subject_receivers,
+            expected_graph,
+        ):
+            cond = gs.condition._GSCWithOperations(
+                *subjects,
+                owner_senders=owner_senders,
+                owner_receivers=owner_receivers,
+                subject_senders=subject_senders,
+                subject_receivers=subject_receivers,
+                reconnect_non_subject_receivers=False,
+                remove_new_self_referential_edges=False,
+                debug=True
+            )
+            cond.owner = owner
+
+            graph = test_graphs[graph_name]
+            new_graph = cond.modify_graph(graph)
+            old_receivers = gs.get_receivers(graph)
+            new_receivers = gs.get_receivers(new_graph)
+
+            combined_old_subject_receivers = set().union(*[old_receivers[s] for s in subjects])
+            combined_old_subject_senders = set().union(*[graph[s] for s in subjects])
+
+            for s in subjects:
+                subject_senders_s = cond._get_subject_operation(subject_senders, s)
+                subject_receivers_s = cond._get_subject_operation(subject_receivers, s)
+
+                verify_operation(owner_senders, new_graph[owner], graph[owner], combined_old_subject_senders)
+                verify_operation(owner_receivers, new_receivers[owner], old_receivers[owner], combined_old_subject_receivers)
+                verify_operation(subject_senders_s, new_graph[s], graph[s], graph[owner])
+                verify_operation(subject_receivers_s, new_receivers[s], old_receivers[s], old_receivers[owner])
+
+            assert new_graph == expected_graph
+
+        @pytest.mark.parametrize(
+            'graph_name, owner, subjects, operation_args, err_msg_patterns',
+            [
+                (
+                    'five_node_hub',
+                    'C',
+                    ['B'],
+                    {'owner_senders': gs.Operation.KEEP, 'owner_receivers': gs.Operation.REPLACE},
+                    [
+                        r'owner_receivers\W+\(Operation.REPLACE\)\W+applied on C with D,E against C makes C a receiver of C',
+                        r'owner_senders\W+\(Operation.KEEP\)\W+applied on C with A,B against {} does not make C a sender of C',
+                    ]
+                ),
+                (
+                    'five_node_hub',
+                    'C',
+                    ['B'],
+                    {'owner_receivers': gs.Operation.REPLACE},
+                    [
+                        r'owner_receivers\W+\(Operation.REPLACE\)\W+applied on C with D,E against C makes C a receiver of C',
+                        r'owner_senders\W+\(Operation.KEEP\)\W+applied on C with A,B against {} does not make C a sender of C',
+                    ]
+                ),
+                (
+                    'five_node_hub',
+                    'C',
+                    ['B'],
+                    {'owner_senders': gs.Operation.KEEP, 'subject_receivers': gs.Operation.REPLACE},
+                    [
+                        r'owner_senders\W+\(Operation.KEEP\)\W+applied on C with A,B against {} makes B a sender of C',
+                        r'subject_receivers\W+\(Operation.REPLACE\)\W+applied on B with C against D,E does not make C a receiver of B',
+                    ]
+                ),
+                (
+                    'five_node_hub',
+                    'C',
+                    ['E'],
+                    {'subject_senders': gs.Operation.MERGE, 'owner_receivers': gs.Operation.REPLACE},
+                    [
+                        r'subject_senders\W+\(Operation.MERGE\)\W+applied on E with C against A,B makes C a sender of E',
+                        r'owner_receivers\W+\(Operation.REPLACE\)\W+applied on C with D,E against {} does not make E a receiver of C',
+                    ]
+                ),
+                (
+                    'five_node_hub',
+                    'C',
+                    ['E', 'D'],
+                    {'subject_senders': gs.Operation.DISCARD, 'owner_receivers': gs.Operation.MERGE},
+                    [
+                        r'owner_receivers\W+\(Operation.MERGE\)\W+applied on C with D,E against {} makes D a receiver of C',
+                        r'subject_senders\W+\(Operation.DISCARD\)\W+applied on D with C against A,B does not make C a sender of D',
+                        r'owner_receivers\W+\(Operation.MERGE\)\W+applied on C with D,E against {} makes E a receiver of C',
+                        r'subject_senders\W+\(Operation.DISCARD\)\W+applied on E with C against A,B does not make C a sender of E',
+                    ]
+                ),
+                (
+                    'nine_node_multi',
+                    'C',
+                    ['H', 'I'],
+                    {
+                        'owner_senders': gs.Operation.INTERSECTION,
+                        'owner_receivers': gs.Operation.MERGE,
+                        'subject_receivers': {
+                            'H': gs.Operation.SYMMETRIC_DIFFERENCE,
+                            'I': gs.Operation.MERGE,
+                        },
+                    },
+                    [
+                        r'owner_receivers\W+\(Operation.MERGE\)\W+applied on C with D,E against E,I makes I a receiver of C',
+                        r'subject_senders\W+\(Operation.KEEP\)\W+applied on I with H against A,B does not make C a sender of I',
+                    ]
+                ),
+                (
+                    'nine_node_multi',
+                    'C',
+                    ['H', 'I'],
+                    {
+                        'owner_senders': gs.Operation.MERGE,
+                        'owner_receivers': gs.Operation.REPLACE,
+                        'subject_senders': {
+                            'H': gs.Operation.SYMMETRIC_DIFFERENCE,
+                            'I': gs.Operation.MERGE,
+                        },
+                        'subject_receivers': gs.Operation.INTERSECTION,
+                    },
+                    [
+                        r'owner_senders\W+\(Operation.MERGE\)\W+applied on C with A,B against G,H makes H a sender of C',
+                        r'subject_receivers\W+\(Operation.INTERSECTION\)\W+applied on H with E,I against D,E does not make C a receiver of H',
+                        r'subject_senders\W+\(Operation.MERGE\)\W+applied on I with H against A,B makes H a sender of I',
+                        r'subject_receivers\W+\(Operation.INTERSECTION\)\W+applied on H with E,I against D,E does not make I a receiver of H',
+                        r'owner_receivers\W+\(Operation.REPLACE\)\W+applied on C with D,E against E,I makes I a receiver of C',
+                        r'subject_senders\W+\(Operation.MERGE\)\W+applied on I with H against A,B does not make C a sender of I',
+                    ]
+                ),
+            ]
+        )
+        def test_conflicting_operations(
+            self,
+            graph_name,
+            owner,
+            subjects,
+            operation_args,
+            err_msg_patterns
+        ):
+            cond = gs.condition._GSCWithOperations(
+                *subjects,
+                **operation_args,
+                reconnect_non_subject_receivers=False,
+                remove_new_self_referential_edges=False,
+                debug=True
+            )
+            cond.owner = owner
+
+            graph = test_graphs[graph_name]
+
+            err_msg = r'Conflict between operations:\W+{0}$'.format(
+                r'\W+'.join(err_msg_patterns)
+            )
+            with pytest.raises(gs.ConditionError, match=err_msg):
+                cond.modify_graph(graph)
+
+        @pytest.mark.parametrize(
+            'graph_name, owner, subjects, operation_args, expected_graph',
+            [
+                (
+                    'five_node_hub',
+                    'C',
+                    ['D'],
+                    {
+                        'owner_receivers': gs.Operation.DISCARD,
+                        'subject_senders': gs.Operation.DISCARD,
+                    },
+                    {'A': set(), 'B': set(), 'C': {'A', 'B'}, 'D': set(), 'E': {'A', 'B'}},
+                ),
+                (
+                    'nine_node_multi',
+                    'C',
+                    ['E'],
+                    {'owner_senders': gs.Operation.DISCARD},
+                    {
+                        'A': set(),
+                        'B': set(),
+                        'C': set(),
+                        'D': {'A', 'B', 'C'},
+                        'E': {'C', 'H'},
+                        'F': {'D', 'E'},
+                        'G': set(),
+                        'H': {'G'},
+                        'I': {'H'}
+                    },
+                ),
+                (
+                    'nine_node_multi',
+                    'C',
+                    ['D'],
+                    {'owner_senders': gs.Operation.DISCARD},
+                    {
+                        'A': set(),
+                        'B': set(),
+                        'C': set(),
+                        'D': {'A', 'C'},
+                        'E': {'A', 'B', 'C', 'H'},
+                        'F': {'D', 'E'},
+                        'G': set(),
+                        'H': {'G'},
+                        'I': {'H'}
+                    },
+                )
+            ]
+        )
+        def test_reconnect_non_subject_receivers(
+            self, graph_name, owner, subjects, operation_args, expected_graph
+        ):
+            cond = gs.condition._GSCWithOperations(
+                *subjects,
+                **operation_args,
+                reconnect_non_subject_receivers=True,
+                remove_new_self_referential_edges=False,
+                prune_cycles=False,
+            )
+            cond.owner = owner
+
+            graph = test_graphs[graph_name]
+            assert cond.modify_graph(graph) == expected_graph
+
+    @pytest.mark.parametrize(
+        'operation_arg, expected_arg_value',
+        [
+            ('KEEP', gs.Operation.KEEP),
+            ('INTERSECTION', gs.Operation.INTERSECTION),
+            ('UNION', gs.Operation.UNION),
+            ('MERGE', gs.Operation.MERGE),
+            ('REPLACE', gs.Operation.REPLACE),
+            ('DISCARD', gs.Operation.DISCARD),
+            ('DIFFERENCE', gs.Operation.DIFFERENCE),
+            ('SYMMETRIC_DIFFERENCE', gs.Operation.SYMMETRIC_DIFFERENCE),
+            ('INVERSE_DIFFERENCE', gs.Operation.INVERSE_DIFFERENCE),
+        ]
+    )
+    @pytest.mark.parametrize(
+        'operation',
+        ['owner_senders', 'owner_receivers', 'subject_senders', 'subject_receivers']
+    )
+    def test_operation_argument_string_parsing(self, operation, operation_arg, expected_arg_value):
+        n = 'A'
+        cond = gs.condition._GSCWithOperations(n, **{operation: operation_arg})
+        assert getattr(cond, operation) == expected_arg_value
+
+        cond_lower = gs.condition._GSCWithOperations(n, **{operation: str.lower(operation_arg)})
+        assert getattr(cond_lower, operation) == expected_arg_value
+
+    @pytest.mark.parametrize(
+        'operation_arg, expected_arg_value',
+        [
+            ('KEEP', gs.Operation.KEEP),
+            ('keep', gs.Operation.KEEP),
+            (gs.Operation.KEEP, gs.Operation.KEEP),
+        ]
+    )
+    @pytest.mark.parametrize(
+        'operation',
+        ['subject_senders', 'subject_receivers']
+    )
+    def test_operation_argument_dict_parsing(self, operation, operation_arg, expected_arg_value):
+        n = 'A'
+        cond = gs.condition._GSCWithOperations(n, **{operation: {n: operation_arg}})
+        operation_attr = getattr(cond, operation)
+        assert operation_attr == {n: expected_arg_value}
+        assert cond._get_subject_operation(operation_attr, n) == expected_arg_value
+
+    def _get_graph_structure_condition_from_generic_class(self, cls_, graph):
+        nodes = list(graph.keys())
+
+        try:
+            gsc = cls_(nodes[0])
+        except TypeError as e:
+            if "Can't instantiate abstract class" in str(e):
+                pytest.skip('Class is abstract')
+            else:
+                raise
+        except gs.ConditionError as e:
+            if 'must be a callable' in str(e):
+                gsc = cls_(lambda d: d)
+            else:
+                raise
+
+        gsc.owner = nodes[1]
+        return gsc
+
+    @pytest.mark.parametrize(
+        'cls_',
+        [
+            c for c in gs.condition.__dict__.values()
+            if (
+                inspect.isclass(c)
+                and issubclass(
+                    c, gs.condition.GraphStructureCondition
+                )
+            )
+        ]
+    )
+    @pytest.mark.parametrize('graph', [test_graphs['five_node_hub']])
+    def test_modify_graph_returns_clone(self, cls_, graph):
+        gsc = self._get_graph_structure_condition_from_generic_class(cls_, graph)
+        result_graph = gsc.modify_graph(graph)
+
+        assert result_graph is not graph
+
+        for k, v in result_graph.items():
+            assert graph[k] is not v
+
+    # not a foolproof test, but should catch some problem cases
+    @pytest.mark.parametrize(
+        'cls_',
+        [
+            c for c in gs.condition.__dict__.values()
+            if (
+                inspect.isclass(c)
+                and issubclass(
+                    c, gs.condition.GraphStructureCondition
+                )
+            )
+        ]
+    )
+    @pytest.mark.parametrize('graph', [test_graphs['five_node_hub']])
+    def test_postprocess_no_modification(self, cls_, graph):
+        gsc = self._get_graph_structure_condition_from_generic_class(cls_, graph)
+        orig_graph = gs.clone_graph(graph)
+        gsc._postprocess({}, graph)
+
+        assert orig_graph == graph
+
+    def custom_gsc_func_1(graph):
+        graph['B'].add('A')
+        return graph
+
+    @pytest.mark.parametrize(
+        'func, nodes, graph, expected_graph',
+        [
+            (
+                custom_gsc_func_1,
+                ['B'],
+                {'A': set(), 'B': set()},
+                {'A': set(), 'B': {'A'}}
+            ),
+            (
+                lambda self, graph: {k: graph[k] if k in self.nodes else {'C'} for k in graph},
+                ['C'],
+                {'A': 'B', 'B': set(), 'C': {'A'}},
+                {'A': {'C'}, 'B': {'C'}, 'C': {'A'}},
+            ),
+        ]
+    )
+    def test_CustomGraphStructureCondition(self, func, nodes, graph, expected_graph):
+        cond = gs.CustomGraphStructureCondition(func, nodes=nodes)
+        cond.owner = 'A'
+        assert cond.modify_graph(graph) == expected_graph
+
+    def test_CustomGraphStructureCondition_wrong_self_pos(self):
+        def func(a, self):
+            pass
+        cond = gs.CustomGraphStructureCondition(func)
+        cond.owner = 'A'
+        with pytest.raises(
+            gs.ConditionError, match=r"If using 'self'.*must be the first argument"
+        ):
+            cond.modify_graph({'A': set(), 'B': set()})
+
+    @staticmethod
+    def _single_condition_test_helper(
+        condition_type, graph_name, owner, nodes, warning_pat, expected_graph
+    ):
+        condition = condition_type(*nodes)
+        condition.owner = owner
+
+        if warning_pat is None:
+            with warnings.catch_warnings():
+                warnings.simplefilter('error')
+                try:
+                    assert condition.modify_graph(test_graphs[graph_name]) == expected_graph
+                except UserWarning as e:
+                    if type(condition).__name__ in str(e) and 'already' in str(e):
+                        raise
+        else:
+            with pytest.warns(UserWarning, match=warning_pat):
+                assert condition.modify_graph(test_graphs[graph_name]) == expected_graph
+
+    beforenodes_parametrizations = [
+        (
+            'five_node_hub', 'D', ['C'], None,
+            {'A': set(), 'B': set(), 'C': {'A', 'B', 'D'}, 'D': {'A', 'B'}, 'E': {'C'}},
+        ),
+        (
+            'five_node_hub', 'D', ['A'], None,
+            {'A': {'D'}, 'B': set(), 'C': {'A', 'B'}, 'D': set(), 'E': {'C'}}
+        ),
+        (
+            'five_node_hub', 'C', ['B'], None,
+            {'A': set(), 'B': {'C'}, 'C': {'A'}, 'D': {'B', 'C'}, 'E': {'B', 'C'}},
+        ),
+        (
+            'five_node_hub', 'C', ['D'], r'.*C is already before D.*Condition is ignored.',
+            {'A': set(), 'B': set(), 'C': {'A', 'B'}, 'D': {'C'}, 'E': {'C'}},
+        ),
+        pytest.param(
+            'five_node_hub', 'C', ['B', 'D'], r'.*C is already before D.*(?<!ignored.)$',
+            {'A': set(), 'B': {'C'}, 'C': {'A'}, 'D': {'C'}, 'E': {'B', 'C'}},
+            id='five_node_hub-C-B_D-Condition_not_ignored'
+        ),
+        (
+            'five_node_hub', 'C', ['D', 'E'], r'.*C is already before D,E.*Condition is ignored.',
+            {'A': set(), 'B': set(), 'C': {'A', 'B'}, 'D': {'C'}, 'E': {'C'}},
+        ),
+        (
+            'nine_node_multi', 'E', ['C', 'G'], None,
+            {
+                'A': set(),
+                'B': set(),
+                'C': {'A', 'B', 'E'},
+                'D': {'A', 'C'},
+                'E': {'A', 'B'},
+                'F': {'C', 'D', 'E', 'H'},
+                'G': {'E'},
+                'H': {'G'},
+                'I': {'H'}
+            },
+        ),
+        (
+            'nine_node_multi', 'C', ['G'], None,
+            {
+                'A': set(),
+                'B': set(),
+                'C': {'A', 'B'},
+                'D': {'A', 'C'},
+                'E': {'C', 'H'},
+                'F': {'D', 'E'},
+                'G': {'C'},
+                'H': {'G'},
+                'I': {'H'}
+            },
+        ),
+    ]
+
+    @pytest.mark.parametrize(
+        'graph_name, owner, nodes, warning_pat, expected_graph',
+        beforenodes_parametrizations
+    )
+    def test_BeforeNodes(self, graph_name, owner, nodes, warning_pat, expected_graph):
+        TestGraphStructureCondition._single_condition_test_helper(
+            gs.BeforeNodes, graph_name, owner, nodes, warning_pat, expected_graph
+        )
+
+    @pytest.mark.parametrize(
+        'graph_name, owner, nodes, warning_pat, expected_graph',
+        filter(lambda p: len(p[2]) == 1, beforenodes_parametrizations),
+    )
+    def test_BeforeNode(self, graph_name, owner, nodes, warning_pat, expected_graph):
+        TestGraphStructureCondition._single_condition_test_helper(
+            gs.BeforeNode, graph_name, owner, nodes, warning_pat, expected_graph
+        )
+
+    @pytest.mark.parametrize(
+        'graph_name, owner, nodes, warning_pat, expected_graph',
+        [
+            (
+                'five_node_hub', 'A', ['C'], None,
+                {'A': {'B'}, 'B': set(), 'C': {'B'}, 'D': {'C'}, 'E': {'C'}},
+            ),
+            (
+                'five_node_hub', 'A', ['D'], None,
+                {'A': {'C'}, 'B': set(), 'C': {'B'}, 'D': {'C'}, 'E': {'C'}}
+            ),
+            (
+                'five_node_hub', 'D', ['E'], r'.*D is already with E.*Condition is ignored.',
+                {'A': set(), 'B': set(), 'C': {'A', 'B'}, 'D': {'C'}, 'E': {'C'}},
+            ),
+            (
+                'nine_node_multi', 'C', ['E'], None,
+                {
+                    'A': set(),
+                    'B': set(),
+                    'C': {'A', 'B', 'H'},
+                    'D': {'A', 'C'},
+                    'E': {'A', 'B', 'H'},
+                    'F': {'D', 'E'},
+                    'G': set(),
+                    'H': {'G'},
+                    'I': {'H'}
+                },
+            ),
+            (
+                'nine_node_multi', 'E', ['H'], None,
+                {
+                    'A': set(),
+                    'B': set(),
+                    'C': {'A', 'B'},
+                    'D': {'A', 'C'},
+                    'E': {'C', 'G'},
+                    'F': {'D', 'E', 'H'},
+                    'G': set(),
+                    'H': {'C', 'G'},
+                    'I': {'H'}
+                },
+            ),
+        ]
+    )
+    def test_WithNode(self, graph_name, owner, nodes, warning_pat, expected_graph):
+        TestGraphStructureCondition._single_condition_test_helper(
+            gs.WithNode, graph_name, owner, nodes, warning_pat, expected_graph
+        )
+
+    afternodes_parametrizations = [
+        (
+            'five_node_hub', 'A', ['C'], None,
+            {'A': {'C'}, 'B': set(), 'C': {'B'}, 'D': {'A', 'C'}, 'E': {'A', 'C'}},
+        ),
+        (
+            'five_node_hub', 'A', ['D'], None,
+            {'A': {'D'}, 'B': set(), 'C': {'B'}, 'D': {'C'}, 'E': {'C'}}
+        ),
+        (
+            'five_node_hub', 'C', ['D'], None,
+            {'A': set(), 'B': set(), 'C': {'A', 'B', 'D'}, 'D': {'A', 'B'}, 'E': {'C'}}
+        ),
+        (
+            'five_node_hub', 'D', ['A'], None,
+            {'A': set(), 'B': set(), 'C': {'A', 'B', 'D'}, 'D': {'A'}, 'E': {'C'}}
+        ),
+        (
+            'five_node_hub', 'D', ['C'], r'.*D is already after C.*Condition is ignored.',
+            {'A': set(), 'B': set(), 'C': {'A', 'B'}, 'D': {'C'}, 'E': {'C'}},
+        ),
+        # A->B comes from subject_senders MERGE
+        pytest.param(
+            'five_node_hub', 'C', ['B', 'D'], r'.*C is already after B.*(?<!ignored.)$',
+            {'A': set(), 'B': {'A'}, 'C': {'A', 'B', 'D'}, 'D': {'A'}, 'E': {'C'}},
+            id='five_node_hub-C-B_D-Condition_not_ignored'
+        ),
+        (
+            'five_node_hub', 'C', ['A', 'B'], r'.*C is already after A,B.*Condition is ignored.',
+            {'A': set(), 'B': set(), 'C': {'A', 'B'}, 'D': {'C'}, 'E': {'C'}},
+        ),
+        (
+            'nine_node_multi', 'C', ['E', 'G'], None,
+            {
+                'A': set(),
+                'B': set(),
+                'C': {'A', 'B', 'E', 'G'},
+                'D': {'A', 'C'},
+                'E': {'A', 'B', 'H'},
+                'F': {'C', 'D', 'E'},
+                'G': {'A', 'B'},
+                'H': {'G'},
+                'I': {'H'}
+            },
+        ),
+        (
+            'nine_node_multi', 'C', ['E'], None,
+            {
+                'A': set(),
+                'B': set(),
+                'C': {'A', 'B', 'E'},
+                'D': {'A', 'C'},
+                'E': {'A', 'B', 'H'},
+                'F': {'C', 'D', 'E'},
+                'G': set(),
+                'H': {'G'},
+                'I': {'H'}
+            },
+        ),
+        (
+            'nine_node_multi', 'C', ['F'], None,
+            {
+                'A': set(),
+                'B': set(),
+                'C': {'A', 'B', 'F'},
+                'D': {'A', 'B'},
+                'E': {'A', 'B', 'H'},
+                'F': {'A', 'B', 'D', 'E'},
+                'G': set(),
+                'H': {'G'},
+                'I': {'H'}
+            },
+        ),
+    ]
+
+    @pytest.mark.parametrize(
+        'graph_name, owner, nodes, warning_pat, expected_graph',
+        afternodes_parametrizations
+    )
+    def test_AfterNodes(self, graph_name, owner, nodes, warning_pat, expected_graph):
+        TestGraphStructureCondition._single_condition_test_helper(
+            gs.AfterNodes, graph_name, owner, nodes, warning_pat, expected_graph
+        )
+
+    @pytest.mark.parametrize(
+        'graph_name, owner, nodes, warning_pat, expected_graph',
+        filter(lambda p: len(p[2]) == 1, afternodes_parametrizations),
+    )
+    def test_AfterNode(self, graph_name, owner, nodes, warning_pat, expected_graph):
+        TestGraphStructureCondition._single_condition_test_helper(
+            gs.AfterNode, graph_name, owner, nodes, warning_pat, expected_graph
+        )
