@@ -34,7 +34,7 @@ class TestScheduler:
                 stroop_consideration_queue
             ),
             (
-                nx.DiGraph(pytest.helpers.create_graph_from_pathways(*stroop_paths)),
+                nx.DiGraph(pytest.helpers.create_graph_from_pathways(*stroop_paths)).reverse(),
                 stroop_consideration_queue
             )
         ]
