@@ -315,7 +315,7 @@ from graph_scheduler.condition import (
     _parse_absolute_unit, _quantity_as_integer,
 )
 from graph_scheduler.time import _get_pint_unit, Clock, TimeScale
-from graph_scheduler.utilities import networkx_digraph_to_dependency_dict
+from graph_scheduler.utilities import clone_graph, networkx_digraph_to_dependency_dict
 
 __all__ = [
     'Scheduler', 'SchedulerError', 'SchedulingMode',
@@ -450,7 +450,11 @@ class Scheduler:
                 'Must instantiate a Scheduler with a graph dependency dict or a networkx.DiGraph'
             )
         else:
-            self.dependency_dict = graph
+            # add empty dependency set for senders that aren't present
+            self.dependency_dict = {
+                **{n: set() for n in set().union(*graph.values())},
+                **clone_graph(graph)
+            }
 
         self.consideration_queue = list(toposort(self.dependency_dict))
         self.nodes = []
