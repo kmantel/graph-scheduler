@@ -420,7 +420,6 @@ class Scheduler:
         default_execution_id=None,
         mode: SchedulingMode = SchedulingMode.STANDARD,
         default_absolute_time_unit: Union[str, pint.Quantity] = _get_pint_unit(1, 'ms'),
-        **kwargs
     ):
         """
         :param self:
