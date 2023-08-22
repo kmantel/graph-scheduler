@@ -413,7 +413,7 @@ import itertools
 import logging
 import operator
 import warnings
-from typing import Callable, Dict, Hashable, Iterable, Set, Union
+from typing import Callable, Dict, Hashable, Iterable, List, Set, Union
 
 import numpy as np
 import pint
@@ -448,6 +448,8 @@ comparison_operators = {
 
 
 typing_subject_operation = Union['Operation', str, Dict[Hashable, Union['Operation', str]]]
+typing_condition_base = 'ConditionBase'
+typing_dict_condition_set = Dict[Hashable, Union[typing_condition_base, Iterable[typing_condition_base]]]
 
 
 def _quantity_as_integer(q):
@@ -623,24 +625,49 @@ class ConditionSet(object):
     ---------
 
     *condition_sets
-        each item is a dict or ConditionSet mapping nodes to conditions
-        to be added via `ConditionSet.add_condition_set`
+        each item is a dict or ConditionSet mapping nodes to one or more
+        conditions to be added via `ConditionSet.add_condition_set`
 
-    conditions : Dict[node: `Condition`]
-        specifies an iterable collection of nodes and the `Conditions <Condition>` associated
-        with each.
+    conditions
+        a dict or ConditionSet mapping nodes to one or more conditions
+        to be added via `ConditionSet.add_condition_set`. Maintained for
+        backwards compatibility with versions 1.x
 
     Attributes
     ----------
 
-    conditions : Dict[node: `Condition`]
-        the key of each entry is a node, and its value is the `Condition <Condition>` associated
+    conditions : Dict[Hashable: Union[ConditionBase, Iterable[ConditionBase]]]
+        the key of each entry is a node, and its value is a condition
+        associated
         with that node.  Conditions can be added to the
         ConditionSet using the ConditionSet's `add_condition` method.
 
+    conditions_basic : Dict[Hashable: `Condition <graph_scheduler.condition.Condition>`]
+        a dict mapping nodes to their single `basic Conditions
+        <graph_scheduler.condition.Condition>`
+
+    conditions_structural : Dict[Hashable: List[`GraphStructureCondition`]]
+        a dict mapping nodes to their `graph structure Conditions
+        <GraphStructureCondition>`
+
+    structural_condition_order : List[`GraphStructureCondition`]
+        a list storing all `GraphStructureCondition` s in this
+        ConditionSet in the order in which they were added (and will be
+        applied to a `Scheduler`)
+
     """
-    def __init__(self, *condition_sets, conditions=None):
-        self.conditions = {}
+    def __init__(
+        self,
+        *condition_sets: typing_dict_condition_set,
+        conditions: typing_dict_condition_set = None
+    ):
+        self._conditions = {}
+        self.conditions_basic = {}
+        self.conditions_structural = {}
+
+        self.structural_condition_order = []
+
+        self._rebuild_conditions = False
 
         for cset in condition_sets:
             if cset is None:
@@ -654,7 +681,14 @@ class ConditionSet(object):
         return item in self.conditions
 
     def __repr__(self):
-        condition_str = '\n\t'.join([f'{repr(owner)}: {condition}' for owner, condition in self.conditions.items()])
+        condition_str_items = []
+        for owner, condition in self.conditions.items():
+            try:
+                condition = '[{0}]'.format(', '.join([str(c) for c in condition]))
+            except TypeError:
+                pass
+            condition_str_items.append(f'{repr(owner)}: {condition}')
+        condition_str = '\n\t'.join(condition_str_items)
         return '{0}({1}{2}{3})'.format(
             self.__class__.__name__,
             '{\n\t' if len(condition_str) > 0 else '',
@@ -663,19 +697,29 @@ class ConditionSet(object):
         )
 
     def __iter__(self):
-        return filter(lambda c: isinstance(c, Condition), self.conditions)
+        return iter(self.conditions)
 
     def __getitem__(self, key):
         return self.conditions[key]
 
     def __setitem__(self, key, value):
-        self.conditions[key] = value
+        if key in self.conditions_structural:
+            for cond in reversed(self.conditions_structural[key]):
+                self.remove_condition(key, cond)
 
-    def add_condition(self, owner, condition):
+        self.add_condition(key, value)
+
+    def add_condition(self, owner: Hashable, condition: typing_condition_base):
         """
-        Adds a `Condition` to the ConditionSet. If **owner** already has a Condition, it is overwritten
-        with the new one. If you want to add multiple conditions to a single owner, use the
-        `composite Conditions <Conditions_Composite>` to accurately specify the desired behavior.
+        Adds a `basic <graph_scheduler.condition.Condition>` or `graph
+        structure <GraphStructureCondition>` Condition to the
+        ConditionSet.
+
+        If **condition** is basic, it will overwrite the current basic
+        Condition for **owner**, if present. If you want to add multiple
+        basic Conditions to a single owner, instead add a single
+        `Composite Condition <Conditions_Composite>` to accurately
+        specify the desired behavior.
 
         Arguments
         ---------
@@ -684,39 +728,199 @@ class ConditionSet(object):
             specifies the node with which the **condition** should be associated. **condition**
             will govern the execution behavior of **owner**
 
-        condition : Condition
-            specifies the Condition, associated with the **owner** to be added to the ConditionSet.
+        condition : ConditionBase
+            specifies the condition associated with **owner** to be
+            added to the ConditionSet.
         """
         condition.owner = owner
-        try:
-            old_condition = self.conditions[owner]
-        except KeyError:
-            pass
+
+        if isinstance(condition, GraphStructureCondition):
+            if owner not in self.conditions_structural:
+                self.conditions_structural[owner] = []
+
+            self.conditions_structural[owner].append(condition)
+            self.structural_condition_order.append(condition)
         else:
-            warnings.warn(f'Replacing condition for {owner}. old: {old_condition} new: {condition}')
+            try:
+                old_condition = self.conditions_basic[owner]
+            except KeyError:
+                pass
+            else:
+                warnings.warn(
+                    f'Replacing basic condition for {owner}. old: {old_condition} new: {condition}'
+                )
+            self.conditions_basic[owner] = condition
+        self._rebuild_conditions = True
 
-        self.conditions[owner] = condition
-
-    def add_condition_set(self, conditions):
+    def remove_condition(
+        self, owner_or_condition: Union[Hashable, typing_condition_base]
+    ) -> Union[typing_condition_base, None]:
         """
-        Adds a set of `Conditions <Condition>` (in the form of a dict or another ConditionSet) to the ConditionSet.
-        Any Condition added here will overwrite an existing Condition for a given owner.
-        If you want to add multiple conditions to a single owner, add a single `Composite Condition <Conditions_Composite>`
-        to accurately specify the desired behavior.
+        Removes the condition specified as or owned by
+        **owner_or_condition**.
+
+        Args:
+            owner_or_condition (Union[Hashable, `ConditionBase`]):
+                Either a condition or the owner of a condition
+
+        Returns:
+            The condition removed, or None if no condition removed
+
+        Raises:
+            ConditionError:
+                - when **owner_or_condition** is an owner and it owns
+                  multiple conditions
+                - when **owner_or_condition** is a condition and its
+                  owner is None
+        """
+        def remove_basic_condition(c):
+            del self.conditions_basic[owner]
+            if c is not None:
+                c.owner = None
+
+        def remove_structural_condition(c):
+            try:
+                self.conditions_structural[owner].remove(c)
+                self.structural_condition_order.remove(c)
+            except (KeyError, ValueError):
+                return False
+            else:
+                if len(self.conditions_structural[owner]) == 0:
+                    del self.conditions_structural[owner]
+                return True
+
+        if isinstance(owner_or_condition, ConditionBase):
+            owner = owner_or_condition.owner
+            condition = owner_or_condition
+
+            if owner is None:
+                raise ConditionError(
+                    f'Condition must have an owner to remove: {owner_or_condition}'
+                )
+        else:
+            owner = owner_or_condition
+            condition = None
+
+        condition_found = None
+        try:
+            owner_struct_conds = self.conditions_structural[owner]
+        except KeyError:
+            owner_struct_conds = None
+
+        try:
+            owner_basic_cond = self.conditions_basic[owner]
+        except KeyError:
+            owner_basic_cond = None
+
+        if condition is None:
+            if owner_basic_cond is not None and owner_struct_conds is not None:
+                raise ConditionError(
+                    'Multiple possible conditions for {0}: {1} {2}'.format(
+                        owner, owner_basic_cond, owner_struct_conds
+                    )
+                )
+            elif owner_basic_cond is not None:
+                remove_basic_condition(owner_basic_cond)
+                condition_found = owner_basic_cond
+            elif owner_struct_conds is not None:
+                if len(owner_struct_conds) > 1:
+                    raise ConditionError(
+                        'Multiple possible conditions for {0}: {1}'.format(
+                            owner, owner_struct_conds
+                        )
+                    )
+                elif len(owner_struct_conds) == 1:
+                    remove_structural_condition(owner_struct_conds[0])
+                    condition_found = owner_struct_conds[0]
+        else:
+            if condition is owner_basic_cond:
+                remove_basic_condition(condition)
+                condition_found = condition
+            elif remove_structural_condition(condition):
+                condition_found = condition
+
+        if condition_found is not None:
+            self._rebuild_conditions = True
+        else:
+            warnings.warn(f'Condition {condition} not found for owner {owner}.')
+
+        return condition
+
+    def add_condition_set(
+        self, conditions: Union['ConditionSet', typing_dict_condition_set]
+    ):
+        """
+        Adds a set of `basic <graph_scheduler.condition.Condition>` or
+        `graph structure <GraphStructureCondition>` Conditions (in the
+        form of a dict or another ConditionSet) to the ConditionSet.
+
+        Any basic Condition added here will overwrite the current basic
+        Condition for a given owner, if present. If you want to add
+        multiple basic Conditions to a single owner, instead add a
+        single `Composite Condition <Conditions_Composite>` to
+        accurately specify the desired behavior.
 
         Arguments
         ---------
 
-        conditions : dict[node: `Condition`], `ConditionSet`
+        conditions
             specifies collection of Conditions to be added to this ConditionSet,
 
             if a dict is provided:
-                each entry should map an owner node (the node whose execution behavior will be
-                governed) to a `Condition <Condition>`
+                each entry should map an owner node (the node whose
+                execution behavior will be governed) to a `Condition
+                <graph_scheduler.condition.Condition>` or
+                `GraphStructureCondition`, or an iterable of them.
 
         """
         for owner in conditions:
-            self.add_condition(owner, conditions[owner])
+            if isinstance(conditions[owner], collections.abc.Iterable):
+                for c in conditions[owner]:
+                    self.add_condition(owner, c)
+            else:
+                self.add_condition(owner, conditions[owner])
+
+    # Maintain backwards compatibility for v1.x
+    @property
+    def conditions(self) -> Union[typing_condition_base, List[typing_condition_base]]:
+        """
+        Returns the Conditions contained within this ConditionSet
+
+        Returns:
+            dict[node: Union[`ConditionBase`, List[`ConditionBase`]]]: a
+            dictionary mapping owners to their conditions. The value for
+            an owner will be a list if there is more than one condition
+            for an owner
+
+        Note:
+            This property maintains compatibility for v1.x. Prefer the
+            `conditions_basic` and `conditions_structural` attributes
+            for new code.
+        """
+        if self._rebuild_conditions:
+            conds = self.conditions_basic
+
+            if len(self.conditions_structural) != 0:
+                conds = copy.copy(conds)
+
+            for node, struct_conds in self.conditions_structural.items():
+                if node in conds:
+                    conds[node] = [conds[node]] + struct_conds
+                elif len(struct_conds) == 1:
+                    # NOTE: this if condition is to maintain consistency
+                    # for this property so that the rule is:
+                    #    1 condition per node -> Condition
+                    #    1< condition per node -> list of Conditions
+                    # instead of varying based on presence of GSC or not
+                    # TODO: make this always a list in v2.0
+                    conds[node] = struct_conds[0]
+                else:
+                    conds[node] = struct_conds
+
+            self._conditions = conds
+            self._rebuild_conditions = False
+
+        return self._conditions
 
 
 class ConditionBase:

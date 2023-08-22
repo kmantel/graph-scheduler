@@ -1,6 +1,7 @@
 import inspect
 import logging
 import warnings
+from typing import Any, Dict, List, Union
 
 import numpy as np
 import pytest
@@ -55,6 +56,52 @@ def verify_operation(operation, test_neighbors, source_neighbors, subject_neighb
         assert False, f"Unrecognized operation {operation}"
 
 
+def flatten_list(obj: List[Union[Any, List]]) -> List:
+    new_list = []
+    for o in obj:
+        try:
+            new_list.extend(o)
+        except TypeError:
+            new_list.append(o)
+    return new_list
+
+
+def gen_expected_conditions(
+    indices: Union[List[int], Dict[Any, List[int]]],
+    conditions: List[Union[gs.Condition, List[gs.Condition]]]
+) -> Union[List[gs.Condition], Dict[Any, Union[gs.Condition, List[gs.Condition]]]]:
+    """
+    Used in tests to simplify parametrization notation. See
+    TestConditionSet.test_add_condition for example usage.
+
+    Args:
+        indices: list of the indices of the Conditions (or lists of
+            Conditions) in **conditions**, optionally as a dict mapping
+            items to index lists
+
+        conditions: a list of Conditions (or lists of Conditions)
+
+    Returns:
+        A list or dict (depending on the type of **indices**) containing
+        the Conditions specified
+    """
+    def get_cond_elem(e):
+        if isinstance(e, list):
+            val = [conditions[i] for i in e]
+        else:
+            val = conditions[e]
+        return val
+
+    if isinstance(indices, list):
+        return [get_cond_elem(i) for i in indices]
+    else:
+        return {owner: get_cond_elem(i) for owner, i in indices.items()}
+
+
+def basic_Condition(*args):
+    return gs.Condition(lambda: None, *args)
+
+
 class TestConditionSet:
     # maintain through v1.x
     class TestConstructorInterface:
@@ -78,6 +125,312 @@ class TestConditionSet:
         def test_keyword_arg(self, conds):
             cond_set = gs.ConditionSet(conditions=conds)
             assert cond_set.conditions == conds
+
+    # _indices parameters match indices of conditions parameter
+    @pytest.mark.parametrize(
+        'owners, conditions, expected_conditions_indices, expected_basic_indices, expected_structural_indices, expected_structural_order_indices',
+        [
+            pytest.param(['A'], [gs.condition._GSCWithOperations('B')], {'A': 0}, {}, {'A': [0]}, [0], id='single_gsc'),
+            pytest.param(
+                ['A', 'A'],
+                [
+                    basic_Condition('B'),
+                    basic_Condition('C'),
+                ],
+                {'A': 1},
+                {'A': 1},
+                {},
+                [],
+                id='double_basic'
+            ),
+            pytest.param(
+                ['A', 'A'],
+                [
+                    gs.condition._GSCWithOperations('B'),
+                    gs.condition._GSCWithOperations('C'),
+                ],
+                {'A': [0, 1]},
+                {},
+                {'A': [0, 1]},
+                [0, 1],
+                id='double_gsc'
+            ),
+            pytest.param(
+                ['A', 'B', 'A'],
+                [
+                    gs.condition._GSCWithOperations('B'),
+                    gs.condition._GSCWithOperations('C'),
+                    gs.condition._GSCWithOperations('C'),
+                ],
+                {'A': [0, 2], 'B': 1},
+                {},
+                {'A': [0, 2], 'B': [1]},
+                [0, 1, 2],
+                id='double_gsc_mixed_owners'
+            ),
+            pytest.param(
+                ['A', 'B', 'A'],
+                [
+                    basic_Condition('B'),
+                    gs.condition._GSCWithOperations('C'),
+                    gs.condition._GSCWithOperations('B'),
+                ],
+                {'A': [0, 2], 'B': 1},
+                {'A': 0},
+                {'A': [2], 'B': [1]},
+                [1, 2],
+                id='single_basic_double_gsc_mixed_owners'
+            ),
+            pytest.param(
+                ['A', 'B', 'A', 'A', 'A'],
+                [
+                    basic_Condition('B'),
+                    gs.condition._GSCWithOperations('C'),
+                    basic_Condition('C'),
+                    gs.condition._GSCWithOperations('B'),
+                    gs.condition._GSCWithOperations('C'),
+                ],
+                {'A': [2, 3, 4], 'B': 1},
+                {'A': 2},
+                {'A': [3, 4], 'B': [1]},
+                [1, 3, 4],
+                id='double_basic_triple_gsc_mixed_owners'
+            ),
+            pytest.param(
+                ['A', 'B', 'A'],
+                [
+                    basic_Condition('A'),
+                    gs.condition._GSCWithOperations('C'),
+                    [
+                        basic_Condition('B'),
+                        gs.condition._GSCWithOperations('B'),
+                        gs.condition._GSCWithOperations('C'),
+                    ]
+                ],
+                {'A': [2, 3, 4], 'B': 1},
+                {'A': 2},
+                {'A': [3, 4], 'B': [1]},
+                [1, 3, 4],
+                id='double_basic_triple_gsc_mixed_owners_in_list'
+            ),
+        ]
+    )
+    @pytest.mark.parametrize(
+        'constructor', [
+            pytest.param(True, id='in_constructor'),
+            pytest.param(False, id='after_construction')
+        ]
+    )
+    def test_add_condition(
+        self,
+        owners,
+        conditions,
+        expected_conditions_indices,
+        expected_basic_indices,
+        expected_structural_indices,
+        expected_structural_order_indices,
+        constructor,
+    ):
+        n_conds = len(conditions)
+        assert n_conds == len(owners)
+
+        if constructor:
+            condition_set = gs.ConditionSet(
+                *[{owners[i]: conditions[i]} for i in range(n_conds)]
+            )
+        else:
+            condition_set = gs.ConditionSet()
+            for i in range(n_conds):
+                if isinstance(conditions[i], list):
+                    for c in conditions[i]:
+                        condition_set.add_condition(owners[i], c)
+                else:
+                    condition_set.add_condition(owners[i], conditions[i])
+
+        conditions = flatten_list(conditions)
+
+        expected_conditions = gen_expected_conditions(expected_conditions_indices, conditions)
+        expected_basic = gen_expected_conditions(expected_basic_indices, conditions)
+        expected_structural = gen_expected_conditions(expected_structural_indices, conditions)
+        expected_structural_order = gen_expected_conditions(expected_structural_order_indices, conditions)
+
+        assert condition_set.conditions == expected_conditions
+        assert condition_set.conditions_basic == expected_basic
+        assert condition_set.conditions_structural == expected_structural
+        assert condition_set.structural_condition_order == expected_structural_order
+
+    @pytest.mark.parametrize(
+        'constructor_args, additional_conditions',
+        [
+            ([{'A': basic_Condition('B')}, {'A': basic_Condition('B')}], []),
+            ([{'A': basic_Condition('B')}], [{'A': basic_Condition('B')}]),
+            ([], [{'A': basic_Condition('B')}, {'A': basic_Condition('B')}]),
+        ]
+    )
+    def test_add_condition_warning(self, constructor_args, additional_conditions):
+        with pytest.warns(UserWarning, match=r'Replacing basic condition for'):
+            condition_set = gs.ConditionSet(*constructor_args)
+            for addl_cset in additional_conditions:
+                for owner, condition in addl_cset.items():
+                    condition_set.add_condition(owner, condition)
+
+    @pytest.mark.parametrize(
+        'to_remove, expected_cond_owners',
+        [
+            ([], ['A', 'B']),
+            (['A'], ['B']),
+            (['B'], ['A']),
+            (['A', 'B'], []),
+            (['B', 'A'], []),
+        ]
+    )
+    @pytest.mark.parametrize(
+        'pass_condition', [
+            pytest.param(True, id='pass_condition'),
+            pytest.param(False, id='no_pass_condition')
+        ]
+    )
+    def test_remove_condition_basic(self, to_remove, expected_cond_owners, pass_condition):
+        conds = {
+            'A': basic_Condition('A'),
+            'B': basic_Condition('B'),
+        }
+        condition_set = gs.ConditionSet(conds)
+
+        for owner in to_remove:
+            if pass_condition:
+                condition_set.remove_condition(conds[owner])
+            else:
+                condition_set.remove_condition(owner)
+
+        assert condition_set.conditions == {owner: conds[owner] for owner in expected_cond_owners}
+
+    def test_remove_condition_structural(self):
+        gscA0 = gs.condition._GSCWithOperations('B')
+        gscA1 = gs.condition._GSCWithOperations('C')
+
+        gscB0 = gs.condition._GSCWithOperations('A')
+        gscB1 = gs.condition._GSCWithOperations('C')
+
+        conds = {
+            'A': [gscA0, gscA1],
+            'B': [gscB0, gscB1],
+        }
+        condition_set = gs.ConditionSet(conds)
+
+        condition_set.remove_condition(gscB0)
+        assert condition_set.conditions_structural == {'A': [gscA0, gscA1], 'B': [gscB1]}
+        assert condition_set.structural_condition_order == [gscA0, gscA1, gscB1]
+
+        condition_set.remove_condition(gscA1)
+        assert condition_set.conditions_structural == {'A': [gscA0], 'B': [gscB1]}
+        assert condition_set.structural_condition_order == [gscA0, gscB1]
+
+        condition_set.remove_condition(gscA0)
+        assert condition_set.conditions_structural == {'B': [gscB1]}
+        assert condition_set.structural_condition_order == [gscB1]
+
+        condition_set.remove_condition(gscB1)
+        assert condition_set.conditions_structural == {}
+        assert condition_set.structural_condition_order == []
+
+    @pytest.mark.parametrize(
+        'owners, conditions, removal_order_indices, expected_conditions_step_indices, expected_structural_order_step_indices',
+        [
+            (
+                ['A', 'A', 'A'],
+                [
+                    gs.condition._GSCWithOperations('B'),
+                    basic_Condition('A'),
+                    gs.condition._GSCWithOperations('C')
+                ],
+                [1, 0, 2],
+                [{'A': [0, 2]}, {'A': 2}, {}],
+                [[0, 2], [2], []],
+            ),
+            (
+                ['A', 'A', 'A'],
+                [
+                    gs.condition._GSCWithOperations('B'),
+                    basic_Condition('A'),
+                    gs.condition._GSCWithOperations('C')
+                ],
+                [0, 2, 1],
+                [{'A': [1, 2]}, {'A': 1}, {}],  # basic conditions are always first
+                [[2], [], []],
+            ),
+        ]
+    )
+    def test_remove_condition_mixed(
+        self,
+        owners,
+        conditions,
+        removal_order_indices,
+        expected_conditions_step_indices,
+        expected_structural_order_step_indices,
+    ):
+        n_conds = len(conditions)
+        n_removals = len(removal_order_indices)
+
+        assert n_conds == len(owners)
+        assert n_removals == len(expected_conditions_step_indices)
+        assert n_removals == len(expected_structural_order_step_indices)
+
+        condition_set = gs.ConditionSet()
+        for i in range(n_conds):
+            condition_set.add_condition(owners[i], conditions[i])
+
+        for i in range(n_removals):
+            condition_set.remove_condition(conditions[removal_order_indices[i]])
+            assert condition_set.conditions == gen_expected_conditions(
+                expected_conditions_step_indices[i], conditions
+            )
+            assert condition_set.structural_condition_order == gen_expected_conditions(
+                expected_structural_order_step_indices[i], conditions
+            )
+
+    def test_remove_condition_error_has_no_owner(self):
+        condition_set = gs.ConditionSet()
+        with pytest.raises(
+            gs.ConditionError, match=r'Condition must have an owner to remove'
+        ):
+            condition_set.remove_condition(basic_Condition('A'))
+
+    @pytest.mark.parametrize(
+        'conditions',
+        [
+            ([basic_Condition('A'), gs.condition._GSCWithOperations('B')]),
+            (
+                [
+                    gs.condition._GSCWithOperations('B'),
+                    gs.condition._GSCWithOperations('C')
+                ]
+            ),
+        ]
+    )
+    def test_remove_condition_error_multiple_possible(self, conditions):
+        condition_set = gs.ConditionSet({'A': conditions})
+        with pytest.raises(
+            gs.ConditionError, match=r'Multiple possible conditions for'
+        ):
+            condition_set.remove_condition('A')
+
+    def test_remove_condition_warning_condition_not_added(self):
+        cond = basic_Condition('A')
+        cond.owner = 'A'
+
+        condition_set = gs.ConditionSet({'A': basic_Condition('A')})
+        with pytest.warns(
+            UserWarning, match=r'Condition .* not found for owner'
+        ):
+            condition_set.remove_condition(cond)
+
+    def test_remove_condition_warning_owner_has_no_conditions(self):
+        condition_set = gs.ConditionSet()
+        with pytest.warns(
+            UserWarning, match=r'Condition .* not found for owner'
+        ):
+            condition_set.remove_condition('B')
 
 
 class TestCondition:
