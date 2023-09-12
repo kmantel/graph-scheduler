@@ -8,17 +8,6 @@ import types
 
 import graph_scheduler as gs
 
-from psyneulink import _unit_registry
-from psyneulink.core.components.functions.stateful.integratorfunctions import DriftDiffusionIntegrator, SimpleIntegrator
-from psyneulink.core.components.functions.nonstateful.transferfunctions import Linear
-from psyneulink.core.components.mechanisms.processing.integratormechanism import IntegratorMechanism
-from psyneulink.core.components.mechanisms.processing.transfermechanism import TransferMechanism
-from psyneulink.core.components.projections.pathway.mappingprojection import MappingProjection
-from psyneulink.core.compositions.composition import Composition, EdgeType
-from psyneulink.core.globals.keywords import VALUE
-from psyneulink.core.scheduling.condition import AfterNCalls, AfterNPasses, AfterNEnvironmentStateUpdates, AfterPass, All, AllHaveRun, Always, Any, AtNCalls, AtPass, BeforeNCalls, BeforePass, EveryNCalls, EveryNPasses, JustRan, TimeInterval, WhenFinished
-from psyneulink.core.scheduling.time import TimeScale
-from psyneulink.library.components.mechanisms.processing.integrator.ddm import DDM
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +53,7 @@ class TestScheduler:
         graph = {'A': set()}
         scheduler = gs.Scheduler(graph)
 
-        scheduler.get_clock(scheduler.default_execution_id)._increment_time(TimeScale.ENVIRONMENT_STATE_UPDATE)
+        scheduler.get_clock(scheduler.default_execution_id)._increment_time(pnl.TimeScale.ENVIRONMENT_STATE_UPDATE)
 
         eid = 'eid'
         eid1 = 'eid1'
@@ -72,7 +61,7 @@ class TestScheduler:
 
         assert scheduler.clocks[eid].time.environment_state_update == 0
 
-        scheduler.get_clock(scheduler.default_execution_id)._increment_time(TimeScale.ENVIRONMENT_STATE_UPDATE)
+        scheduler.get_clock(scheduler.default_execution_id)._increment_time(pnl.TimeScale.ENVIRONMENT_STATE_UPDATE)
 
         assert scheduler.clocks[eid].time.environment_state_update == 0
 
@@ -82,19 +71,19 @@ class TestScheduler:
 
     @pytest.mark.psyneulink
     def test_two_compositions_one_scheduler(self):
-        comp1 = Composition()
-        comp2 = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        comp1 = pnl.Composition()
+        comp2 = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
         comp1.add_node(A)
         comp2.add_node(A)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp1))
 
-        sched.add_condition(A, BeforeNCalls(A, 5, time_scale=TimeScale.LIFE))
+        sched.add_condition(A, pnl.BeforeNCalls(A, 5, time_scale=pnl.TimeScale.LIFE))
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(6)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNPasses(1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(6)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNPasses(1)
         comp1.run(
             inputs={A: [[0], [1], [2], [3], [4], [5]]},
             scheduler=sched,
@@ -123,17 +112,17 @@ class TestScheduler:
 
     @pytest.mark.psyneulink
     def test_one_composition_two_contexts(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
         comp.add_node(A)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
-        sched.add_condition(A, BeforeNCalls(A, 5, time_scale=TimeScale.LIFE))
+        sched.add_condition(A, pnl.BeforeNCalls(A, 5, time_scale=pnl.TimeScale.LIFE))
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(6)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNPasses(1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(6)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNPasses(1)
         eid = 'eid'
         comp.run(
             inputs={A: [[0], [1], [2], [3], [4], [5]]},
@@ -180,39 +169,39 @@ class TestScheduler:
 
     @pytest.mark.psyneulink
     def test_change_termination_condition(self):
-        D = DDM(
-            function=DriftDiffusionIntegrator(
+        D = pnl.DDM(
+            function=pnl.DriftDiffusionIntegrator(
                 threshold=10, time_step_size=1.0
             ),
             execute_until_finished=False,
             reset_stateful_function_when=pnl.Never()
         )
-        C = Composition(pathways=[D])
+        C = pnl.Composition(pathways=[D])
 
-        D.set_log_conditions(VALUE)
+        D.set_log_conditions(pnl.VALUE)
 
         def change_termination_processing():
             if C.termination_processing is None:
-                C.scheduler.termination_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: WhenFinished(D)}
-                C.termination_processing = {TimeScale.ENVIRONMENT_STATE_UPDATE: WhenFinished(D)}
-            elif isinstance(C.termination_processing[TimeScale.ENVIRONMENT_STATE_UPDATE], AllHaveRun):
-                C.scheduler.termination_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: WhenFinished(D)}
-                C.termination_processing = {TimeScale.ENVIRONMENT_STATE_UPDATE: WhenFinished(D)}
+                C.scheduler.termination_conds = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.WhenFinished(D)}
+                C.termination_processing = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.WhenFinished(D)}
+            elif isinstance(C.termination_processing[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE], pnl.AllHaveRun):
+                C.scheduler.termination_conds = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.WhenFinished(D)}
+                C.termination_processing = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.WhenFinished(D)}
             else:
-                C.scheduler.termination_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: AllHaveRun()}
-                C.termination_processing = {TimeScale.ENVIRONMENT_STATE_UPDATE: AllHaveRun()}
+                C.scheduler.termination_conds = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.AllHaveRun()}
+                C.termination_processing = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.AllHaveRun()}
 
         change_termination_processing()
         C.run(inputs={D: [[1.0], [2.0]]},
-              # termination_processing={TimeScale.ENVIRONMENT_STATE_UPDATE: WhenFinished(D)},
+              # termination_processing={pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.WhenFinished(D)},
               call_after_trial=change_termination_processing,
               reset_stateful_functions_when=pnl.AtConsiderationSetExecution(0),
               num_trials=4)
         # EnvironmentStateUpdate 0:
-        # input = 1.0, termination condition = WhenFinished
+        # input = 1.0, termination condition = pnl.WhenFinished
         # 10 passes (value = 1.0, 2.0 ... 9.0, 10.0)
         # EnvironmentStateUpdate 1:
-        # input = 2.0, termination condition = AllHaveRun
+        # input = 2.0, termination condition = pnl.AllHaveRun
         # 1 pass (value = 2.0)
         expected_results = [[np.array([10.]), np.array([10.])],
                             [np.array([2.]), np.array([1.])],
@@ -227,8 +216,8 @@ class TestScheduler:
         C = pnl.TransferMechanism(name='C')
 
         comp = pnl.Composition(pathways=[[A, C], [A, B, C]])
-        comp.scheduler.add_condition(A, AtPass(1))
-        comp.scheduler.add_condition(B, Always())
+        comp.scheduler.add_condition(A, pnl.AtPass(1))
+        comp.scheduler.add_condition(B, pnl.Always())
 
         output = list(comp.scheduler.run())
         expected_output = [B, A, B, C]
@@ -241,7 +230,7 @@ class TestScheduler:
         C = pnl.TransferMechanism(name='C')
 
         comp = pnl.Composition(pathways=[[A, B], [C]])
-        comp.scheduler.add_condition(C, AtPass(1))
+        comp.scheduler.add_condition(C, pnl.AtPass(1))
 
         output = list(comp.scheduler.run())
         expected_output = [A, B, {C, A}]
@@ -254,8 +243,8 @@ class TestScheduler:
         )
 
         # these cannot run at same execution set unless in EXACT_TIME
-        sched.add_condition('A', TimeInterval(start=1))
-        sched.add_condition('B', TimeInterval(start=1))
+        sched.add_condition('A', pnl.TimeInterval(start=1))
+        sched.add_condition('B', pnl.TimeInterval(start=1))
 
         list(sched.run())
 
@@ -317,33 +306,33 @@ class TestLinear:
 
     @classmethod
     def setup_class(self):
-        self.orig_is_finished_flag = TransferMechanism.is_finished_flag
-        self.orig_is_finished = TransferMechanism.is_finished
-        TransferMechanism.is_finished_flag = True
-        TransferMechanism.is_finished = lambda self, context: self.is_finished_flag
+        self.orig_is_finished_flag = pnl.TransferMechanism.is_finished_flag
+        self.orig_is_finished = pnl.TransferMechanism.is_finished
+        pnl.TransferMechanism.is_finished_flag = True
+        pnl.TransferMechanism.is_finished = lambda self, context: self.is_finished_flag
 
     @classmethod
     def teardown_class(self):
-        del TransferMechanism.is_finished_flag
-        del TransferMechanism.is_finished
-        TransferMechanism.is_finished_flag = self.orig_is_finished_flag
-        TransferMechanism.is_finished = self.orig_is_finished
+        del pnl.TransferMechanism.is_finished_flag
+        del pnl.TransferMechanism.is_finished
+        pnl.TransferMechanism.is_finished_flag = self.orig_is_finished_flag
+        pnl.TransferMechanism.is_finished = self.orig_is_finished
 
     def test_no_termination_conds(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
-        B = TransferMechanism(function=Linear(intercept=4.0), name='scheduler-pytests-B')
-        C = TransferMechanism(function=Linear(intercept=1.5), name='scheduler-pytests-C')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        B = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='scheduler-pytests-B')
+        C = pnl.TransferMechanism(function=pnl.Linear(intercept=1.5), name='scheduler-pytests-C')
         for m in [A, B, C]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, B)
-        comp.add_projection(MappingProjection(), B, C)
+        comp.add_projection(pnl.MappingProjection(), A, B)
+        comp.add_projection(pnl.MappingProjection(), B, C)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
-        sched.add_condition(A, EveryNPasses(1))
-        sched.add_condition(B, EveryNCalls(A, 2))
-        sched.add_condition(C, EveryNCalls(B, 3))
+        sched.add_condition(A, pnl.EveryNPasses(1))
+        sched.add_condition(B, pnl.EveryNCalls(A, 2))
+        sched.add_condition(C, pnl.EveryNCalls(B, 3))
 
         output = list(sched.run())
 
@@ -355,24 +344,24 @@ class TestLinear:
 
     # tests below are copied from old scheduler, need renaming
     def test_1(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
-        B = TransferMechanism(function=Linear(intercept=4.0), name='scheduler-pytests-B')
-        C = TransferMechanism(function=Linear(intercept=1.5), name='scheduler-pytests-C')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        B = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='scheduler-pytests-B')
+        C = pnl.TransferMechanism(function=pnl.Linear(intercept=1.5), name='scheduler-pytests-C')
         for m in [A, B, C]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, B)
-        comp.add_projection(MappingProjection(), B, C)
+        comp.add_projection(pnl.MappingProjection(), A, B)
+        comp.add_projection(pnl.MappingProjection(), B, C)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
-        sched.add_condition(A, EveryNPasses(1))
-        sched.add_condition(B, EveryNCalls(A, 2))
-        sched.add_condition(C, EveryNCalls(B, 3))
+        sched.add_condition(A, pnl.EveryNPasses(1))
+        sched.add_condition(B, pnl.EveryNCalls(A, 2))
+        sched.add_condition(C, pnl.EveryNCalls(B, 3))
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 4, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNCalls(C, 4, time_scale=pnl.TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
         expected_output = [
@@ -385,24 +374,24 @@ class TestLinear:
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
     def test_1b(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
-        B = TransferMechanism(function=Linear(intercept=4.0), name='scheduler-pytests-B')
-        C = TransferMechanism(function=Linear(intercept=1.5), name='scheduler-pytests-C')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        B = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='scheduler-pytests-B')
+        C = pnl.TransferMechanism(function=pnl.Linear(intercept=1.5), name='scheduler-pytests-C')
         for m in [A, B, C]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, B)
-        comp.add_projection(MappingProjection(), B, C)
+        comp.add_projection(pnl.MappingProjection(), A, B)
+        comp.add_projection(pnl.MappingProjection(), B, C)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
-        sched.add_condition(A, EveryNPasses(1))
-        sched.add_condition(B, Any(EveryNCalls(A, 2), AfterPass(1)))
-        sched.add_condition(C, EveryNCalls(B, 3))
+        sched.add_condition(A, pnl.EveryNPasses(1))
+        sched.add_condition(B, pnl.Any(pnl.EveryNCalls(A, 2), pnl.AfterPass(1)))
+        sched.add_condition(C, pnl.EveryNCalls(B, 3))
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 4, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNCalls(C, 4, time_scale=pnl.TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
         expected_output = [
@@ -415,48 +404,48 @@ class TestLinear:
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
     def test_2(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
-        B = TransferMechanism(function=Linear(intercept=4.0), name='scheduler-pytests-B')
-        C = TransferMechanism(function=Linear(intercept=1.5), name='scheduler-pytests-C')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        B = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='scheduler-pytests-B')
+        C = pnl.TransferMechanism(function=pnl.Linear(intercept=1.5), name='scheduler-pytests-C')
         for m in [A, B, C]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, B)
-        comp.add_projection(MappingProjection(), B, C)
+        comp.add_projection(pnl.MappingProjection(), A, B)
+        comp.add_projection(pnl.MappingProjection(), B, C)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
-        sched.add_condition(A, EveryNPasses(1))
-        sched.add_condition(B, EveryNCalls(A, 2))
-        sched.add_condition(C, EveryNCalls(B, 2))
+        sched.add_condition(A, pnl.EveryNPasses(1))
+        sched.add_condition(B, pnl.EveryNCalls(A, 2))
+        sched.add_condition(C, pnl.EveryNCalls(B, 2))
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 1, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNCalls(C, 1, time_scale=pnl.TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
         expected_output = [A, A, B, A, A, B, C]
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
     def test_3(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
-        B = TransferMechanism(function=Linear(intercept=4.0), name='scheduler-pytests-B')
-        C = TransferMechanism(function=Linear(intercept=1.5), name='scheduler-pytests-C')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        B = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='scheduler-pytests-B')
+        C = pnl.TransferMechanism(function=pnl.Linear(intercept=1.5), name='scheduler-pytests-C')
         for m in [A, B, C]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, B)
-        comp.add_projection(MappingProjection(), B, C)
+        comp.add_projection(pnl.MappingProjection(), A, B)
+        comp.add_projection(pnl.MappingProjection(), B, C)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
-        sched.add_condition(A, EveryNPasses(1))
-        sched.add_condition(B, EveryNCalls(A, 2))
-        sched.add_condition(C, All(AfterNCalls(B, 2), EveryNCalls(B, 1)))
+        sched.add_condition(A, pnl.EveryNPasses(1))
+        sched.add_condition(B, pnl.EveryNCalls(A, 2))
+        sched.add_condition(C, pnl.All(pnl.AfterNCalls(B, 2), pnl.EveryNCalls(B, 1)))
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 4, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNCalls(C, 4, time_scale=pnl.TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
         expected_output = [
@@ -466,24 +455,24 @@ class TestLinear:
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
     def test_6(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
-        B = TransferMechanism(function=Linear(intercept=4.0), name='scheduler-pytests-B')
-        C = TransferMechanism(function=Linear(intercept=1.5), name='scheduler-pytests-C')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        B = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='scheduler-pytests-B')
+        C = pnl.TransferMechanism(function=pnl.Linear(intercept=1.5), name='scheduler-pytests-C')
         for m in [A, B, C]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, B)
-        comp.add_projection(MappingProjection(), B, C)
+        comp.add_projection(pnl.MappingProjection(), A, B)
+        comp.add_projection(pnl.MappingProjection(), B, C)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
-        sched.add_condition(A, BeforePass(5))
-        sched.add_condition(B, AfterNCalls(A, 5))
-        sched.add_condition(C, AfterNCalls(B, 1))
+        sched.add_condition(A, pnl.BeforePass(5))
+        sched.add_condition(B, pnl.AfterNCalls(A, 5))
+        sched.add_condition(C, pnl.AfterNCalls(B, 1))
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 3)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNCalls(C, 3)
         output = list(sched.run(termination_conds=termination_conds))
 
         expected_output = [
@@ -493,24 +482,24 @@ class TestLinear:
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
     def test_6_two_environment_state_updates(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
-        B = TransferMechanism(function=Linear(intercept=4.0), name='scheduler-pytests-B')
-        C = TransferMechanism(function=Linear(intercept=1.5), name='scheduler-pytests-C')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        B = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='scheduler-pytests-B')
+        C = pnl.TransferMechanism(function=pnl.Linear(intercept=1.5), name='scheduler-pytests-C')
         for m in [A, B, C]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, B)
-        comp.add_projection(MappingProjection(), B, C)
+        comp.add_projection(pnl.MappingProjection(), A, B)
+        comp.add_projection(pnl.MappingProjection(), B, C)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
-        sched.add_condition(A, BeforePass(5))
-        sched.add_condition(B, AfterNCalls(A, 5))
-        sched.add_condition(C, AfterNCalls(B, 1))
+        sched.add_condition(A, pnl.BeforePass(5))
+        sched.add_condition(B, pnl.AfterNCalls(A, 5))
+        sched.add_condition(C, pnl.AfterNCalls(B, 1))
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(2)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 3)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(2)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNCalls(C, 3)
         comp.run(
                 inputs={A: [[0], [1], [2], [3], [4], [5]]},
                 scheduler=sched,
@@ -526,63 +515,63 @@ class TestLinear:
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
     def test_7(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
-        B = TransferMechanism(function=Linear(intercept=4.0), name='scheduler-pytests-B')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        B = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='scheduler-pytests-B')
         for m in [A, B]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, B)
+        comp.add_projection(pnl.MappingProjection(), A, B)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
-        sched.add_condition(A, EveryNPasses(1))
-        sched.add_condition(B, EveryNCalls(A, 2))
+        sched.add_condition(A, pnl.EveryNPasses(1))
+        sched.add_condition(B, pnl.EveryNCalls(A, 2))
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = Any(AfterNCalls(A, 1), AfterNCalls(B, 1))
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.Any(pnl.AfterNCalls(A, 1), pnl.AfterNCalls(B, 1))
         output = list(sched.run(termination_conds=termination_conds))
 
         expected_output = [A]
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
     def test_8(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
-        B = TransferMechanism(function=Linear(intercept=4.0), name='scheduler-pytests-B')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        B = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='scheduler-pytests-B')
         for m in [A, B]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, B)
+        comp.add_projection(pnl.MappingProjection(), A, B)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
-        sched.add_condition(A, EveryNPasses(1))
-        sched.add_condition(B, EveryNCalls(A, 2))
+        sched.add_condition(A, pnl.EveryNPasses(1))
+        sched.add_condition(B, pnl.EveryNCalls(A, 2))
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = All(AfterNCalls(A, 1), AfterNCalls(B, 1))
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.All(pnl.AfterNCalls(A, 1), pnl.AfterNCalls(B, 1))
         output = list(sched.run(termination_conds=termination_conds))
 
         expected_output = [A, A, B]
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
     def test_9(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
-        B = TransferMechanism(function=Linear(intercept=4.0), name='scheduler-pytests-B')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        B = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='scheduler-pytests-B')
         for m in [A, B]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, B)
+        comp.add_projection(pnl.MappingProjection(), A, B)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
-        sched.add_condition(A, EveryNPasses(1))
-        sched.add_condition(B, WhenFinished(A))
+        sched.add_condition(A, pnl.EveryNPasses(1))
+        sched.add_condition(B, pnl.WhenFinished(A))
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(B, 2)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNCalls(B, 2)
 
         output = []
         i = 0
@@ -597,114 +586,114 @@ class TestLinear:
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
     def test_9b(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
         A.is_finished_flag = False
-        B = TransferMechanism(function=Linear(intercept=4.0), name='scheduler-pytests-B')
+        B = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='scheduler-pytests-B')
         for m in [A, B]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, B)
+        comp.add_projection(pnl.MappingProjection(), A, B)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
-        sched.add_condition(A, EveryNPasses(1))
-        sched.add_condition(B, WhenFinished(A))
+        sched.add_condition(A, pnl.EveryNPasses(1))
+        sched.add_condition(B, pnl.WhenFinished(A))
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AtPass(5)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AtPass(5)
         output = list(sched.run(termination_conds=termination_conds))
 
         expected_output = [A, A, A, A, A]
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
     def test_10(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
         A.is_finished_flag = True
-        B = TransferMechanism(function=Linear(intercept=4.0), name='scheduler-pytests-B')
+        B = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='scheduler-pytests-B')
 
         for m in [A, B]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, B)
+        comp.add_projection(pnl.MappingProjection(), A, B)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
-        sched.add_condition(A, EveryNPasses(1))
-        sched.add_condition(B, Any(WhenFinished(A), AfterNCalls(A, 3)))
+        sched.add_condition(A, pnl.EveryNPasses(1))
+        sched.add_condition(B, pnl.Any(pnl.WhenFinished(A), pnl.AfterNCalls(A, 3)))
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(B, 5)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNCalls(B, 5)
         output = list(sched.run(termination_conds=termination_conds))
 
         expected_output = [A, B, A, B, A, B, A, B, A, B]
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
     def test_10b(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
         A.is_finished_flag = False
-        B = TransferMechanism(function=Linear(intercept=4.0), name='scheduler-pytests-B')
+        B = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='scheduler-pytests-B')
 
         for m in [A, B]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, B)
+        comp.add_projection(pnl.MappingProjection(), A, B)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
-        sched.add_condition(A, EveryNPasses(1))
-        sched.add_condition(B, Any(WhenFinished(A), AfterNCalls(A, 3)))
+        sched.add_condition(A, pnl.EveryNPasses(1))
+        sched.add_condition(B, pnl.Any(pnl.WhenFinished(A), pnl.AfterNCalls(A, 3)))
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(B, 4)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNCalls(B, 4)
         output = list(sched.run(termination_conds=termination_conds))
 
         expected_output = [A, A, A, B, A, B, A, B, A, B]
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
     def test_10c(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
         A.is_finished_flag = True
-        B = TransferMechanism(function=Linear(intercept=4.0), name='scheduler-pytests-B')
+        B = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='scheduler-pytests-B')
 
         for m in [A, B]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, B)
+        comp.add_projection(pnl.MappingProjection(), A, B)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
-        sched.add_condition(A, EveryNPasses(1))
-        sched.add_condition(B, All(WhenFinished(A), AfterNCalls(A, 3)))
+        sched.add_condition(A, pnl.EveryNPasses(1))
+        sched.add_condition(B, pnl.All(pnl.WhenFinished(A), pnl.AfterNCalls(A, 3)))
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(B, 4)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNCalls(B, 4)
         output = list(sched.run(termination_conds=termination_conds))
 
         expected_output = [A, A, A, B, A, B, A, B, A, B]
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
     def test_10d(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
         A.is_finished_flag = False
-        B = TransferMechanism(function=Linear(intercept=4.0), name='scheduler-pytests-B')
+        B = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='scheduler-pytests-B')
 
         for m in [A, B]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, B)
+        comp.add_projection(pnl.MappingProjection(), A, B)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
-        sched.add_condition(A, EveryNPasses(1))
-        sched.add_condition(B, All(WhenFinished(A), AfterNCalls(A, 3)))
+        sched.add_condition(A, pnl.EveryNPasses(1))
+        sched.add_condition(B, pnl.All(pnl.WhenFinished(A), pnl.AfterNCalls(A, 3)))
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AtPass(10)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AtPass(10)
         output = list(sched.run(termination_conds=termination_conds))
 
         expected_output = [A, A, A, A, A, A, A, A, A, A]
@@ -714,107 +703,107 @@ class TestLinear:
     # tests with linear compositions
     ########################################
     def test_linear_AAB(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
-        B = TransferMechanism(function=Linear(intercept=4.0), name='scheduler-pytests-B')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        B = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='scheduler-pytests-B')
         for m in [A, B]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, B)
+        comp.add_projection(pnl.MappingProjection(), A, B)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
-        sched.add_condition(A, EveryNPasses(1))
-        sched.add_condition(B, EveryNCalls(A, 2))
+        sched.add_condition(A, pnl.EveryNPasses(1))
+        sched.add_condition(B, pnl.EveryNCalls(A, 2))
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNCalls(B, 2, time_scale=TimeScale.ENVIRONMENT_SEQUENCE)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(B, 2, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNCalls(B, 2, time_scale=pnl.TimeScale.ENVIRONMENT_SEQUENCE)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNCalls(B, 2, time_scale=pnl.TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
         expected_output = [A, A, B, A, A, B]
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
     def test_linear_ABB(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
-        B = TransferMechanism(function=Linear(intercept=4.0), name='scheduler-pytests-B')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        B = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='scheduler-pytests-B')
         for m in [A, B]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, B)
+        comp.add_projection(pnl.MappingProjection(), A, B)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
-        sched.add_condition(A, Any(AtPass(0), EveryNCalls(B, 2)))
-        sched.add_condition(B, Any(EveryNCalls(A, 1), EveryNCalls(B, 1)))
+        sched.add_condition(A, pnl.Any(pnl.AtPass(0), pnl.EveryNCalls(B, 2)))
+        sched.add_condition(B, pnl.Any(pnl.EveryNCalls(A, 1), pnl.EveryNCalls(B, 1)))
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(B, 8, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNCalls(B, 8, time_scale=pnl.TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
         expected_output = [A, B, B, A, B, B, A, B, B, A, B, B]
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
     def test_linear_ABBCC(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
-        B = TransferMechanism(function=Linear(intercept=4.0), name='scheduler-pytests-B')
-        C = TransferMechanism(function=Linear(intercept=1.5), name='scheduler-pytests-C')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        B = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='scheduler-pytests-B')
+        C = pnl.TransferMechanism(function=pnl.Linear(intercept=1.5), name='scheduler-pytests-C')
         for m in [A, B, C]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, B)
-        comp.add_projection(MappingProjection(), B, C)
+        comp.add_projection(pnl.MappingProjection(), A, B)
+        comp.add_projection(pnl.MappingProjection(), B, C)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
-        sched.add_condition(A, Any(AtPass(0), EveryNCalls(C, 2)))
-        sched.add_condition(B, Any(JustRan(A), JustRan(B)))
-        sched.add_condition(C, Any(EveryNCalls(B, 2), JustRan(C)))
+        sched.add_condition(A, pnl.Any(pnl.AtPass(0), pnl.EveryNCalls(C, 2)))
+        sched.add_condition(B, pnl.Any(pnl.JustRan(A), pnl.JustRan(B)))
+        sched.add_condition(C, pnl.Any(pnl.EveryNCalls(B, 2), pnl.JustRan(C)))
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 4, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNCalls(C, 4, time_scale=pnl.TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
         expected_output = [A, B, B, C, C, A, B, B, C, C]
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
     def test_linear_ABCBC(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
-        B = TransferMechanism(function=Linear(intercept=4.0), name='scheduler-pytests-B')
-        C = TransferMechanism(function=Linear(intercept=1.5), name='scheduler-pytests-C')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        B = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='scheduler-pytests-B')
+        C = pnl.TransferMechanism(function=pnl.Linear(intercept=1.5), name='scheduler-pytests-C')
         for m in [A, B, C]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, B)
-        comp.add_projection(MappingProjection(), B, C)
+        comp.add_projection(pnl.MappingProjection(), A, B)
+        comp.add_projection(pnl.MappingProjection(), B, C)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
-        sched.add_condition(A, Any(AtPass(0), EveryNCalls(C, 2)))
-        sched.add_condition(B, Any(EveryNCalls(A, 1), EveryNCalls(C, 1)))
-        sched.add_condition(C, EveryNCalls(B, 1))
+        sched.add_condition(A, pnl.Any(pnl.AtPass(0), pnl.EveryNCalls(C, 2)))
+        sched.add_condition(B, pnl.Any(pnl.EveryNCalls(A, 1), pnl.EveryNCalls(C, 1)))
+        sched.add_condition(C, pnl.EveryNCalls(B, 1))
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 4, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNCalls(C, 4, time_scale=pnl.TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
         expected_output = [A, B, C, B, C, A, B, C, B, C]
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
     def test_one_run_twice(self):
-        A = IntegratorMechanism(
+        A = pnl.IntegratorMechanism(
             name='A',
             default_variable=[0],
-            function=SimpleIntegrator(
+            function=pnl.SimpleIntegrator(
                 rate=.5,
             )
         )
 
-        c = Composition(pathways=[A])
+        c = pnl.Composition(pathways=[A])
 
-        term_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(A, 2)}
+        term_conds = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.AfterNCalls(A, 2)}
         stim_list = {A: [[1]]}
 
         c.run(
@@ -831,27 +820,27 @@ class TestLinear:
             np.testing.assert_allclose(expected_output[i], terminal_mech.get_output_values(c)[i])
 
     def test_two_AAB(self):
-        A = IntegratorMechanism(
+        A = pnl.IntegratorMechanism(
             name='A',
             default_variable=[0],
-            function=SimpleIntegrator(
+            function=pnl.SimpleIntegrator(
                 rate=.5
             )
         )
 
-        B = TransferMechanism(
+        B = pnl.TransferMechanism(
             name='B',
             default_variable=[0],
-            function=Linear(slope=2.0),
+            function=pnl.Linear(slope=2.0),
         )
 
-        c = Composition(pathways=[A, B])
+        c = pnl.Composition(pathways=[A, B])
 
-        term_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(B, 1)}
+        term_conds = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.AfterNCalls(B, 1)}
         stim_list = {A: [[1]]}
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
-        sched.add_condition(B, EveryNCalls(A, 2))
+        sched.add_condition(B, pnl.EveryNCalls(A, 2))
         c.scheduler = sched
 
         c.run(
@@ -868,28 +857,28 @@ class TestLinear:
             np.testing.assert_allclose(expected_output[i], terminal_mech.get_output_values(c)[i])
 
     def test_two_ABB(self):
-        A = TransferMechanism(
+        A = pnl.TransferMechanism(
             name='A',
             default_variable=[0],
-            function=Linear(slope=2.0),
+            function=pnl.Linear(slope=2.0),
         )
 
-        B = IntegratorMechanism(
+        B = pnl.IntegratorMechanism(
             name='B',
             default_variable=[0],
-            function=SimpleIntegrator(
+            function=pnl.SimpleIntegrator(
                 rate=.5
             )
         )
 
-        c = Composition(pathways=[A, B])
+        c = pnl.Composition(pathways=[A, B])
 
-        term_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(B, 2)}
+        term_conds = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.AfterNCalls(B, 2)}
         stim_list = {A: [[1]]}
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
-        sched.add_condition(A, Any(AtPass(0), AfterNCalls(B, 2)))
-        sched.add_condition(B, Any(JustRan(A), JustRan(B)))
+        sched.add_condition(A, pnl.Any(pnl.AtPass(0), pnl.AfterNCalls(B, 2)))
+        sched.add_condition(B, pnl.Any(pnl.JustRan(A), pnl.JustRan(B)))
         c.scheduler = sched
 
         c.run(
@@ -914,41 +903,41 @@ class TestLinear:
 class TestBranching:
     @classmethod
     def setup_class(self):
-        self.orig_is_finished_flag = TransferMechanism.is_finished_flag
-        self.orig_is_finished = TransferMechanism.is_finished
-        TransferMechanism.is_finished_flag = True
-        TransferMechanism.is_finished = lambda self, context: self.is_finished_flag
+        self.orig_is_finished_flag = pnl.TransferMechanism.is_finished_flag
+        self.orig_is_finished = pnl.TransferMechanism.is_finished
+        pnl.TransferMechanism.is_finished_flag = True
+        pnl.TransferMechanism.is_finished = lambda self, context: self.is_finished_flag
 
     @classmethod
     def teardown_class(self):
-        del TransferMechanism.is_finished_flag
-        del TransferMechanism.is_finished
-        TransferMechanism.is_finished_flag = self.orig_is_finished_flag
-        TransferMechanism.is_finished = self.orig_is_finished
+        del pnl.TransferMechanism.is_finished_flag
+        del pnl.TransferMechanism.is_finished
+        pnl.TransferMechanism.is_finished_flag = self.orig_is_finished_flag
+        pnl.TransferMechanism.is_finished = self.orig_is_finished
 
     #   triangle:         A
     #                    / \
     #                   B   C
 
     def test_triangle_1(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
-        B = TransferMechanism(function=Linear(intercept=4.0), name='scheduler-pytests-B')
-        C = TransferMechanism(function=Linear(intercept=1.5), name='scheduler-pytests-C')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        B = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='scheduler-pytests-B')
+        C = pnl.TransferMechanism(function=pnl.Linear(intercept=1.5), name='scheduler-pytests-C')
         for m in [A, B, C]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, B)
-        comp.add_projection(MappingProjection(), A, C)
+        comp.add_projection(pnl.MappingProjection(), A, B)
+        comp.add_projection(pnl.MappingProjection(), A, C)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
-        sched.add_condition(A, EveryNPasses(1))
-        sched.add_condition(B, EveryNCalls(A, 1))
-        sched.add_condition(C, EveryNCalls(A, 1))
+        sched.add_condition(A, pnl.EveryNPasses(1))
+        sched.add_condition(B, pnl.EveryNCalls(A, 1))
+        sched.add_condition(C, pnl.EveryNCalls(A, 1))
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 3, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNCalls(C, 3, time_scale=pnl.TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
         expected_output = [
@@ -960,24 +949,24 @@ class TestBranching:
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
     def test_triangle_2(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
-        B = TransferMechanism(function=Linear(intercept=4.0), name='scheduler-pytests-B')
-        C = TransferMechanism(function=Linear(intercept=1.5), name='scheduler-pytests-C')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        B = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='scheduler-pytests-B')
+        C = pnl.TransferMechanism(function=pnl.Linear(intercept=1.5), name='scheduler-pytests-C')
         for m in [A, B, C]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, B)
-        comp.add_projection(MappingProjection(), A, C)
+        comp.add_projection(pnl.MappingProjection(), A, B)
+        comp.add_projection(pnl.MappingProjection(), A, C)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
-        sched.add_condition(A, EveryNPasses(1))
-        sched.add_condition(B, EveryNCalls(A, 1))
-        sched.add_condition(C, EveryNCalls(A, 2))
+        sched.add_condition(A, pnl.EveryNPasses(1))
+        sched.add_condition(B, pnl.EveryNCalls(A, 1))
+        sched.add_condition(C, pnl.EveryNCalls(A, 2))
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 3, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNCalls(C, 3, time_scale=pnl.TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
         expected_output = [
@@ -992,24 +981,24 @@ class TestBranching:
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
     def test_triangle_3(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
-        B = TransferMechanism(function=Linear(intercept=4.0), name='scheduler-pytests-B')
-        C = TransferMechanism(function=Linear(intercept=1.5), name='scheduler-pytests-C')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        B = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='scheduler-pytests-B')
+        C = pnl.TransferMechanism(function=pnl.Linear(intercept=1.5), name='scheduler-pytests-C')
         for m in [A, B, C]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, B)
-        comp.add_projection(MappingProjection(), A, C)
+        comp.add_projection(pnl.MappingProjection(), A, B)
+        comp.add_projection(pnl.MappingProjection(), A, C)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
-        sched.add_condition(A, EveryNPasses(1))
-        sched.add_condition(B, EveryNCalls(A, 2))
-        sched.add_condition(C, EveryNCalls(A, 3))
+        sched.add_condition(A, pnl.EveryNPasses(1))
+        sched.add_condition(B, pnl.EveryNCalls(A, 2))
+        sched.add_condition(C, pnl.EveryNCalls(A, 3))
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 2, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNCalls(C, 2, time_scale=pnl.TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
         expected_output = [
@@ -1020,25 +1009,25 @@ class TestBranching:
 
     # this is test 11 of original constraint_scheduler.py
     def test_triangle_4(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
-        B = TransferMechanism(function=Linear(intercept=4.0), name='scheduler-pytests-B')
-        C = TransferMechanism(function=Linear(intercept=1.5), name='scheduler-pytests-C')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        B = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='scheduler-pytests-B')
+        C = pnl.TransferMechanism(function=pnl.Linear(intercept=1.5), name='scheduler-pytests-C')
 
         for m in [A, B, C]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, B)
-        comp.add_projection(MappingProjection(), A, C)
+        comp.add_projection(pnl.MappingProjection(), A, B)
+        comp.add_projection(pnl.MappingProjection(), A, C)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
-        sched.add_condition(A, EveryNPasses(1))
-        sched.add_condition(B, EveryNCalls(A, 2))
-        sched.add_condition(C, All(WhenFinished(A), AfterNCalls(B, 3)))
+        sched.add_condition(A, pnl.EveryNPasses(1))
+        sched.add_condition(B, pnl.EveryNCalls(A, 2))
+        sched.add_condition(C, pnl.All(pnl.WhenFinished(A), pnl.AfterNCalls(B, 3)))
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNCalls(C, 1)
         output = []
         i = 0
         A.is_finished_flag = False
@@ -1053,25 +1042,25 @@ class TestBranching:
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
     def test_triangle_4b(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
-        B = TransferMechanism(function=Linear(intercept=4.0), name='scheduler-pytests-B')
-        C = TransferMechanism(function=Linear(intercept=1.5), name='scheduler-pytests-C')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        B = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='scheduler-pytests-B')
+        C = pnl.TransferMechanism(function=pnl.Linear(intercept=1.5), name='scheduler-pytests-C')
 
         for m in [A, B, C]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, B)
-        comp.add_projection(MappingProjection(), A, C)
+        comp.add_projection(pnl.MappingProjection(), A, B)
+        comp.add_projection(pnl.MappingProjection(), A, C)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
-        sched.add_condition(A, EveryNPasses(1))
-        sched.add_condition(B, EveryNCalls(A, 2))
-        sched.add_condition(C, All(WhenFinished(A), AfterNCalls(B, 3)))
+        sched.add_condition(A, pnl.EveryNPasses(1))
+        sched.add_condition(B, pnl.EveryNCalls(A, 2))
+        sched.add_condition(C, pnl.All(pnl.WhenFinished(A), pnl.AfterNCalls(B, 3)))
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNCalls(C, 1)
         output = []
         i = 0
         A.is_finished_flag = False
@@ -1092,24 +1081,24 @@ class TestBranching:
     # this is test 4 of original constraint_scheduler.py
     # this test has an implicit priority set of A<B !
     def test_invtriangle_1(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
-        B = TransferMechanism(function=Linear(intercept=4.0), name='scheduler-pytests-B')
-        C = TransferMechanism(function=Linear(intercept=1.5), name='scheduler-pytests-C')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        B = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='scheduler-pytests-B')
+        C = pnl.TransferMechanism(function=pnl.Linear(intercept=1.5), name='scheduler-pytests-C')
         for m in [A, B, C]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, C)
-        comp.add_projection(MappingProjection(), B, C)
+        comp.add_projection(pnl.MappingProjection(), A, C)
+        comp.add_projection(pnl.MappingProjection(), B, C)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
-        sched.add_condition(A, EveryNPasses(1))
-        sched.add_condition(B, EveryNCalls(A, 2))
-        sched.add_condition(C, Any(AfterNCalls(A, 3), AfterNCalls(B, 3)))
+        sched.add_condition(A, pnl.EveryNPasses(1))
+        sched.add_condition(B, pnl.EveryNCalls(A, 2))
+        sched.add_condition(C, pnl.Any(pnl.AfterNCalls(A, 3), pnl.AfterNCalls(B, 3)))
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 4, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNCalls(C, 4, time_scale=pnl.TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
         expected_output = [
@@ -1121,24 +1110,24 @@ class TestBranching:
     # this is test 5 of original constraint_scheduler.py
     # this test has an implicit priority set of A<B !
     def test_invtriangle_2(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
-        B = TransferMechanism(function=Linear(intercept=4.0), name='scheduler-pytests-B')
-        C = TransferMechanism(function=Linear(intercept=1.5), name='scheduler-pytests-C')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        B = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='scheduler-pytests-B')
+        C = pnl.TransferMechanism(function=pnl.Linear(intercept=1.5), name='scheduler-pytests-C')
         for m in [A, B, C]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, C)
-        comp.add_projection(MappingProjection(), B, C)
+        comp.add_projection(pnl.MappingProjection(), A, C)
+        comp.add_projection(pnl.MappingProjection(), B, C)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
-        sched.add_condition(A, EveryNPasses(1))
-        sched.add_condition(B, EveryNCalls(A, 2))
-        sched.add_condition(C, All(AfterNCalls(A, 3), AfterNCalls(B, 3)))
+        sched.add_condition(A, pnl.EveryNPasses(1))
+        sched.add_condition(B, pnl.EveryNCalls(A, 2))
+        sched.add_condition(C, pnl.All(pnl.AfterNCalls(A, 3), pnl.AfterNCalls(B, 3)))
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(C, 2, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNCalls(C, 2, time_scale=pnl.TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
         expected_output = [
@@ -1154,27 +1143,27 @@ class TestBranching:
 
     # testing toposort
     def test_checkmark_1(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
-        B = TransferMechanism(function=Linear(intercept=4.0), name='scheduler-pytests-B')
-        C = TransferMechanism(function=Linear(intercept=1.5), name='scheduler-pytests-C')
-        D = TransferMechanism(function=Linear(intercept=.5), name='scheduler-pytests-D')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        B = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='scheduler-pytests-B')
+        C = pnl.TransferMechanism(function=pnl.Linear(intercept=1.5), name='scheduler-pytests-C')
+        D = pnl.TransferMechanism(function=pnl.Linear(intercept=.5), name='scheduler-pytests-D')
         for m in [A, B, C, D]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, B)
-        comp.add_projection(MappingProjection(), B, D)
-        comp.add_projection(MappingProjection(), C, D)
+        comp.add_projection(pnl.MappingProjection(), A, B)
+        comp.add_projection(pnl.MappingProjection(), B, D)
+        comp.add_projection(pnl.MappingProjection(), C, D)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
-        sched.add_condition(A, Always())
-        sched.add_condition(B, Always())
-        sched.add_condition(C, Always())
-        sched.add_condition(D, Always())
+        sched.add_condition(A, pnl.Always())
+        sched.add_condition(B, pnl.Always())
+        sched.add_condition(C, pnl.Always())
+        sched.add_condition(D, pnl.Always())
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(D, 1, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNCalls(D, 1, time_scale=pnl.TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
         expected_output = [
@@ -1183,27 +1172,27 @@ class TestBranching:
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
     def test_checkmark_2(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
-        B = TransferMechanism(function=Linear(intercept=4.0), name='scheduler-pytests-B')
-        C = TransferMechanism(function=Linear(intercept=1.5), name='scheduler-pytests-C')
-        D = TransferMechanism(function=Linear(intercept=.5), name='scheduler-pytests-D')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        B = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='scheduler-pytests-B')
+        C = pnl.TransferMechanism(function=pnl.Linear(intercept=1.5), name='scheduler-pytests-C')
+        D = pnl.TransferMechanism(function=pnl.Linear(intercept=.5), name='scheduler-pytests-D')
         for m in [A, B, C, D]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, B)
-        comp.add_projection(MappingProjection(), B, D)
-        comp.add_projection(MappingProjection(), C, D)
+        comp.add_projection(pnl.MappingProjection(), A, B)
+        comp.add_projection(pnl.MappingProjection(), B, D)
+        comp.add_projection(pnl.MappingProjection(), C, D)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
-        sched.add_condition(A, EveryNPasses(1))
-        sched.add_condition(B, EveryNCalls(A, 2))
-        sched.add_condition(C, EveryNCalls(A, 2))
-        sched.add_condition(D, All(EveryNCalls(B, 2), EveryNCalls(C, 2)))
+        sched.add_condition(A, pnl.EveryNPasses(1))
+        sched.add_condition(B, pnl.EveryNCalls(A, 2))
+        sched.add_condition(C, pnl.EveryNCalls(A, 2))
+        sched.add_condition(D, pnl.All(pnl.EveryNCalls(B, 2), pnl.EveryNCalls(C, 2)))
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(D, 1, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNCalls(D, 1, time_scale=pnl.TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
         expected_output = [
@@ -1212,28 +1201,28 @@ class TestBranching:
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
     def test_checkmark2_1(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
-        B = TransferMechanism(function=Linear(intercept=4.0), name='scheduler-pytests-B')
-        C = TransferMechanism(function=Linear(intercept=1.5), name='scheduler-pytests-C')
-        D = TransferMechanism(function=Linear(intercept=.5), name='scheduler-pytests-D')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        B = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='scheduler-pytests-B')
+        C = pnl.TransferMechanism(function=pnl.Linear(intercept=1.5), name='scheduler-pytests-C')
+        D = pnl.TransferMechanism(function=pnl.Linear(intercept=.5), name='scheduler-pytests-D')
         for m in [A, B, C, D]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, B)
-        comp.add_projection(MappingProjection(), A, D)
-        comp.add_projection(MappingProjection(), B, D)
-        comp.add_projection(MappingProjection(), C, D)
+        comp.add_projection(pnl.MappingProjection(), A, B)
+        comp.add_projection(pnl.MappingProjection(), A, D)
+        comp.add_projection(pnl.MappingProjection(), B, D)
+        comp.add_projection(pnl.MappingProjection(), C, D)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
-        sched.add_condition(A, EveryNPasses(1))
-        sched.add_condition(B, EveryNCalls(A, 2))
-        sched.add_condition(C, EveryNCalls(A, 2))
-        sched.add_condition(D, All(EveryNCalls(B, 2), EveryNCalls(C, 2)))
+        sched.add_condition(A, pnl.EveryNPasses(1))
+        sched.add_condition(B, pnl.EveryNCalls(A, 2))
+        sched.add_condition(C, pnl.EveryNCalls(A, 2))
+        sched.add_condition(D, pnl.All(pnl.EveryNCalls(B, 2), pnl.EveryNCalls(C, 2)))
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(D, 1, time_scale=TimeScale.ENVIRONMENT_STATE_UPDATE)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNCalls(D, 1, time_scale=pnl.TimeScale.ENVIRONMENT_STATE_UPDATE)
         output = list(sched.run(termination_conds=termination_conds))
 
         expected_output = [
@@ -1248,34 +1237,34 @@ class TestBranching:
     #                                   \ /  \ /
     #                                    C1   C2
     def test_multisource_1(self):
-        comp = Composition()
-        A1 = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A1')
-        A2 = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A2')
-        B1 = TransferMechanism(function=Linear(intercept=4.0), name='B1')
-        B2 = TransferMechanism(function=Linear(intercept=4.0), name='B2')
-        B3 = TransferMechanism(function=Linear(intercept=4.0), name='B3')
-        C1 = TransferMechanism(function=Linear(intercept=1.5), name='C1')
-        C2 = TransferMechanism(function=Linear(intercept=.5), name='C2')
+        comp = pnl.Composition()
+        A1 = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='A1')
+        A2 = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='A2')
+        B1 = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='B1')
+        B2 = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='B2')
+        B3 = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='B3')
+        C1 = pnl.TransferMechanism(function=pnl.Linear(intercept=1.5), name='C1')
+        C2 = pnl.TransferMechanism(function=pnl.Linear(intercept=.5), name='C2')
         for m in [A1, A2, B1, B2, B3, C1, C2]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A1, B1)
-        comp.add_projection(MappingProjection(), A1, B2)
-        comp.add_projection(MappingProjection(), A2, B1)
-        comp.add_projection(MappingProjection(), A2, B2)
-        comp.add_projection(MappingProjection(), A2, B3)
-        comp.add_projection(MappingProjection(), B1, C1)
-        comp.add_projection(MappingProjection(), B2, C1)
-        comp.add_projection(MappingProjection(), B1, C2)
-        comp.add_projection(MappingProjection(), B3, C2)
+        comp.add_projection(pnl.MappingProjection(), A1, B1)
+        comp.add_projection(pnl.MappingProjection(), A1, B2)
+        comp.add_projection(pnl.MappingProjection(), A2, B1)
+        comp.add_projection(pnl.MappingProjection(), A2, B2)
+        comp.add_projection(pnl.MappingProjection(), A2, B3)
+        comp.add_projection(pnl.MappingProjection(), B1, C1)
+        comp.add_projection(pnl.MappingProjection(), B2, C1)
+        comp.add_projection(pnl.MappingProjection(), B1, C2)
+        comp.add_projection(pnl.MappingProjection(), B3, C2)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         for m in comp.nodes:
-            sched.add_condition(m, Always())
+            sched.add_condition(m, pnl.Always())
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = All(AfterNCalls(C1, 1), AfterNCalls(C2, 1))
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.All(pnl.AfterNCalls(C1, 1), pnl.AfterNCalls(C2, 1))
         output = list(sched.run(termination_conds=termination_conds))
 
         expected_output = [
@@ -1284,41 +1273,41 @@ class TestBranching:
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
     def test_multisource_2(self):
-        comp = Composition()
-        A1 = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A1')
-        A2 = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='A2')
-        B1 = TransferMechanism(function=Linear(intercept=4.0), name='B1')
-        B2 = TransferMechanism(function=Linear(intercept=4.0), name='B2')
-        B3 = TransferMechanism(function=Linear(intercept=4.0), name='B3')
-        C1 = TransferMechanism(function=Linear(intercept=1.5), name='C1')
-        C2 = TransferMechanism(function=Linear(intercept=.5), name='C2')
+        comp = pnl.Composition()
+        A1 = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='A1')
+        A2 = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='A2')
+        B1 = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='B1')
+        B2 = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='B2')
+        B3 = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='B3')
+        C1 = pnl.TransferMechanism(function=pnl.Linear(intercept=1.5), name='C1')
+        C2 = pnl.TransferMechanism(function=pnl.Linear(intercept=.5), name='C2')
         for m in [A1, A2, B1, B2, B3, C1, C2]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A1, B1)
-        comp.add_projection(MappingProjection(), A1, B2)
-        comp.add_projection(MappingProjection(), A2, B1)
-        comp.add_projection(MappingProjection(), A2, B2)
-        comp.add_projection(MappingProjection(), A2, B3)
-        comp.add_projection(MappingProjection(), B1, C1)
-        comp.add_projection(MappingProjection(), B2, C1)
-        comp.add_projection(MappingProjection(), B1, C2)
-        comp.add_projection(MappingProjection(), B3, C2)
+        comp.add_projection(pnl.MappingProjection(), A1, B1)
+        comp.add_projection(pnl.MappingProjection(), A1, B2)
+        comp.add_projection(pnl.MappingProjection(), A2, B1)
+        comp.add_projection(pnl.MappingProjection(), A2, B2)
+        comp.add_projection(pnl.MappingProjection(), A2, B3)
+        comp.add_projection(pnl.MappingProjection(), B1, C1)
+        comp.add_projection(pnl.MappingProjection(), B2, C1)
+        comp.add_projection(pnl.MappingProjection(), B1, C2)
+        comp.add_projection(pnl.MappingProjection(), B3, C2)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
         sched.add_condition_set({
-            A1: Always(),
-            A2: Always(),
-            B1: EveryNCalls(A1, 2),
-            B3: EveryNCalls(A2, 2),
-            B2: All(EveryNCalls(A1, 4), EveryNCalls(A2, 4)),
-            C1: Any(AfterNCalls(B1, 2), AfterNCalls(B2, 2)),
-            C2: Any(AfterNCalls(B2, 2), AfterNCalls(B3, 2)),
+            A1: pnl.Always(),
+            A2: pnl.Always(),
+            B1: pnl.EveryNCalls(A1, 2),
+            B3: pnl.EveryNCalls(A2, 2),
+            B2: pnl.All(pnl.EveryNCalls(A1, 4), pnl.EveryNCalls(A2, 4)),
+            C1: pnl.Any(pnl.AfterNCalls(B1, 2), pnl.AfterNCalls(B2, 2)),
+            C2: pnl.Any(pnl.AfterNCalls(B2, 2), pnl.AfterNCalls(B3, 2)),
         })
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = All(AfterNCalls(C1, 1), AfterNCalls(C2, 1))
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.All(pnl.AfterNCalls(C1, 1), pnl.AfterNCalls(C2, 1))
         output = list(sched.run(termination_conds=termination_conds))
 
         expected_output = [
@@ -1327,33 +1316,33 @@ class TestBranching:
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
     def test_three_ABAC(self):
-        A = IntegratorMechanism(
+        A = pnl.IntegratorMechanism(
             name='A',
             default_variable=[0],
-            function=SimpleIntegrator(
+            function=pnl.SimpleIntegrator(
                 rate=.5
             )
         )
 
-        B = TransferMechanism(
+        B = pnl.TransferMechanism(
             name='B',
             default_variable=[0],
-            function=Linear(slope=2.0),
+            function=pnl.Linear(slope=2.0),
         )
-        C = TransferMechanism(
+        C = pnl.TransferMechanism(
             name='C',
             default_variable=[0],
-            function=Linear(slope=2.0),
+            function=pnl.Linear(slope=2.0),
         )
 
-        c = Composition(pathways=[[A,B],[A,C]])
+        c = pnl.Composition(pathways=[[A,B],[A,C]])
 
-        term_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(C, 1)}
+        term_conds = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.AfterNCalls(C, 1)}
         stim_list = {A: [[1]]}
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
-        sched.add_condition(B, Any(AtNCalls(A, 1), EveryNCalls(A, 2)))
-        sched.add_condition(C, EveryNCalls(A, 2))
+        sched.add_condition(B, pnl.Any(pnl.AtNCalls(A, 1), pnl.EveryNCalls(A, 2)))
+        sched.add_condition(C, pnl.EveryNCalls(A, 2))
         c.scheduler = sched
 
         c.run(
@@ -1376,32 +1365,32 @@ class TestBranching:
                 np.testing.assert_allclose(expected_output[m][i], terminal_mechs[m].get_output_values(c)[i])
 
     def test_three_ABAC_convenience(self):
-        A = IntegratorMechanism(
+        A = pnl.IntegratorMechanism(
             name='A',
             default_variable=[0],
-            function=SimpleIntegrator(
+            function=pnl.SimpleIntegrator(
                 rate=.5
             )
         )
 
-        B = TransferMechanism(
+        B = pnl.TransferMechanism(
             name='B',
             default_variable=[0],
-            function=Linear(slope=2.0),
+            function=pnl.Linear(slope=2.0),
         )
-        C = TransferMechanism(
+        C = pnl.TransferMechanism(
             name='C',
             default_variable=[0],
-            function=Linear(slope=2.0),
+            function=pnl.Linear(slope=2.0),
         )
 
-        c = Composition(pathways=[[A,B],[A,C]])
+        c = pnl.Composition(pathways=[[A,B],[A,C]])
 
-        term_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(C, 1)}
+        term_conds = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.AfterNCalls(C, 1)}
         stim_list = {A: [[1]]}
 
-        c.scheduler.add_condition(B, Any(AtNCalls(A, 1), EveryNCalls(A, 2)))
-        c.scheduler.add_condition(C, EveryNCalls(A, 2))
+        c.scheduler.add_condition(B, pnl.Any(pnl.AtNCalls(A, 1), pnl.EveryNCalls(A, 2)))
+        c.scheduler.add_condition(C, pnl.EveryNCalls(A, 2))
 
         c.run(
             inputs=stim_list,
@@ -1423,33 +1412,33 @@ class TestBranching:
                 np.testing.assert_allclose(expected_output[m][i], terminal_mechs[m].get_output_values(c)[i])
 
     def test_three_ABACx2(self):
-        A = IntegratorMechanism(
+        A = pnl.IntegratorMechanism(
             name='A',
             default_variable=[0],
-            function=SimpleIntegrator(
+            function=pnl.SimpleIntegrator(
                 rate=.5
             )
         )
 
-        B = TransferMechanism(
+        B = pnl.TransferMechanism(
             name='B',
             default_variable=[0],
-            function=Linear(slope=2.0),
+            function=pnl.Linear(slope=2.0),
         )
-        C = TransferMechanism(
+        C = pnl.TransferMechanism(
             name='C',
             default_variable=[0],
-            function=Linear(slope=2.0),
+            function=pnl.Linear(slope=2.0),
         )
 
-        c = Composition(pathways=[[A,B],[A,C]])
+        c = pnl.Composition(pathways=[[A,B],[A,C]])
 
-        term_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(C, 2)}
+        term_conds = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.AfterNCalls(C, 2)}
         stim_list = {A: [[1]]}
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
-        sched.add_condition(B, Any(AtNCalls(A, 1), EveryNCalls(A, 2)))
-        sched.add_condition(C, EveryNCalls(A, 2))
+        sched.add_condition(B, pnl.Any(pnl.AtNCalls(A, 1), pnl.EveryNCalls(A, 2)))
+        sched.add_condition(C, pnl.EveryNCalls(A, 2))
         c.scheduler = sched
 
         c.run(
@@ -1472,35 +1461,35 @@ class TestBranching:
                 np.testing.assert_allclose(expected_output[m][i], terminal_mechs[m].get_output_values(c)[i])
 
     def test_three_2_ABC(self):
-        A = IntegratorMechanism(
+        A = pnl.IntegratorMechanism(
             name='A',
             default_variable=[0],
-            function=SimpleIntegrator(
+            function=pnl.SimpleIntegrator(
                 rate=.5
             )
         )
 
-        B = IntegratorMechanism(
+        B = pnl.IntegratorMechanism(
             name='B',
             default_variable=[0],
-            function=SimpleIntegrator(
+            function=pnl.SimpleIntegrator(
                 rate=1
             )
         )
 
-        C = TransferMechanism(
+        C = pnl.TransferMechanism(
             name='C',
             default_variable=[0],
-            function=Linear(slope=2.0),
+            function=pnl.Linear(slope=2.0),
         )
 
-        c = Composition(pathways=[[A,C],[B,C]])
+        c = pnl.Composition(pathways=[[A,C],[B,C]])
 
-        term_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(C, 1)}
+        term_conds = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.AfterNCalls(C, 1)}
         stim_list = {A: [[1]], B: [[2]]}
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
-        sched.add_condition(C, All(EveryNCalls(A, 1), EveryNCalls(B, 1)))
+        sched.add_condition(C, pnl.All(pnl.EveryNCalls(A, 1), pnl.EveryNCalls(B, 1)))
         c.scheduler = sched
 
         c.run(
@@ -1520,35 +1509,35 @@ class TestBranching:
                 np.testing.assert_allclose(expected_output[m][i], terminal_mechs[m].get_output_values(c)[i])
 
     def test_three_2_ABCx2(self):
-        A = IntegratorMechanism(
+        A = pnl.IntegratorMechanism(
             name='A',
             default_variable=[0],
-            function=SimpleIntegrator(
+            function=pnl.SimpleIntegrator(
                 rate=.5
             )
         )
 
-        B = IntegratorMechanism(
+        B = pnl.IntegratorMechanism(
             name='B',
             default_variable=[0],
-            function=SimpleIntegrator(
+            function=pnl.SimpleIntegrator(
                 rate=1
             )
         )
 
-        C = TransferMechanism(
+        C = pnl.TransferMechanism(
             name='C',
             default_variable=[0],
-            function=Linear(slope=2.0),
+            function=pnl.Linear(slope=2.0),
         )
 
-        c = Composition(pathways=[[A,C],[B,C]])
+        c = pnl.Composition(pathways=[[A,C],[B,C]])
 
-        term_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(C, 2)}
+        term_conds = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.AfterNCalls(C, 2)}
         stim_list = {A: [[1]], B: [[2]]}
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
-        sched.add_condition(C, All(EveryNCalls(A, 1), EveryNCalls(B, 1)))
+        sched.add_condition(C, pnl.All(pnl.EveryNCalls(A, 1), pnl.EveryNCalls(B, 1)))
         c.scheduler = sched
 
         c.run(
@@ -1568,38 +1557,38 @@ class TestBranching:
                 np.testing.assert_allclose(expected_output[m][i], terminal_mechs[m].get_output_values(c)[i])
 
     def test_three_integrators(self):
-        A = IntegratorMechanism(
+        A = pnl.IntegratorMechanism(
             name='A',
             default_variable=[0],
-            function=SimpleIntegrator(
+            function=pnl.SimpleIntegrator(
                 rate=1
             )
         )
 
-        B = IntegratorMechanism(
+        B = pnl.IntegratorMechanism(
             name='B',
             default_variable=[0],
-            function=SimpleIntegrator(
+            function=pnl.SimpleIntegrator(
                 rate=1
             )
         )
 
-        C = IntegratorMechanism(
+        C = pnl.IntegratorMechanism(
             name='C',
             default_variable=[0],
-            function=SimpleIntegrator(
+            function=pnl.SimpleIntegrator(
                 rate=1
             )
         )
 
-        c = Composition(pathways=[[A,C],[B,C]])
+        c = pnl.Composition(pathways=[[A,C],[B,C]])
 
-        term_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(C, 2)}
+        term_conds = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.AfterNCalls(C, 2)}
         stim_list = {A: [[1]], B: [[1]]}
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
-        sched.add_condition(B, EveryNCalls(A, 2))
-        sched.add_condition(C, Any(EveryNCalls(A, 1), EveryNCalls(B, 1)))
+        sched.add_condition(B, pnl.EveryNCalls(A, 2))
+        sched.add_condition(C, pnl.Any(pnl.EveryNCalls(A, 1), pnl.EveryNCalls(B, 1)))
         c.scheduler = sched
 
         c.run(
@@ -1625,43 +1614,43 @@ class TestBranching:
                 np.testing.assert_allclose(expected_output[m][i], mechs[m].get_output_values(c)[i])
 
     def test_four_ABBCD(self):
-        A = TransferMechanism(
+        A = pnl.TransferMechanism(
             name='A',
             default_variable=[0],
-            function=Linear(slope=2.0),
+            function=pnl.Linear(slope=2.0),
         )
 
-        B = IntegratorMechanism(
+        B = pnl.IntegratorMechanism(
             name='B',
             default_variable=[0],
-            function=SimpleIntegrator(
+            function=pnl.SimpleIntegrator(
                 rate=.5
             )
         )
 
-        C = IntegratorMechanism(
+        C = pnl.IntegratorMechanism(
             name='C',
             default_variable=[0],
-            function=SimpleIntegrator(
+            function=pnl.SimpleIntegrator(
                 rate=.5
             )
         )
 
-        D = TransferMechanism(
+        D = pnl.TransferMechanism(
             name='D',
             default_variable=[0],
-            function=Linear(slope=1.0),
+            function=pnl.Linear(slope=1.0),
         )
 
-        c = Composition(pathways=[[A,B,D],[A,C,D]])
+        c = pnl.Composition(pathways=[[A,B,D],[A,C,D]])
 
-        term_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(D, 1)}
+        term_conds = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.AfterNCalls(D, 1)}
         stim_list = {A: [[1]]}
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
-        sched.add_condition(B, EveryNCalls(A, 1))
-        sched.add_condition(C, EveryNCalls(A, 2))
-        sched.add_condition(D, Any(EveryNCalls(B, 3), EveryNCalls(C, 3)))
+        sched.add_condition(B, pnl.EveryNCalls(A, 1))
+        sched.add_condition(C, pnl.EveryNCalls(A, 2))
+        sched.add_condition(D, pnl.Any(pnl.EveryNCalls(B, 3), pnl.EveryNCalls(C, 3)))
         c.scheduler = sched
 
         c.run(
@@ -1681,47 +1670,47 @@ class TestBranching:
                 np.testing.assert_allclose(expected_output[m][i], terminal_mechs[m].get_output_values(c)[i])
 
     def test_four_integrators_mixed(self):
-        A = IntegratorMechanism(
+        A = pnl.IntegratorMechanism(
             name='A',
             default_variable=[0],
-            function=SimpleIntegrator(
+            function=pnl.SimpleIntegrator(
                 rate=1
             )
         )
 
-        B = IntegratorMechanism(
+        B = pnl.IntegratorMechanism(
             name='B',
             default_variable=[0],
-            function=SimpleIntegrator(
+            function=pnl.SimpleIntegrator(
                 rate=1
             )
         )
 
-        C = IntegratorMechanism(
+        C = pnl.IntegratorMechanism(
             name='C',
             default_variable=[0],
-            function=SimpleIntegrator(
+            function=pnl.SimpleIntegrator(
                 rate=1
             )
         )
 
-        D = IntegratorMechanism(
+        D = pnl.IntegratorMechanism(
             name='D',
             default_variable=[0],
-            function=SimpleIntegrator(
+            function=pnl.SimpleIntegrator(
                 rate=1
             )
         )
 
-        c = Composition(pathways=[[A,C],[A,D],[B,C],[B,D]])
+        c = pnl.Composition(pathways=[[A,C],[A,D],[B,C],[B,D]])
 
-        term_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: All(AfterNCalls(C, 1), AfterNCalls(D, 1))}
+        term_conds = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.All(pnl.AfterNCalls(C, 1), pnl.AfterNCalls(D, 1))}
         stim_list = {A: [[1]], B: [[1]]}
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
-        sched.add_condition(B, EveryNCalls(A, 2))
-        sched.add_condition(C, EveryNCalls(A, 1))
-        sched.add_condition(D, EveryNCalls(B, 1))
+        sched.add_condition(B, pnl.EveryNCalls(A, 2))
+        sched.add_condition(C, pnl.EveryNCalls(A, 1))
+        sched.add_condition(D, pnl.EveryNCalls(B, 1))
         c.scheduler = sched
 
         c.run(
@@ -1750,47 +1739,47 @@ class TestBranching:
                 np.testing.assert_allclose(expected_output[m][i], mechs[m].get_output_values(c)[i])
 
     def test_five_ABABCDE(self):
-        A = TransferMechanism(
+        A = pnl.TransferMechanism(
             name='A',
             default_variable=[0],
-            function=Linear(slope=2.0),
+            function=pnl.Linear(slope=2.0),
         )
 
-        B = TransferMechanism(
+        B = pnl.TransferMechanism(
             name='B',
             default_variable=[0],
-            function=Linear(slope=2.0),
+            function=pnl.Linear(slope=2.0),
         )
 
-        C = IntegratorMechanism(
+        C = pnl.IntegratorMechanism(
             name='C',
             default_variable=[0],
-            function=SimpleIntegrator(
+            function=pnl.SimpleIntegrator(
                 rate=.5
             )
         )
 
-        D = TransferMechanism(
+        D = pnl.TransferMechanism(
             name='D',
             default_variable=[0],
-            function=Linear(slope=1.0),
+            function=pnl.Linear(slope=1.0),
         )
 
-        E = TransferMechanism(
+        E = pnl.TransferMechanism(
             name='E',
             default_variable=[0],
-            function=Linear(slope=2.0),
+            function=pnl.Linear(slope=2.0),
         )
 
-        c = Composition(pathways=[[A,C,D],[B,C,E]])
+        c = pnl.Composition(pathways=[[A,C,D],[B,C,E]])
 
-        term_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(E, 1)}
+        term_conds = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.AfterNCalls(E, 1)}
         stim_list = {A: [[1]], B: [[2]]}
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
-        sched.add_condition(C, Any(EveryNCalls(A, 1), EveryNCalls(B, 1)))
-        sched.add_condition(D, EveryNCalls(C, 1))
-        sched.add_condition(E, EveryNCalls(C, 1))
+        sched.add_condition(C, pnl.Any(pnl.EveryNCalls(A, 1), pnl.EveryNCalls(B, 1)))
+        sched.add_condition(D, pnl.EveryNCalls(C, 1))
+        sched.add_condition(E, pnl.EveryNCalls(C, 1))
         c.scheduler = sched
 
         c.run(
@@ -1820,65 +1809,65 @@ class TestBranching:
     #   E  F
     #
     def test_six_integrators_threelayer_mixed(self):
-        A = IntegratorMechanism(
+        A = pnl.IntegratorMechanism(
             name='A',
             default_variable=[0],
-            function=SimpleIntegrator(
+            function=pnl.SimpleIntegrator(
                 rate=1
             )
         )
 
-        B = IntegratorMechanism(
+        B = pnl.IntegratorMechanism(
             name='B',
             default_variable=[0],
-            function=SimpleIntegrator(
+            function=pnl.SimpleIntegrator(
                 rate=1
             )
         )
 
-        C = IntegratorMechanism(
+        C = pnl.IntegratorMechanism(
             name='C',
             default_variable=[0],
-            function=SimpleIntegrator(
+            function=pnl.SimpleIntegrator(
                 rate=1
             )
         )
 
-        D = IntegratorMechanism(
+        D = pnl.IntegratorMechanism(
             name='D',
             default_variable=[0],
-            function=SimpleIntegrator(
+            function=pnl.SimpleIntegrator(
                 rate=1
             )
         )
 
-        E = IntegratorMechanism(
+        E = pnl.IntegratorMechanism(
             name='E',
             default_variable=[0],
-            function=SimpleIntegrator(
+            function=pnl.SimpleIntegrator(
                 rate=1
             )
         )
 
-        F = IntegratorMechanism(
+        F = pnl.IntegratorMechanism(
             name='F',
             default_variable=[0],
-            function=SimpleIntegrator(
+            function=pnl.SimpleIntegrator(
                 rate=1
             )
         )
 
-        c = Composition(pathways=[[A,C,E],[A,C,F],[A,D,E],[A,D,F],[B,C,E],[B,C,F],[B,D,E],[B,D,F]])
+        c = pnl.Composition(pathways=[[A,C,E],[A,C,F],[A,D,E],[A,D,F],[B,C,E],[B,C,F],[B,D,E],[B,D,F]])
 
-        term_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: All(AfterNCalls(E, 1), AfterNCalls(F, 1))}
+        term_conds = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.All(pnl.AfterNCalls(E, 1), pnl.AfterNCalls(F, 1))}
         stim_list = {A: [[1]], B: [[1]]}
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
-        sched.add_condition(B, EveryNCalls(A, 2))
-        sched.add_condition(C, EveryNCalls(A, 1))
-        sched.add_condition(D, EveryNCalls(B, 1))
-        sched.add_condition(E, EveryNCalls(C, 1))
-        sched.add_condition(F, EveryNCalls(D, 2))
+        sched.add_condition(B, pnl.EveryNCalls(A, 2))
+        sched.add_condition(C, pnl.EveryNCalls(A, 1))
+        sched.add_condition(D, pnl.EveryNCalls(B, 1))
+        sched.add_condition(E, pnl.EveryNCalls(C, 1))
+        sched.add_condition(F, pnl.EveryNCalls(D, 2))
         c.scheduler = sched
 
         c.run(
@@ -1926,20 +1915,20 @@ class TestBranching:
 @pytest.mark.psyneulink
 class TestTermination:
     def test_termination_conditions_reset(self):
-        comp = Composition()
-        A = TransferMechanism(function=Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
-        B = TransferMechanism(function=Linear(intercept=4.0), name='scheduler-pytests-B')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(function=pnl.Linear(slope=5.0, intercept=2.0), name='scheduler-pytests-A')
+        B = pnl.TransferMechanism(function=pnl.Linear(intercept=4.0), name='scheduler-pytests-B')
         for m in [A, B]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, B)
+        comp.add_projection(pnl.MappingProjection(), A, B)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
 
-        sched.add_condition(B, EveryNCalls(A, 2))
+        sched.add_condition(B, pnl.EveryNCalls(A, 2))
 
         termination_conds = {}
-        termination_conds[TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(1)
-        termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE] = AfterNCalls(B, 2)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(1)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNCalls(B, 2)
 
         output = list(sched.run(termination_conds=termination_conds))
 
@@ -1947,8 +1936,8 @@ class TestTermination:
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
         # reset the ENVIRONMENT_SEQUENCE because schedulers run ENVIRONMENT_STATE_UPDATEs
-        sched.get_clock(sched.default_execution_id)._increment_time(TimeScale.ENVIRONMENT_SEQUENCE)
-        sched._reset_counts_total(TimeScale.ENVIRONMENT_SEQUENCE, execution_id=sched.default_execution_id)
+        sched.get_clock(sched.default_execution_id)._increment_time(pnl.TimeScale.ENVIRONMENT_SEQUENCE)
+        sched._reset_counts_total(pnl.TimeScale.ENVIRONMENT_SEQUENCE, execution_id=sched.default_execution_id)
 
         output = list(sched.run())
 
@@ -1956,16 +1945,16 @@ class TestTermination:
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
     def test_partial_override_scheduler(self):
-        comp = Composition()
-        A = TransferMechanism(name='scheduler-pytests-A')
-        B = TransferMechanism(name='scheduler-pytests-B')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(name='scheduler-pytests-A')
+        B = pnl.TransferMechanism(name='scheduler-pytests-B')
         for m in [A, B]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, B)
+        comp.add_projection(pnl.MappingProjection(), A, B)
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(comp))
-        sched.add_condition(B, EveryNCalls(A, 2))
-        termination_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(B, 2)}
+        sched.add_condition(B, pnl.EveryNCalls(A, 2))
+        termination_conds = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.AfterNCalls(B, 2)}
 
         output = list(sched.run(termination_conds=termination_conds))
 
@@ -1973,41 +1962,41 @@ class TestTermination:
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
     def test_partial_override_composition(self):
-        comp = Composition()
-        A = TransferMechanism(name='scheduler-pytests-A')
-        B = IntegratorMechanism(name='scheduler-pytests-B')
+        comp = pnl.Composition()
+        A = pnl.TransferMechanism(name='scheduler-pytests-A')
+        B = pnl.IntegratorMechanism(name='scheduler-pytests-B')
         for m in [A, B]:
             comp.add_node(m)
-        comp.add_projection(MappingProjection(), A, B)
+        comp.add_projection(pnl.MappingProjection(), A, B)
 
-        termination_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(B, 2)}
+        termination_conds = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.AfterNCalls(B, 2)}
 
         output = comp.run(inputs={A: 1}, termination_processing=termination_conds)
         # two executions of B
         assert output == [.75]
 
     def test_termination_conditions_reset_execution(self):
-        A = IntegratorMechanism(
+        A = pnl.IntegratorMechanism(
             name='A',
             default_variable=[0],
-            function=SimpleIntegrator(
+            function=pnl.SimpleIntegrator(
                 rate=.5
             )
         )
 
-        B = TransferMechanism(
+        B = pnl.TransferMechanism(
             name='B',
             default_variable=[0],
-            function=Linear(slope=2.0),
+            function=pnl.Linear(slope=2.0),
         )
 
-        c = Composition(pathways=[[A,B]])
+        c = pnl.Composition(pathways=[[A,B]])
 
-        term_conds = {TimeScale.ENVIRONMENT_STATE_UPDATE: AfterNCalls(B, 2)}
+        term_conds = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.AfterNCalls(B, 2)}
         stim_list = {A: [[1]]}
 
         sched = pnl.Scheduler(**pytest.helpers.composition_to_scheduler_args(c))
-        sched.add_condition(B, EveryNCalls(A, 2))
+        sched.add_condition(B, pnl.EveryNCalls(A, 2))
         c.scheduler = sched
 
         c.run(
@@ -2051,7 +2040,7 @@ def _get_feedback_source_type(graph, sender, receiver):
     try:
         return graph.comp_to_vertex[receiver].source_types[graph.comp_to_vertex[sender]]
     except KeyError:
-        return EdgeType.NON_FEEDBACK
+        return pnl.EdgeType.NON_FEEDBACK
 
 
 @pytest.mark.psyneulink
@@ -2070,11 +2059,11 @@ class TestFeedback:
         comp.add_node(C)
         comp._analyze_graph()
 
-        assert _get_vertex_feedback_type(comp.graph, A.output_port, B) is EdgeType.NON_FEEDBACK
-        assert _get_vertex_feedback_type(comp.graph, B.output_port, C) is EdgeType.NON_FEEDBACK
+        assert _get_vertex_feedback_type(comp.graph, A.output_port, B) is pnl.EdgeType.NON_FEEDBACK
+        assert _get_vertex_feedback_type(comp.graph, B.output_port, C) is pnl.EdgeType.NON_FEEDBACK
 
-        assert _get_vertex_feedback_type(comp.graph, C.control_signals[0], A) is EdgeType.FLEXIBLE
-        assert _get_feedback_source_type(comp.graph_processing, C, A) is EdgeType.FEEDBACK
+        assert _get_vertex_feedback_type(comp.graph, C.control_signals[0], A) is pnl.EdgeType.FLEXIBLE
+        assert _get_feedback_source_type(comp.graph_processing, C, A) is pnl.EdgeType.FEEDBACK
 
     @pytest.mark.parametrize(
         'terminal_mech',
@@ -2097,10 +2086,10 @@ class TestFeedback:
         comp._analyze_graph()
 
         # "is" comparisons because MAYBE can be assigned to feedback
-        assert _get_vertex_feedback_type(comp.graph, A.output_port, terminal_mech) is EdgeType.NON_FEEDBACK
+        assert _get_vertex_feedback_type(comp.graph, A.output_port, terminal_mech) is pnl.EdgeType.NON_FEEDBACK
 
-        assert _get_vertex_feedback_type(comp.graph, C.control_signals[0], terminal_mech) is EdgeType.FLEXIBLE
-        assert _get_feedback_source_type(comp.graph_processing, C, A) is EdgeType.NON_FEEDBACK
+        assert _get_vertex_feedback_type(comp.graph, C.control_signals[0], terminal_mech) is pnl.EdgeType.FLEXIBLE
+        assert _get_feedback_source_type(comp.graph_processing, C, A) is pnl.EdgeType.NON_FEEDBACK
 
     # any of the projections in the B, D, E, F cycle may be deleted
     # based on feedback specification. There are individual parametrized
@@ -2121,7 +2110,7 @@ class TestFeedback:
         E = pnl.TransferMechanism(name='E')
         F = pnl.TransferMechanism(name='F')
 
-        comp = Composition()
+        comp = pnl.Composition()
         comp.add_linear_processing_pathway([A, B, C])
         comp.add_nodes([D, E, F])
 
@@ -2159,7 +2148,7 @@ class TestFeedback:
 
         comp.add_projection(
             sender=fb_sender, receiver=fb_receiver,
-            feedback=EdgeType.FLEXIBLE
+            feedback=pnl.EdgeType.FLEXIBLE
         )
         comp._analyze_graph()
 
@@ -2176,7 +2165,7 @@ class TestFeedback:
                         cycle_nodes[s_i],
                         cycle_nodes[r_i]
                     )
-                    is EdgeType.NON_FEEDBACK
+                    is pnl.EdgeType.NON_FEEDBACK
                 )
 
         assert (
@@ -2185,7 +2174,7 @@ class TestFeedback:
                 fb_sender,
                 fb_receiver
             )
-            is EdgeType.FEEDBACK
+            is pnl.EdgeType.FEEDBACK
         )
 
     @pytest.mark.parametrize(
@@ -2222,7 +2211,7 @@ class TestFeedback:
 
         comp.add_projection(
             sender=fb_sender, receiver=fb_receiver,
-            feedback=EdgeType.FLEXIBLE
+            feedback=pnl.EdgeType.FLEXIBLE
         )
         comp._analyze_graph()
 
@@ -2235,7 +2224,7 @@ class TestFeedback:
         D = pnl.TransferMechanism(name='D')
         E = pnl.TransferMechanism(name='E')
 
-        comp = Composition()
+        comp = pnl.Composition()
         comp.add_linear_processing_pathway([C, D, E, C])
         comp.add_linear_processing_pathway([A, C])
         comp.add_linear_processing_pathway([B, C])
@@ -2256,7 +2245,7 @@ class TestFeedback:
         B = pnl.TransferMechanism(name="B", function=pnl.Linear(slope=5.0))
         C = pnl.TransferMechanism(name="C", function=pnl.Linear(slope=5.0))
         A = pnl.ObjectiveMechanism(
-            function=Linear,
+            function=pnl.Linear,
             monitor=[B],
             name="A"
         )
@@ -2330,16 +2319,16 @@ class TestFeedback:
     @pytest.mark.mechanism
     @pytest.mark.transfer_mechanism
     @pytest.mark.parametrize('timescale, expected',
-                             [(TimeScale.CONSIDERATION_SET_EXECUTION, [[0.5], [0.4375]]),
-                              (TimeScale.PASS, [[0.5], [0.4375]]),
-                              (TimeScale.ENVIRONMENT_STATE_UPDATE, [[1.5], [0.4375]]),
-                              (TimeScale.ENVIRONMENT_SEQUENCE, [[1.5], [0.4375]])],
-                              ids=lambda x: x if isinstance(x, TimeScale) else "")
+                             [(pnl.TimeScale.CONSIDERATION_SET_EXECUTION, [[0.5], [0.4375]]),
+                              (pnl.TimeScale.PASS, [[0.5], [0.4375]]),
+                              (pnl.TimeScale.ENVIRONMENT_STATE_UPDATE, [[1.5], [0.4375]]),
+                              (pnl.TimeScale.ENVIRONMENT_SEQUENCE, [[1.5], [0.4375]])],
+                              ids=lambda x: x if isinstance(x, pnl.TimeScale) else "")
     # 'LLVM' mode is not supported, because synchronization of compiler and
     # python values during execution is not implemented.
     @pytest.mark.usefixtures("comp_mode_no_llvm")
     def test_time_termination_measures(self, comp_mode, timescale, expected):
-        in_one_pass = timescale in {TimeScale.CONSIDERATION_SET_EXECUTION, TimeScale.PASS}
+        in_one_pass = timescale in {pnl.TimeScale.CONSIDERATION_SET_EXECUTION, pnl.TimeScale.PASS}
         attention = pnl.TransferMechanism(name='Attention',
                                  integrator_mode=True,
                                  termination_threshold=3,
@@ -2351,7 +2340,7 @@ class TestFeedback:
         response = pnl.IntegratorMechanism(
             function=pnl.AdaptiveIntegrator(rate=0.5))
 
-        comp = Composition()
+        comp = pnl.Composition()
         comp.add_linear_processing_pathway([counter, response])
         comp.add_node(attention)
         comp.scheduler.add_condition(response, pnl.WhenFinished(attention))
@@ -2366,13 +2355,13 @@ class TestFeedback:
 
     @pytest.mark.composition
     @pytest.mark.parametrize("condition,scale,expected_result",
-                             [(pnl.BeforeNCalls, TimeScale.ENVIRONMENT_STATE_UPDATE, [[.05, .05]]),
-                              (pnl.BeforeNCalls, TimeScale.PASS, [[.05, .05]]),
+                             [(pnl.BeforeNCalls, pnl.TimeScale.ENVIRONMENT_STATE_UPDATE, [[.05, .05]]),
+                              (pnl.BeforeNCalls, pnl.TimeScale.PASS, [[.05, .05]]),
                               (pnl.EveryNCalls, None, [[0.05, .05]]),
-                              (pnl.AtNCalls, TimeScale.ENVIRONMENT_STATE_UPDATE, [[.25, .25]]),
-                              (pnl.AtNCalls, TimeScale.ENVIRONMENT_SEQUENCE, [[.25, .25]]),
-                              (pnl.AfterNCalls, TimeScale.ENVIRONMENT_STATE_UPDATE, [[.25, .25]]),
-                              (pnl.AfterNCalls, TimeScale.PASS, [[.05, .05]]),
+                              (pnl.AtNCalls, pnl.TimeScale.ENVIRONMENT_STATE_UPDATE, [[.25, .25]]),
+                              (pnl.AtNCalls, pnl.TimeScale.ENVIRONMENT_SEQUENCE, [[.25, .25]]),
+                              (pnl.AfterNCalls, pnl.TimeScale.ENVIRONMENT_STATE_UPDATE, [[.25, .25]]),
+                              (pnl.AfterNCalls, pnl.TimeScale.PASS, [[.05, .05]]),
                               (pnl.WhenFinished, None, [[1.0, 1.0]]),
                               (pnl.WhenFinishedAny, None, [[1.0, 1.0]]),
                               (pnl.WhenFinishedAll, None, [[1.0, 1.0]]),
@@ -2397,7 +2386,7 @@ class TestFeedback:
                         reset_stateful_function_when=pnl.AtTrialStart(),
                         execute_until_finished=False,
                         output_ports=[pnl.DECISION_VARIABLE, pnl.RESPONSE_TIME],
-                        name='DDM')
+                        name='pnl.DDM')
 
         response = pnl.ProcessingMechanism(size=2, name="GATE")
 
@@ -2413,7 +2402,7 @@ class TestFeedback:
         elif condition is pnl.AfterNCalls:
             # Mechanisms run only once per PASS unless they are in
             # 'run_until_finished' mode.
-            c = 1 if scale is TimeScale.PASS else 5
+            c = 1 if scale is pnl.TimeScale.PASS else 5
             comp.scheduler.add_condition(response, condition(decisionMaker, c,
                                                              time_scale=scale))
         elif condition is pnl.EveryNCalls:
@@ -2475,14 +2464,14 @@ class TestAbsoluteTime:
     @pytest.mark.parametrize(
         'conditions, interval',
         [
-            ({'A': TimeInterval(repeat=8), 'B': TimeInterval(repeat=4)}, fractions.Fraction(4, 3) * _unit_registry.ms),
-            ({'A': TimeInterval(repeat=1), 'B': TimeInterval(repeat=3)}, fractions.Fraction(1, 3) * _unit_registry.ms),
-            ({'A': Any(TimeInterval(repeat=2), TimeInterval(repeat=3))}, fractions.Fraction(1, 3) * _unit_registry.ms),
-            ({'A': TimeInterval(repeat=6), 'B': TimeInterval(repeat=3)}, 1 * _unit_registry.ms),
-            ({'A': TimeInterval(repeat=100 * _unit_registry.us), 'B': TimeInterval(repeat=2)}, fractions.Fraction(100, 3) * _unit_registry.us),
-            ({'A': Any(TimeInterval(repeat=1000 * _unit_registry.us), TimeInterval(repeat=2))}, fractions.Fraction(1, 3) * _unit_registry.ms),
-            ({'A': TimeInterval(repeat=1000 * _unit_registry.us), 'B': TimeInterval(repeat=2)}, fractions.Fraction(1, 3) * _unit_registry.ms),
-            ({'A': Any(TimeInterval(repeat=1000), TimeInterval(repeat=1500)), 'B': TimeInterval(repeat=2000)}, fractions.Fraction(500, 3) * _unit_registry.ms),
+            ({'A': pnl.TimeInterval(repeat=8), 'B': pnl.TimeInterval(repeat=4)}, fractions.Fraction(4, 3) * pnl._unit_registry.ms),
+            ({'A': pnl.TimeInterval(repeat=1), 'B': pnl.TimeInterval(repeat=3)}, fractions.Fraction(1, 3) * pnl._unit_registry.ms),
+            ({'A': pnl.Any(pnl.TimeInterval(repeat=2), pnl.TimeInterval(repeat=3))}, fractions.Fraction(1, 3) * pnl._unit_registry.ms),
+            ({'A': pnl.TimeInterval(repeat=6), 'B': pnl.TimeInterval(repeat=3)}, 1 * pnl._unit_registry.ms),
+            ({'A': pnl.TimeInterval(repeat=100 * pnl._unit_registry.us), 'B': pnl.TimeInterval(repeat=2)}, fractions.Fraction(100, 3) * pnl._unit_registry.us),
+            ({'A': pnl.Any(pnl.TimeInterval(repeat=1000 * pnl._unit_registry.us), pnl.TimeInterval(repeat=2))}, fractions.Fraction(1, 3) * pnl._unit_registry.ms),
+            ({'A': pnl.TimeInterval(repeat=1000 * pnl._unit_registry.us), 'B': pnl.TimeInterval(repeat=2)}, fractions.Fraction(1, 3) * pnl._unit_registry.ms),
+            ({'A': pnl.Any(pnl.TimeInterval(repeat=1000), pnl.TimeInterval(repeat=1500)), 'B': pnl.TimeInterval(repeat=2000)}, fractions.Fraction(500, 3) * pnl._unit_registry.ms),
         ]
     )
     def test_absolute_interval_linear(self, three_node_linear_composition, conditions, interval):
