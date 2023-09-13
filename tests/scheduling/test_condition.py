@@ -1,6 +1,6 @@
 import logging
 
-import graph_scheduler
+import graph_scheduler as gs
 import numpy as np
 import psyneulink as pnl
 import pytest
@@ -490,19 +490,19 @@ class TestCondition:
             'node_condition, termination_conditions, expected_output',
             [
                 pytest.param(
-                    graph_scheduler.AfterNPasses(1),
+                    gs.AfterNPasses(1),
                     {
-                        TimeScale.ENVIRONMENT_SEQUENCE: graph_scheduler.AfterNEnvironmentStateUpdates(1),
-                        TimeScale.ENVIRONMENT_STATE_UPDATE: graph_scheduler.AfterConsiderationSetExecution(4)
+                        TimeScale.ENVIRONMENT_SEQUENCE: gs.AfterNEnvironmentStateUpdates(1),
+                        TimeScale.ENVIRONMENT_STATE_UPDATE: gs.AfterConsiderationSetExecution(4)
                     },
                     [set(), 'A', 'A', 'A', 'A'],
                     id='AfterConsiderationSetExecution'
                 ),
                 pytest.param(
-                    graph_scheduler.AfterNPasses(1),
+                    gs.AfterNPasses(1),
                     {
-                        TimeScale.ENVIRONMENT_SEQUENCE: graph_scheduler.AfterNEnvironmentStateUpdates(1),
-                        TimeScale.ENVIRONMENT_STATE_UPDATE: graph_scheduler.AfterNConsiderationSetExecutions(5)
+                        TimeScale.ENVIRONMENT_SEQUENCE: gs.AfterNEnvironmentStateUpdates(1),
+                        TimeScale.ENVIRONMENT_STATE_UPDATE: gs.AfterNConsiderationSetExecutions(5)
                     },
                     [set(), 'A', 'A', 'A', 'A'],
                     id='AfterNConsiderationSetExecutions'
@@ -514,7 +514,7 @@ class TestCondition:
         ):
             graph = {'A': set()}
 
-            sched = graph_scheduler.Scheduler(graph)
+            sched = gs.Scheduler(graph)
             sched.add_condition('A', node_condition)
             output = list(sched.run(termination_conds=termination_conditions))
 
@@ -524,48 +524,48 @@ class TestCondition:
             'node_condition, termination_conditions, expected_output, n_sequences, n_state_updates_per_sequence',
             [
                 pytest.param(
-                    graph_scheduler.AtEnvironmentStateUpdateNStart(2),
-                    {TimeScale.ENVIRONMENT_STATE_UPDATE: graph_scheduler.AfterNPasses(1)},
+                    gs.AtEnvironmentStateUpdateNStart(2),
+                    {TimeScale.ENVIRONMENT_STATE_UPDATE: gs.AfterNPasses(1)},
                     [[set(), set(), 'A', set()]],
                     1,
                     4,
                     id='AtEnvironmentStateUpdateNStart'
                 ),
                 pytest.param(
-                    graph_scheduler.AtEnvironmentSequence(4),
-                    {TimeScale.ENVIRONMENT_STATE_UPDATE: graph_scheduler.AfterNPasses(1)},
+                    gs.AtEnvironmentSequence(4),
+                    {TimeScale.ENVIRONMENT_STATE_UPDATE: gs.AfterNPasses(1)},
                     [[set()], [set()], [set()], [set()], ['A'], [set()]],
                     6,
                     1,
                     id='AtEnvironmentSequence'
                 ),
                 pytest.param(
-                    graph_scheduler.AfterEnvironmentSequence(3),
-                    {TimeScale.ENVIRONMENT_STATE_UPDATE: graph_scheduler.AfterNPasses(1)},
+                    gs.AfterEnvironmentSequence(3),
+                    {TimeScale.ENVIRONMENT_STATE_UPDATE: gs.AfterNPasses(1)},
                     [[set()], [set()], [set()], [set()], ['A'], ['A']],
                     6,
                     1,
                     id='AfterEnvironmentSequence'
                 ),
                 pytest.param(
-                    graph_scheduler.AfterNEnvironmentSequences(4),
-                    {TimeScale.ENVIRONMENT_STATE_UPDATE: graph_scheduler.AfterNPasses(1)},
+                    gs.AfterNEnvironmentSequences(4),
+                    {TimeScale.ENVIRONMENT_STATE_UPDATE: gs.AfterNPasses(1)},
                     [[set()], [set()], [set()], [set()], ['A'], ['A']],
                     6,
                     1,
                     id='AfterNEnvironmentSequences'
                 ),
                 pytest.param(
-                    graph_scheduler.AtEnvironmentSequenceStart(),
-                    {TimeScale.ENVIRONMENT_STATE_UPDATE: graph_scheduler.AfterNPasses(1)},
+                    gs.AtEnvironmentSequenceStart(),
+                    {TimeScale.ENVIRONMENT_STATE_UPDATE: gs.AfterNPasses(1)},
                     [['A', set()], ['A', set()]],
                     2,
                     2,
                     id='AtEnvironmentSequenceStart'
                 ),
                 pytest.param(
-                    graph_scheduler.AtEnvironmentSequenceNStart(1),
-                    {TimeScale.ENVIRONMENT_STATE_UPDATE: graph_scheduler.AfterNPasses(1)},
+                    gs.AtEnvironmentSequenceNStart(1),
+                    {TimeScale.ENVIRONMENT_STATE_UPDATE: gs.AfterNPasses(1)},
                     [[set(), set()], ['A', set()], [set(), set()]],
                     3,
                     2,
@@ -583,7 +583,7 @@ class TestCondition:
         ):
             graph = {'A': set()}
 
-            sched = graph_scheduler.Scheduler(graph)
+            sched = gs.Scheduler(graph)
             sched.add_condition('A', node_condition)
             output = []
 
@@ -841,7 +841,7 @@ class TestCondition:
         comp = Composition(pathways=[A])
 
         comp.termination_processing = {
-            TimeScale.TRIAL: graph_scheduler.Threshold(A, parameter, threshold, '>=', indices=indices)
+            TimeScale.TRIAL: gs.Threshold(A, parameter, threshold, '>=', indices=indices)
         }
 
         comp.run(inputs={A: np.ones(A.defaults.variable.shape)})
@@ -871,7 +871,7 @@ class TestCondition:
         comp = Composition(pathways=[A])
 
         comp.termination_processing = {
-            TimeScale.TRIAL: graph_scheduler.Threshold(A, 'value', threshold, comparator)
+            TimeScale.TRIAL: gs.Threshold(A, 'value', threshold, comparator)
         }
 
         comp.run(inputs={A: np.ones(A.defaults.variable.shape)})
@@ -887,14 +887,14 @@ class TestCondition:
                 return parameter in self.parameters
 
         d = CustomDependency(a=0, b=5)
-        cond = graph_scheduler.Threshold(
+        cond = gs.Threshold(
             d, 'a', 2, '>',
             custom_parameter_getter=lambda o, p: o.parameters[p],
             custom_parameter_validator=lambda o, p: o.has_parameter(p)
         )
-        scheduler = graph_scheduler.Scheduler({d: set()}, {})
+        scheduler = gs.Scheduler({d: set()}, {})
         for _ in scheduler.run(
-            termination_conds={graph_scheduler.TimeScale.ENVIRONMENT_STATE_UPDATE: cond}
+            termination_conds={gs.TimeScale.ENVIRONMENT_STATE_UPDATE: cond}
         ):
             d.parameters['a'] += 1
 
@@ -925,7 +925,7 @@ class TestCondition:
         comp = Composition(pathways=[A])
 
         comp.termination_processing = {
-            TimeScale.TRIAL: graph_scheduler.Threshold(A, 'value', threshold, comparator, atol=atol, rtol=rtol)
+            TimeScale.TRIAL: gs.Threshold(A, 'value', threshold, comparator, atol=atol, rtol=rtol)
         }
 
         comp.run(inputs={A: np.ones(A.defaults.variable.shape)})

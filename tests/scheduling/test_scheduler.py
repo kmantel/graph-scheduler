@@ -6,8 +6,7 @@ import psyneulink as pnl
 import pytest
 import types
 
-import graph_scheduler
-from graph_scheduler import Scheduler
+import graph_scheduler as gs
 
 from psyneulink import _unit_registry
 from psyneulink.core.components.functions.stateful.integratorfunctions import DriftDiffusionIntegrator, SimpleIntegrator
@@ -52,7 +51,7 @@ class TestScheduler:
         ]
     )
     def test_construction(self, graph, expected_consideration_queue):
-        sched = Scheduler(graph)
+        sched = gs.Scheduler(graph)
         assert sched.consideration_queue == expected_consideration_queue
 
     def test_copy(self):
@@ -63,7 +62,7 @@ class TestScheduler:
 
     def test_create_multiple_contexts(self):
         graph = {'A': set()}
-        scheduler = Scheduler(graph)
+        scheduler = gs.Scheduler(graph)
 
         scheduler.get_clock(scheduler.default_execution_id)._increment_time(TimeScale.ENVIRONMENT_STATE_UPDATE)
 
@@ -249,9 +248,9 @@ class TestScheduler:
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
     def test_exact_time_mode(self):
-        sched = Scheduler(
+        sched = gs.Scheduler(
             {'A': set(), 'B': {'A'}},
-            mode=graph_scheduler.SchedulingMode.EXACT_TIME
+            mode=gs.SchedulingMode.EXACT_TIME
         )
 
         # these cannot run at same execution set unless in EXACT_TIME
@@ -260,13 +259,13 @@ class TestScheduler:
 
         list(sched.run())
 
-        assert sched.mode == graph_scheduler.SchedulingMode.EXACT_TIME
+        assert sched.mode == gs.SchedulingMode.EXACT_TIME
         assert sched.execution_list[sched.default_execution_id] == [{'A', 'B'}]
-        assert sched.execution_timestamps[sched.default_execution_id][0].absolute == 1 * graph_scheduler._unit_registry.ms
+        assert sched.execution_timestamps[sched.default_execution_id][0].absolute == 1 * gs._unit_registry.ms
 
     def test_run_with_new_execution_id(self):
-        sched = Scheduler({'A': set()})
-        sched.add_condition('A', graph_scheduler.AtPass(1))
+        sched = gs.Scheduler({'A': set()})
+        sched.add_condition('A', gs.AtPass(1))
 
         output = list(sched.run(execution_id='eid'))
 
@@ -277,7 +276,7 @@ class TestScheduler:
         assert sched.get_clock('eid') == sched.get_clock(types.SimpleNamespace(default_execution_id='eid'))
 
     def test_delete_counts(self):
-        sched = Scheduler(
+        sched = gs.Scheduler(
             {
                 'A': set(),
                 'B': {'A'},
@@ -288,10 +287,10 @@ class TestScheduler:
 
         sched.add_condition_set(
             {
-                'A': graph_scheduler.EveryNPasses(2),
-                'B': graph_scheduler.EveryNCalls('A', 2),
-                'C': graph_scheduler.EveryNCalls('A', 3),
-                'D': graph_scheduler.AfterNCallsCombined('B', 'C', n=6)
+                'A': gs.EveryNPasses(2),
+                'B': gs.EveryNCalls('A', 2),
+                'C': gs.EveryNCalls('A', 3),
+                'D': gs.AfterNCallsCombined('B', 'C', n=6)
             }
         )
 
