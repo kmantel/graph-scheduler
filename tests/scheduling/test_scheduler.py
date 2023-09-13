@@ -2316,8 +2316,6 @@ class TestFeedback:
         }
         assert comp.scheduler.dependency_dict == expected_dependencies
 
-    @pytest.mark.mechanism
-    @pytest.mark.transfer_mechanism
     @pytest.mark.parametrize('timescale, expected',
                              [(pnl.TimeScale.CONSIDERATION_SET_EXECUTION, [[0.5], [0.4375]]),
                               (pnl.TimeScale.PASS, [[0.5], [0.4375]]),
@@ -2353,7 +2351,6 @@ class TestFeedback:
             assert response.execution_count == 1
         assert np.allclose(result, expected)
 
-    @pytest.mark.composition
     @pytest.mark.parametrize("condition,scale,expected_result",
                              [(pnl.BeforeNCalls, pnl.TimeScale.ENVIRONMENT_STATE_UPDATE, [[.05, .05]]),
                               (pnl.BeforeNCalls, pnl.TimeScale.PASS, [[.05, .05]]),
@@ -2435,7 +2432,6 @@ class TestFeedback:
         assert np.allclose(result, expected_result)
 
 
-    @pytest.mark.composition
     @pytest.mark.parametrize("mode", [pnl.ExecutionMode.Python,
                                       pytest.param(pnl.ExecutionMode.LLVMRun, marks=pytest.mark.llvm),
                                       pytest.param(pnl.ExecutionMode.PTXRun, marks=[pytest.mark.llvm, pytest.mark.cuda]),

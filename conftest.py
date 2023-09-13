@@ -1,7 +1,6 @@
 import doctest
 import pytest
 
-from psyneulink import clear_registry, primary_registries
 from psyneulink.core import llvm as pnlvm
 
 
@@ -12,18 +11,6 @@ def pytest_runtest_setup(item):
     doctest.ELLIPSIS_MARKER = "[...]"
 
 def pytest_generate_tests(metafunc):
-    mech_and_func_modes = ['Python',
-                           pytest.param('LLVM', marks=pytest.mark.llvm),
-                           pytest.param('PTX', marks=[pytest.mark.llvm,
-                                                      pytest.mark.cuda])
-                          ]
-
-    if "func_mode" in metafunc.fixturenames:
-        metafunc.parametrize("func_mode", mech_and_func_modes)
-
-    if "mech_mode" in metafunc.fixturenames:
-        metafunc.parametrize("mech_mode", mech_and_func_modes)
-
     if "comp_mode_no_llvm" in metafunc.fixturenames:
         modes = [m for m in get_comp_execution_modes()
                  if m.values[0] is not pnlvm.ExecutionMode.LLVM]
@@ -32,17 +19,8 @@ def pytest_generate_tests(metafunc):
     elif "comp_mode" in metafunc.fixturenames:
         metafunc.parametrize("comp_mode", get_comp_execution_modes())
 
-    if "autodiff_mode" in metafunc.fixturenames:
-        auto_modes = [pnlvm.ExecutionMode.Python,
-                      pytest.param(pnlvm.ExecutionMode.LLVMRun, marks=pytest.mark.llvm)]
-        metafunc.parametrize("autodiff_mode", auto_modes)
-
 
 def pytest_runtest_teardown(item):
-    for registry in primary_registries:
-        # Clear Registry to have a stable reference for indexed suffixes of default names
-        clear_registry(registry)
-
     pnlvm.cleanup()
 
 @pytest.fixture
