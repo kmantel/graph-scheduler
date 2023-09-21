@@ -57,9 +57,6 @@ def prune_unused_args(func, args=None, kwargs=None):
             args = [args]
 
         if not has_args_param:
-            num_extra_args = len(args) - count_positional
-            if num_extra_args > 0:
-                logger.debug('{1} extra arguments specified to function {0}, will be ignored (values: {2})'.format(func, num_extra_args, args[-num_extra_args:]))
             args = args[:count_positional]
     else:
         args = []
@@ -72,8 +69,6 @@ def prune_unused_args(func, args=None, kwargs=None):
             for kw in kwargs:
                 if kw not in func_kwargs_names:
                     filtered.add(kw)
-            if len(filtered) > 0:
-                logger.debug('{1} extra keyword arguments specified to function {0}, will be ignored (values: {2})'.format(func, len(filtered), filtered))
             for kw in filtered:
                 del kwargs[kw]
     else:
