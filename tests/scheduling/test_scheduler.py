@@ -12,6 +12,12 @@ logger = logging.getLogger(__name__)
 SimpleTestNode = pytest.helpers.get_test_node()
 
 
+test_graphs = {
+    'three_node_linear': pytest.helpers.create_graph_from_pathways(['A', 'B', 'C']),
+    'four_node_split': pytest.helpers.create_graph_from_pathways(['A', 'B', 'D'], ['C', 'D'])
+}
+
+
 class TestScheduler:
     stroop_paths = [
         ['Color_Input', 'Color_Hidden', 'Output', 'Decision'],
@@ -161,6 +167,121 @@ class TestScheduler:
 
         assert sched.execution_list[eid_delete] == del_run_1
         assert sched.execution_list[eid_repeat] == repeat_run_2 + repeat_run_2
+
+    @pytest.mark.parametrize('add_method', ['add_graph_edge', 'add_condition_AddEdgeTo'])
+    @pytest.mark.parametrize('remove_method', ['remove_graph_edge', 'add_condition_RemoveEdgeFrom'])
+    def test_add_graph_structure_conditions(self, add_method, remove_method):
+        def add_condition(owner, condition):
+            if isinstance(condition, gs.AddEdgeTo) and add_method == 'add_graph_edge':
+                return scheduler.add_graph_edge(owner, condition.node)
+            elif isinstance(condition, gs.RemoveEdgeFrom) and remove_method == 'remove_graph_edge':
+                return scheduler.remove_graph_edge(condition.node, owner)
+            else:
+                scheduler.add_condition(owner, condition)
+                return condition
+
+        initial_graph = pytest.helpers.create_graph_from_pathways(['A', 'B', 'C', 'D', 'E'])
+        initial_conds = {'A': gs.AddEdgeTo('C')}
+        scheduler = gs.Scheduler(initial_graph, initial_conds)
+
+        assert scheduler.dependency_dict == {
+            **initial_graph,
+            **{'C': {'A', 'B'}},
+        }
+        assert len(scheduler._graphs) == 2
+        assert scheduler._graphs[0] == initial_graph
+
+        addl_conditions = [
+            ('B', gs.AddEdgeTo('D')),
+            ('B', gs.AddEdgeTo('E')),
+            ('C', gs.AddEdgeTo('E')),
+            ('E', gs.RemoveEdgeFrom('B')),
+            ('D', gs.RemoveEdgeFrom('B')),
+        ]
+
+        for i, (owner, cond) in enumerate(addl_conditions):
+            added_cond = add_condition(owner, cond)
+            addl_conditions[i] = (owner, added_cond)
+
+        assert scheduler.dependency_dict == {
+            'A': set(),
+            'B': {'A'},
+            'C': {'A', 'B'},
+            'D': {'C'},
+            'E': {'C', 'D'},
+        }
+        assert scheduler._last_handled_structural_condition_order == (
+            [initial_conds['A']] + [c[1] for c in addl_conditions]
+        )
+
+        # take only the first three elements in addl_conditions
+        addl_conds_sub_idx = 3
+        scheduler.conditions = gs.ConditionSet({
+            **{
+                k: [
+                    addl_conditions[i][1] for i in range(addl_conds_sub_idx)
+                    if addl_conditions[i][0] == k
+                ]
+                for k in initial_graph
+            },
+            'A': initial_conds['A'],
+        })
+        assert scheduler.dependency_dict == {
+            'A': set(),
+            'B': {'A'},
+            'C': {'A', 'B'},
+            'D': {'B', 'C'},
+            'E': {'B', 'C', 'D'},
+        }
+        assert scheduler._last_handled_structural_condition_order == (
+            [initial_conds['A']] + [c[1] for c in addl_conditions[:addl_conds_sub_idx]]
+        )
+
+    @pytest.mark.parametrize(
+        'graph_name, conditions, expected_output',
+        [
+            ('three_node_linear', {'C': gs.BeforeNode('A')}, [{'C'}, {'A'}, {'B'}]),
+            ('three_node_linear', {'B': gs.AfterNodes('C')}, [{'A'}, {'C'}, {'B'}]),
+            ('four_node_split', {'D': gs.BeforeNodes('A', 'C')}, [{'D'}, {'A', 'C'}, {'B'}]),
+        ]
+    )
+    def test_run_graph_structure_conditions(self, graph_name, conditions, expected_output):
+        scheduler = gs.Scheduler(test_graphs[graph_name], conditions)
+        output = list(scheduler.run())
+
+        assert output == expected_output
+
+    def test_gsc_creates_cyclic_graph(self):
+        scheduler = gs.Scheduler(
+            pytest.helpers.create_graph_from_pathways(['A', 'B', 'C'])
+        )
+        scheduler.add_condition('B', gs.EveryNCalls('A', 1))
+        scheduler.add_condition('B', gs.AfterNode('C'))
+        with pytest.warns(UserWarning, match='for B creates a cycle:'):
+            scheduler.add_condition('B', gs.BeforeNode('A', prune_cycles=False))
+
+        # If _build_consideration_queue failure not explicitly detected
+        # and handled while adding BeforeNode('A') for 'B', the new
+        # modified cyclic graph is pushed but the condition is not
+        # added, resulting in incorrect state of scheduler._graphs.
+        # Assert this doesn't happen.
+        assert len(scheduler._graphs) == 3
+        assert len(scheduler.conditions.structural_condition_order) == 2
+
+        with pytest.raises(gs.SchedulerError, match='contains a cycle'):
+            list(scheduler.run())
+
+    def test_gsc_exact_time_warning(self):
+        scheduler = gs.Scheduler(
+            {'A': set(), 'B': set()}, mode=gs.SchedulingMode.EXACT_TIME
+        )
+        scheduler.add_condition('A', gs.AfterNode('B'))
+
+        with pytest.warns(
+            UserWarning,
+            match='In exact time mode, graph structure conditions will have no effect'
+        ):
+            list(scheduler.run())
 
 
 class TestLinear:
