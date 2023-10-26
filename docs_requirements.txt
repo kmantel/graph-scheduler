@@ -1,4 +1,4 @@
 m2r2
-sphinx
+sphinx <7
 sphinx-autodoc-typehints
 sphinx-rtd-theme
