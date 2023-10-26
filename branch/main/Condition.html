@@ -8,7 +8,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Condition &mdash; Graph Scheduler 1.1.1+8.g8842776 documentation</title>
+  <title>Condition &mdash; Graph Scheduler 1.1.2+1.g3bc2e74 documentation</title>
   
 
   
@@ -69,7 +69,7 @@
             
             
               <div class="version">
-                1.1.1+8
+                1.1.2+1
               </div>
             
           
@@ -391,10 +391,10 @@ satisfied the first specified number of times the specified Condition is satisfi
 specified <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale" title="graph_scheduler.time.TimeScale"><code class="xref any py py-class docutils literal notranslate"><span class="pre">TimeScale</span></code></a> or <a class="reference internal" href="Scheduler.html#scheduler-absolute-time"><span class="std std-ref">Time</span></a>):</p>
 <blockquote>
 <div><ul class="simple">
-<li><p><a class="reference internal" href="#graph_scheduler.condition.TimeInterval" title="graph_scheduler.condition.TimeInterval"><code class="xref any py py-class docutils literal notranslate"><span class="pre">TimeInterval</span></code></a> ([<a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.20.1)"><code class="xref any docutils literal notranslate"><span class="pre">pint.Quantity</span></code></a>, <a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.20.1)"><code class="xref any docutils literal notranslate"><span class="pre">pint.Quantity</span></code></a>, <a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.20.1)"><code class="xref any docutils literal notranslate"><span class="pre">pint.Quantity</span></code></a>])
+<li><p><a class="reference internal" href="#graph_scheduler.condition.TimeInterval" title="graph_scheduler.condition.TimeInterval"><code class="xref any py py-class docutils literal notranslate"><span class="pre">TimeInterval</span></code></a> ([<a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.22)"><code class="xref any docutils literal notranslate"><span class="pre">pint.Quantity</span></code></a>, <a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.22)"><code class="xref any docutils literal notranslate"><span class="pre">pint.Quantity</span></code></a>, <a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.22)"><code class="xref any docutils literal notranslate"><span class="pre">pint.Quantity</span></code></a>])
 satisfied every time an optional amount of absolute time has
 passed in between an optional specified range</p></li>
-<li><p><a class="reference internal" href="#graph_scheduler.condition.TimeTermination" title="graph_scheduler.condition.TimeTermination"><code class="xref any py py-class docutils literal notranslate"><span class="pre">TimeTermination</span></code></a> (<a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.20.1)"><code class="xref any docutils literal notranslate"><span class="pre">pint.Quantity</span></code></a>)
+<li><p><a class="reference internal" href="#graph_scheduler.condition.TimeTermination" title="graph_scheduler.condition.TimeTermination"><code class="xref any py py-class docutils literal notranslate"><span class="pre">TimeTermination</span></code></a> (<a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.22)"><code class="xref any docutils literal notranslate"><span class="pre">pint.Quantity</span></code></a>)
 satisfied after the given absolute time</p></li>
 <li><p><a class="reference internal" href="#graph_scheduler.condition.BeforeConsiderationSetExecution" title="graph_scheduler.condition.BeforeConsiderationSetExecution"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BeforeConsiderationSetExecution</span></code></a> (int[, TimeScale])
 satisfied any time before the specified <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION" title="graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">CONSIDERATION_SET_EXECUTION</span></code></a> occurs.</p></li>
@@ -1489,7 +1489,7 @@ satisfied</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="graph_scheduler.condition.TimeInterval.unit">
 <span class="sig-name descname"><span class="pre">unit</span></span><a class="headerlink" href="#graph_scheduler.condition.TimeInterval.unit" title="Permalink to this definition">¶</a></dt>
-<dd><p>the <a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Unit" title="(in pint v0.20.1)"><code class="xref any docutils literal notranslate"><span class="pre">pint.Unit</span></code></a> to use for scalar values of <em>repeat</em>,
+<dd><p>the <a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Unit" title="(in pint v0.22)"><code class="xref any docutils literal notranslate"><span class="pre">pint.Unit</span></code></a> to use for scalar values of <em>repeat</em>,
 <em>start</em>, and <em>end</em></p>
 </dd></dl>
 
@@ -1553,7 +1553,7 @@ unsatisfaction of this Condition or those it contains</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="graph_scheduler.condition.TimeTermination.unit">
 <span class="sig-name descname"><span class="pre">unit</span></span><a class="headerlink" href="#graph_scheduler.condition.TimeTermination.unit" title="Permalink to this definition">¶</a></dt>
-<dd><p>the <a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Unit" title="(in pint v0.20.1)"><code class="xref any docutils literal notranslate"><span class="pre">pint.Unit</span></code></a> to use for scalar values of <em>t</em>, <em>start</em>,
+<dd><p>the <a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Unit" title="(in pint v0.22)"><code class="xref any docutils literal notranslate"><span class="pre">pint.Unit</span></code></a> to use for scalar values of <em>t</em>, <em>start</em>,
 and <em>end</em></p>
 </dd></dl>
 
