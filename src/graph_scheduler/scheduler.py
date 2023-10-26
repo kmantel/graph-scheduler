@@ -302,7 +302,7 @@ import datetime
 import enum
 import fractions
 import logging
-import typing
+from typing import Union
 
 import numpy as np
 import pint
@@ -419,7 +419,7 @@ class Scheduler:
         termination_conds=None,
         default_execution_id=None,
         mode: SchedulingMode = SchedulingMode.STANDARD,
-        default_absolute_time_unit: typing.Union[str, pint.Quantity] = _get_pint_unit(1, 'ms'),
+        default_absolute_time_unit: Union[str, pint.Quantity] = _get_pint_unit(1, 'ms'),
         **kwargs
     ):
         """

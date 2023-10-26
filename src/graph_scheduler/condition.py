@@ -288,8 +288,8 @@ import collections
 import itertools
 import logging
 import operator
-import typing
 import warnings
+from typing import Union
 
 import numpy as np
 import pint
@@ -907,10 +907,10 @@ class TimeInterval(AbsoluteCondition):
     """
     def __init__(
         self,
-        repeat: typing.Union[int, str, pint.Quantity] = None,
-        start: typing.Union[int, str, pint.Quantity] = None,
-        end: typing.Union[int, str, pint.Quantity] = None,
-        unit: typing.Union[str, pint.Unit] = _unit_registry.ms,
+        repeat: Union[int, str, pint.Quantity] = None,
+        start: Union[int, str, pint.Quantity] = None,
+        end: Union[int, str, pint.Quantity] = None,
+        unit: Union[str, pint.Unit] = _unit_registry.ms,
         start_inclusive: bool = True,
         end_inclusive: bool = True
     ):
@@ -1005,9 +1005,9 @@ class TimeTermination(AbsoluteCondition):
     """
     def __init__(
         self,
-        t: typing.Union[int, str, pint.Quantity],
+        t: Union[int, str, pint.Quantity],
         inclusive: bool = True,
-        unit: typing.Union[str, pint.Unit] = _unit_registry.ms,
+        unit: Union[str, pint.Unit] = _unit_registry.ms,
     ):
         t = _parse_absolute_unit(t, unit)
 

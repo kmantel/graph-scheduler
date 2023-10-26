@@ -17,7 +17,7 @@ import functools
 import keyword
 import re
 import types
-import typing
+from typing import Dict, Union
 
 from graph_scheduler import _unit_registry
 
@@ -622,7 +622,7 @@ def _time_scale_to_attr_str(time_scale: TimeScale) -> str:
 
 
 @functools.lru_cache(maxsize=None)
-def _time_scale_to_class_str(time_scale: typing.Union[TimeScale, str]) -> str:
+def _time_scale_to_class_str(time_scale: Union[TimeScale, str]) -> str:
     try:
         name = time_scale.name
     except AttributeError:
@@ -635,7 +635,7 @@ def _attr_str_to_time_scale(attr_str):
     return getattr(TimeScale, attr_str.rstrip('_'))
 
 
-def _multi_substitute_docstring(cls, subs: typing.Dict[str, str]):
+def _multi_substitute_docstring(cls, subs: Dict[str, str]):
     new_docstring = cls.__doc__
     try:
         for prev, new in subs.items():
