@@ -1,13 +1,18 @@
+import collections
 import inspect
 import logging
 import weakref
+from typing import Dict, Hashable, Set
 
-__all__ = []
+
+__all__ = ['clone_graph']
 
 
 logger = logging.getLogger(__name__)
 
 _unused_args_sig_cache = weakref.WeakKeyDictionary()
+
+typing_graph_dependency_dict = Dict[Hashable, Set[Hashable]]
 
 
 def prune_unused_args(func, args=None, kwargs=None):
@@ -84,3 +89,18 @@ def call_with_pruned_args(func, *args, **kwargs):
     """
     args, kwargs = prune_unused_args(func, args, kwargs)
     return func(*args, **kwargs)
+
+
+def clone_graph(graph: typing_graph_dependency_dict) -> typing_graph_dependency_dict:
+    """
+    Returns a copy of dependency-dict-formatted **graph** where the
+    nodes within are copied as references
+    """
+    res = {}
+    for k, v in graph.items():
+        if isinstance(v, collections.abc.Iterable) and not isinstance(v, str):
+            v = set(v)
+        else:
+            v = set([v])
+        res[k] = v
+    return res
