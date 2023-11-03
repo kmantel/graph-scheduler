@@ -5,7 +5,7 @@ import weakref
 from typing import Dict, Hashable, Set
 
 
-__all__ = ['clone_graph']
+__all__ = ['clone_graph', 'disable_debug_logging', 'enable_debug_logging']
 
 
 logger = logging.getLogger(__name__)
@@ -104,3 +104,49 @@ def clone_graph(graph: typing_graph_dependency_dict) -> typing_graph_dependency_
             v = set([v])
         res[k] = v
     return res
+
+
+def enable_debug_logging():
+    """
+    Enables display of debugging logs using python logging module
+
+    Note: sets python root logger level to DEBUG
+    """
+    root_logger = logging.getLogger()
+    gs_logger = logging.getLogger(__package__)
+    gs_logger.propagate = False
+
+    if len(gs_logger.handlers) == 0:
+        gs_logging_formatter = logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - %(funcName)s - %(message)s'
+        )
+        gs_debug_log_handler = logging.StreamHandler()
+        gs_debug_log_handler.setLevel(logging.DEBUG)
+        gs_debug_log_handler.setFormatter(gs_logging_formatter)
+        gs_logger.addHandler(gs_debug_log_handler)
+
+    new_level = logging.DEBUG
+    root_logger.setLevel(new_level)
+
+    logger.info(
+        f"Changing root logger level to {logging.getLevelName(new_level)}"
+    )
+    logger.debug('Debug mode on')
+
+
+def disable_debug_logging(level: int = logging.WARNING):
+    """
+    Disables display of debugging logs using python logging module
+
+    Args:
+        level (int, optional): Level to reset root logger to. Defaults
+            to logging.WARNING (root logger default).
+    """
+    root_logger = logging.getLogger()
+
+    logger.debug('Debug mode off')
+    logger.info(
+        f'Changing root logger level to {logging.getLevelName(level)}'
+    )
+
+    root_logger.setLevel(level)
