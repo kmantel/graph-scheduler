@@ -449,12 +449,12 @@ class ConditionSet(object):
         return item in self.conditions
 
     def __repr__(self):
-        condition_str = '\n\t'.join([f'{owner}: {condition}' for owner, condition in self.conditions.items()])
+        condition_str = '\n\t'.join([f'{repr(owner)}: {condition}' for owner, condition in self.conditions.items()])
         return '{0}({1}{2}{3})'.format(
             self.__class__.__name__,
-            '\n\t' if len(condition_str) > 0 else '',
+            '{\n\t' if len(condition_str) > 0 else '',
             condition_str,
-            '\n' if len(condition_str) > 0 else ''
+            '\n}' if len(condition_str) > 0 else '',
         )
 
     def __iter__(self):
