@@ -2,14 +2,14 @@ import collections
 import inspect
 import logging
 import weakref
-from typing import Dict, Hashable, Set
+from typing import Dict, Hashable, Set, Union
 
 import networkx as nx
 
 __all__ = [
     'clone_graph', 'dependency_dict_to_networkx_digraph',
     'disable_debug_logging', 'enable_debug_logging',
-    'networkx_digraph_to_dependency_dict',
+    'networkx_digraph_to_dependency_dict', 'output_graph_image',
 ]
 
 
@@ -199,3 +199,57 @@ def networkx_digraph_to_dependency_dict(
                 res_graph[rec] = set()
             res_graph[rec].add(sender)
     return res_graph
+
+
+def output_graph_image(
+    graph: Union[typing_graph_dependency_dict, nx.Graph],
+    filename: str = None,
+    format: str = 'png',
+):
+    """
+    Writes an image representation of **graph** to file **filename**.
+
+    Args:
+        graph: a graph in dependency dict form
+        filename (str, optional): full path of image to write. Defaults
+            to 'graph-scheduler-figure-<graph id>.<format>' in the current
+            directory.
+        format (str, optional): image format. Many common formats
+            supported. Pass None to display supported formats. Defaults
+            to png.
+
+    Requires:
+        - system graphviz: https://graphviz.org/download
+        - Python pydot: pip install pydot
+    """
+    if filename is None:
+        filename = f'graph-scheduler-figure-{id(graph)}.{format}'
+
+    if not isinstance(graph, nx.Graph):
+        graph = dependency_dict_to_networkx_digraph(graph)
+
+    try:
+        pd = nx.drawing.nx_pydot.to_pydot(graph)
+    except ModuleNotFoundError as e:
+        raise ModuleNotFoundError(
+            'Python pydot is required for output_graph_image.'
+            ' Install it with: pip install pydot'
+        ) from e
+
+    try:
+        pd.write(filename, format=format)
+    except AssertionError as e:
+        raise AssertionError(
+            f"Format '{format}' not recognized. Supported formats:"
+            f" {', '.join(pd.formats)}"
+        ) from e
+    except FileNotFoundError as e:
+        if '"dot" not found in path' in str(e):
+            raise FileNotFoundError(
+                'System graphviz is required for output_graph_image.'
+                ' Install it from https://graphviz.org/download'
+            ) from e
+        else:
+            raise
+
+    print(f'graph_scheduler.output_graph_image: wrote {format} to {filename}')
