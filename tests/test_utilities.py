@@ -143,3 +143,16 @@ def test_output_graph_image(graph, nx_type, format, tmp_path):
 
     gs.output_graph_image(graph, fname, format)
     gs.output_graph_image(nx_graph, fname, format)
+
+
+@pytest.mark.parametrize(
+    'graph, expected_receivers',
+    [
+        (
+            {'A': set(), 'B': {'A'}, 'C': {'A', 'B'}, 'D': {'E'}, 'E': {'D'}, 'F': set()},
+            {'A': {'B', 'C'}, 'B': {'C'}, 'C': set(), 'D': {'E'}, 'E': {'D'}, 'F': set()},
+        ),
+    ]
+)
+def test_get_receivers(graph, expected_receivers):
+    assert gs.get_receivers(graph) == expected_receivers
