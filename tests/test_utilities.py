@@ -1,6 +1,8 @@
+import inspect
 import logging
 import types
 
+import networkx as nx
 import pytest
 
 import graph_scheduler as gs
@@ -28,6 +30,21 @@ t2 = HashableTestObject()
 test_graphs = [
     {t1: {1, 'A', t2}, 1: set(), 'A': {1}, t2: set()},
 ]
+nx_digraph_types = [
+    t for t in nx.__dict__.values()
+    if inspect.isclass(t) and issubclass(t, nx.DiGraph)
+]
+
+
+def graph_as_nx_graph(graph, typ=nx.DiGraph):
+    nx_graph = typ()
+
+    nx_graph.add_nodes_from(graph.keys())
+    for receiver, senders in graph.items():
+        for s in senders:
+            nx_graph.add_edge(s, receiver)
+
+    return nx_graph
 
 
 @pytest.mark.parametrize('graph', test_graphs)
@@ -94,3 +111,24 @@ def test_debug_helpers(clean_logging, request, disable_level):
     gs.disable_debug_logging()
     assert_initialized_gs_logger_properties()
     assert root_logger.level == logging.WARNING
+
+
+@pytest.mark.parametrize('graph', test_graphs)
+@pytest.mark.parametrize('nx_type', nx_digraph_types)
+def test_convert_from_dependency_dict(graph, nx_type):
+    res = gs.networkx_digraph_to_dependency_dict(
+        gs.dependency_dict_to_networkx_digraph(graph, nx_type)
+    )
+    assert graph == res
+
+
+@pytest.mark.parametrize('graph', test_graphs)
+@pytest.mark.parametrize('nx_type', nx_digraph_types)
+def test_convert_from_nx_graph(graph, nx_type):
+    nx_graph = graph_as_nx_graph(graph, nx_type)
+
+    res = gs.dependency_dict_to_networkx_digraph(
+        gs.networkx_digraph_to_dependency_dict(nx_graph), nx_type,
+    )
+    assert nx_graph.nodes == nx_graph.nodes
+    assert nx_graph.edges == res.edges

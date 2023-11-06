@@ -4,8 +4,13 @@ import logging
 import weakref
 from typing import Dict, Hashable, Set
 
+import networkx as nx
 
-__all__ = ['clone_graph', 'disable_debug_logging', 'enable_debug_logging']
+__all__ = [
+    'clone_graph', 'dependency_dict_to_networkx_digraph',
+    'disable_debug_logging', 'enable_debug_logging',
+    'networkx_digraph_to_dependency_dict',
+]
 
 
 logger = logging.getLogger(__name__)
@@ -150,3 +155,47 @@ def disable_debug_logging(level: int = logging.WARNING):
     )
 
     root_logger.setLevel(level)
+
+
+def dependency_dict_to_networkx_digraph(
+    graph: typing_graph_dependency_dict, nx_type=nx.DiGraph
+) -> nx.DiGraph:
+    """
+    Converts a graph in dependency dict form to a networkx DiGraph of type
+    **nx_type**
+
+    Args:
+        graph: a graph in dependency dict form
+        nx_type (optional): a subclass of networkx.DiGraph
+
+    Returns:
+        networkx.DiGraph
+    """
+    # networkx treats dict arguments as {sender: {receivers}}, so
+    # reverse directed graphs
+    return nx_type(graph).reverse()
+
+
+def networkx_digraph_to_dependency_dict(
+    graph: nx.DiGraph, add_missing=True
+) -> typing_graph_dependency_dict:
+    """
+    Converts a networkx DiGraph to a graph in dependency dict form
+
+    Args:
+        graph: a networkx.DiGraph
+        add_missing: if True, adds empty set of dependencies for nodes
+        listed only in dependencies of other nodes
+
+    Returns:
+        a graph in dependency dict form
+    """
+    res_graph = {}
+    for sender, receivers in graph.adj.items():
+        if add_missing and sender not in res_graph:
+            res_graph[sender] = set()
+        for rec in receivers:
+            if rec not in res_graph:
+                res_graph[rec] = set()
+            res_graph[rec].add(sender)
+    return res_graph
