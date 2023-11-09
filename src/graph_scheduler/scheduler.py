@@ -359,8 +359,12 @@ class Scheduler:
     ---------
 
     graph : Dict[object: set(object)], `networkx.DiGraph`
-        a graph specification dictionary - each entry of the dictionary must be an object,
-        and the value of each entry must be a set of zero or more objects that project directly to the key.
+        a directed acyclic graph (DAG). Specified as either:
+            - a graph specification dictionary: each entry of the
+            dictionary must be an object, and the value of each entry
+            must be a set of zero or more objects that project directly
+            to the key.
+            - a `networkx.DiGraph`
 
     conditions  : ConditionSet
         set of `Conditions <Condition>` that specify when individual nodes in **graph**
@@ -394,8 +398,10 @@ class Scheduler:
     consideration_queue_indices : dict
         a dict mapping **nodes** to their position in the `consideration_queue`
 
-    termination_conds : Dict[TimeScale: Condition]
-        a mapping from `TimeScales <TimeScale>` to `Conditions <Condition>` that, when met, terminate the execution
+    termination_conds : Dict[TimeScale: `Condition <graph_scheduler.condition.Condition>`]
+        a mapping from `TimeScales <TimeScale>` to `Conditions
+        <graph_scheduler.condition.Condition>` that, when met, terminate
+        the execution
         of the specified `TimeScale`. On set, update only for the
         `TimeScale`\\ s specified in the argument.
 
