@@ -1,4 +1,4 @@
-name: CI Core
+name: CI Integration
 
 on:
   push:
@@ -15,7 +15,7 @@ on:
       - 'docs_requirements.txt'
 
 jobs:
-  build:
+  psyneulink:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -52,27 +52,11 @@ jobs:
         restore-keys: ${{ runner.os }}-python-${{ matrix.python-version }}-${{ matrix.python-architecture }}-pip-wheels-v2
 
     - name: Install package
-      run: python -m pip install -r dev_requirements.txt && python -m pip install -e .
-
-    - name: Install coverage helper
-      if: ${{ matrix.python-version == 3.9 }}
-      run: python -m pip install coveragepy-lcov "coverage<7.0.0"
-
-    - name: Install Graphviz
-      uses: tlylt/install-graphviz@v1
-
-    - name: Lint with flake8
-      shell: bash
-      run: |
-        pip install flake8
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --exit-zero --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      run: python -m pip install -r psyneulink_requirements.txt && python -m pip install -e .[dev]
 
     - name: Test with pytest
       timeout-minutes: 80
-      run: pytest --junit-xml=tests_out.xml --verbosity=0 -n auto --ignore tests/integration/
+      run: pytest --junit-xml=tests_out.xml --verbosity=0 -n auto --no-cov tests/integration/psyneulink/
 
     - name: Upload test results
       uses: actions/upload-artifact@v3
@@ -81,27 +65,3 @@ jobs:
         path: tests_out.xml
         retention-days: 5
       if: success() || failure()
-
-    - name: Convert coverage file
-      if: ${{ matrix.python-version == 3.9 && matrix.os == 'ubuntu-latest' }}
-      run: |
-        coveragepy-lcov --data_file_path .coverage --output_file_path lcov.info
-
-    - name: Upload to Coveralls
-      if: ${{ matrix.python-version == 3.9 && matrix.os == 'ubuntu-latest' }}
-      uses: coverallsapp/github-action@master
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        path-to-lcov: lcov.info
-
-    - name: Build dist
-      run: |
-        pip install setuptools wheel
-        python setup.py sdist bdist_wheel
-
-    - name: Upload dist packages
-      uses: actions/upload-artifact@v3
-      with:
-        name: dist-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.python-architecture }}
-        path: dist/
-        retention-days: 2

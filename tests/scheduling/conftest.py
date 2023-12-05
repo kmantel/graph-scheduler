@@ -14,19 +14,6 @@ def pytest_assertrepr_compare(op, left, right):
 
 
 @pytest.helpers.register
-def setify_expected_output(expected_output):
-    type_set = type(set())
-    for i in range(len(expected_output)):
-        if type(expected_output[i]) is not type_set:
-            try:
-                iter(expected_output[i])
-                expected_output[i] = set(expected_output[i])
-            except TypeError:
-                expected_output[i] = set([expected_output[i]])
-    return expected_output
-
-
-@pytest.helpers.register
 def create_graph_from_pathways(*pathways):
     dependency_dict = {}
     for p in pathways:

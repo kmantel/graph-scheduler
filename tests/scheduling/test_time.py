@@ -116,8 +116,8 @@ class TestTimeHistoryTree:
 class TestAliasTimeScale:
     @pytest.fixture(scope='class', autouse=True)
     def setup_alias(cls):
-        # must save and replace psyneulink aliases as long as tests still
-        # depend on psyneulink
+        # save and replace other aliases in case integration packages
+        # apply them (psyneulink does)
         existing_aliases = gs.time._time_scale_aliases.copy()
         for ts, alias in existing_aliases.items():
             gs.remove_time_scale_alias(alias)
