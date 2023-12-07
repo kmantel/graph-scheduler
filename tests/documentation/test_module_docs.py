@@ -1,15 +1,15 @@
 import doctest
 
 import pytest
-import graph_scheduler
+import graph_scheduler as gs
 
 
 @pytest.mark.parametrize(
     "mod",
     [
-        graph_scheduler.condition,
-        graph_scheduler.scheduler,
-        graph_scheduler.time,
+        gs.condition,
+        gs.scheduler,
+        gs.time,
     ]
 )
 def test_other_docs(mod, capsys):
