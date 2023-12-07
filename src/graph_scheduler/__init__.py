@@ -20,14 +20,17 @@ _unit_registry.precision = 8  # TODO: remove when floating point issues resolved
 from . import condition  # noqa: E402
 from . import scheduler  # noqa: E402
 from . import time  # noqa: E402
+from . import utilities  # noqa: E402
 
 from .condition import *  # noqa: E402
 from .scheduler import *  # noqa: E402
 from .time import *  # noqa: E402
+from .utilities import *  # noqa: E402
 
 __all__ = list(condition.__all__)
 __all__.extend(scheduler.__all__)
 __all__.extend(time.__all__)
+__all__.extend(utilities.__all__)
 __all__.extend([
     '_unit_registry'
 ])
