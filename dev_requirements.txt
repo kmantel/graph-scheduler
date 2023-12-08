@@ -1,5 +1,5 @@
-networkx
 psyneulink >=0.9.1.0
+pydot
 pytest
 pytest-benchmark
 pytest-cov
