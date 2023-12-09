@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Scheduler &mdash; Graph Scheduler 1.1.2+17.gee708ec documentation</title>
+  <title>Scheduler &mdash; Graph Scheduler 1.1.2+22.ge2ead05 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
 
@@ -38,7 +38,7 @@
             Graph Scheduler
           </a>
               <div class="version">
-                1.1.2+17
+                1.1.2+22
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -386,14 +386,23 @@ Additionally, non-absolute conditions like
 </section>
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.scheduler.Scheduler">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.scheduler.</span></span><span class="sig-name descname"><span class="pre">Scheduler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conditions=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">termination_conds=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_execution_id=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode=SchedulingMode.STANDARD</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_absolute_time_unit=&lt;Quantity(1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'millisecond')&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.scheduler.Scheduler" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.scheduler.</span></span><span class="sig-name descname"><span class="pre">Scheduler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conditions=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">termination_conds=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_execution_id=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode=SchedulingMode.STANDARD</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_absolute_time_unit=&lt;Quantity(1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'millisecond')&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.scheduler.Scheduler" title="Permalink to this definition"></a></dt>
 <dd><p>Generates an order of execution for nodes in a graph or graph
 specification dictionary, possibly determined by a set of <a class="reference internal" href="Condition.html"><span class="doc">Conditions</span></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>graph</strong> (Dict[object: set(object)], <a class="reference external" href="https://networkx.org/documentation/stable/reference/classes/digraph.html#networkx.DiGraph" title="(in NetworkX v3.2.1)"><code class="xref any docutils literal notranslate"><span class="pre">networkx.DiGraph</span></code></a>) – a graph specification dictionary - each entry of the dictionary must be an object,
-and the value of each entry must be a set of zero or more objects that project directly to the key.</p></li>
+<li><p><strong>graph</strong> (Dict[object: set(object)], <a class="reference external" href="https://networkx.org/documentation/stable/reference/classes/digraph.html#networkx.DiGraph" title="(in NetworkX v3.2.1)"><code class="xref any docutils literal notranslate"><span class="pre">networkx.DiGraph</span></code></a>) – <dl>
+<dt>a directed acyclic graph (DAG). Specified as either:</dt><dd><ul>
+<li><p>a graph specification dictionary: each entry of the</p></li>
+</ul>
+<p>dictionary must be an object, and the value of each entry
+must be a set of zero or more objects that project directly
+to the key.
+- a <a class="reference external" href="https://networkx.org/documentation/stable/reference/classes/digraph.html#networkx.DiGraph" title="(in NetworkX v3.2.1)"><code class="xref any docutils literal notranslate"><span class="pre">networkx.DiGraph</span></code></a></p>
+</dd>
+</dl>
+</p></li>
 <li><p><strong>conditions</strong> (<a class="reference internal" href="Condition.html#graph_scheduler.condition.ConditionSet" title="graph_scheduler.condition.ConditionSet"><em>ConditionSet</em></a>) – set of <a class="reference internal" href="Condition.html"><span class="doc">Conditions</span></a> that specify when individual nodes in <strong>graph</strong>
 execute and any dependencies among them.</p></li>
 <li><p><strong>mode</strong> (<a class="reference internal" href="#graph_scheduler.scheduler.SchedulingMode" title="graph_scheduler.scheduler.SchedulingMode"><em>SchedulingMode</em></a><em>[</em><em>STANDARD</em><em>|</em><em>EXACT_TIME</em><em>] </em><em>: SchedulingMode.STANDARD</em>) – sets the mode of scheduling: <a class="reference internal" href="#scheduler-execution"><span class="std std-ref">standard</span></a> or
@@ -463,12 +472,13 @@ hashable.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="graph_scheduler.scheduler.Scheduler.termination_conds">
 <span class="sig-name descname"><span class="pre">termination_conds</span></span><a class="headerlink" href="#graph_scheduler.scheduler.Scheduler.termination_conds" title="Permalink to this definition"></a></dt>
-<dd><p>a mapping from <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale" title="graph_scheduler.time.TimeScale"><code class="xref any py py-class docutils literal notranslate"><span class="pre">TimeScales</span></code></a> to <a class="reference internal" href="Condition.html"><span class="doc">Conditions</span></a> that, when met, terminate the execution
+<dd><p>a mapping from <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale" title="graph_scheduler.time.TimeScale"><code class="xref any py py-class docutils literal notranslate"><span class="pre">TimeScales</span></code></a> to <a class="reference internal" href="Condition.html#graph_scheduler.condition.Condition" title="graph_scheduler.condition.Condition"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Conditions</span></code></a> that, when met, terminate
+the execution
 of the specified <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale" title="graph_scheduler.time.TimeScale"><code class="xref any py py-class docutils literal notranslate"><span class="pre">TimeScale</span></code></a>. On set, update only for the
 <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale" title="graph_scheduler.time.TimeScale"><code class="xref any py py-class docutils literal notranslate"><span class="pre">TimeScale</span></code></a>s specified in the argument.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Dict[TimeScale: Condition]</p>
+<dd class="field-odd"><p>Dict[TimeScale: <a class="reference internal" href="Condition.html#graph_scheduler.condition.Condition" title="graph_scheduler.condition.Condition"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Condition</span></code></a>]</p>
 </dd>
 </dl>
 </dd></dl>
