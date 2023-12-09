@@ -2042,7 +2042,7 @@ class Threshold(_DependencyValidation, Condition):
         if comparator not in comparison_operators:
             raise ConditionError(f'Operator must be one of {list(comparison_operators.keys())}')
 
-        if atol != 0 or rtol != 0 and comparator in {'<', '<=', '>', '>='}:
+        if (atol != 0 or rtol != 0) and comparator in {'<', '<=', '>', '>='}:
             warnings.warn('Tolerances for inequality comparators are ignored')
 
         if isinstance(indices, TimeScale):
