@@ -304,6 +304,7 @@ import fractions
 import logging
 from typing import Union
 
+import networkx as nx
 import numpy as np
 import pint
 from toposort import toposort
@@ -314,6 +315,7 @@ from graph_scheduler.condition import (
     _parse_absolute_unit, _quantity_as_integer,
 )
 from graph_scheduler.time import _get_pint_unit, Clock, TimeScale
+from graph_scheduler.utilities import clone_graph, networkx_digraph_to_dependency_dict
 
 __all__ = [
     'Scheduler', 'SchedulerError', 'SchedulingMode',
@@ -357,8 +359,12 @@ class Scheduler:
     ---------
 
     graph : Dict[object: set(object)], `networkx.DiGraph`
-        a graph specification dictionary - each entry of the dictionary must be an object,
-        and the value of each entry must be a set of zero or more objects that project directly to the key.
+        a directed acyclic graph (DAG). Specified as either:
+            - a graph specification dictionary: each entry of the
+            dictionary must be an object, and the value of each entry
+            must be a set of zero or more objects that project directly
+            to the key.
+            - a `networkx.DiGraph`
 
     conditions  : ConditionSet
         set of `Conditions <Condition>` that specify when individual nodes in **graph**
@@ -392,8 +398,10 @@ class Scheduler:
     consideration_queue_indices : dict
         a dict mapping **nodes** to their position in the `consideration_queue`
 
-    termination_conds : Dict[TimeScale: Condition]
-        a mapping from `TimeScales <TimeScale>` to `Conditions <Condition>` that, when met, terminate the execution
+    termination_conds : Dict[TimeScale: `Condition <graph_scheduler.condition.Condition>`]
+        a mapping from `TimeScales <TimeScale>` to `Conditions
+        <graph_scheduler.condition.Condition>` that, when met, terminate
+        the execution
         of the specified `TimeScale`. On set, update only for the
         `TimeScale`\\ s specified in the argument.
 
@@ -420,7 +428,6 @@ class Scheduler:
         default_execution_id=None,
         mode: SchedulingMode = SchedulingMode.STANDARD,
         default_absolute_time_unit: Union[str, pint.Quantity] = _get_pint_unit(1, 'ms'),
-        **kwargs
     ):
         """
         :param self:
@@ -442,24 +449,24 @@ class Scheduler:
         self.mode = mode
         self.default_absolute_time_unit = _parse_absolute_unit(default_absolute_time_unit)
 
-        if graph is not None:
-            try:
-                # networkx graph
-                self.dependency_dict = {
-                    child: set(parents.keys())
-                    for child, parents in graph.succ.items()
-                }
-            except AttributeError:
-                self.dependency_dict = graph
-            self.consideration_queue = list(toposort(self.dependency_dict))
-            self.nodes = []
-            for consideration_set in self.consideration_queue:
-                for node in consideration_set:
-                    self.nodes.append(node)
-        else:
+        if isinstance(graph, nx.DiGraph):
+            self.dependency_dict = networkx_digraph_to_dependency_dict(graph)
+        elif graph is None or isinstance(graph, nx.Graph):
             raise SchedulerError(
                 'Must instantiate a Scheduler with a graph dependency dict or a networkx.DiGraph'
             )
+        else:
+            # add empty dependency set for senders that aren't present
+            self.dependency_dict = {
+                **{n: set() for n in set().union(*graph.values())},
+                **clone_graph(graph)
+            }
+
+        self.consideration_queue = list(toposort(self.dependency_dict))
+        self.nodes = []
+        for consideration_set in self.consideration_queue:
+            for node in consideration_set:
+                self.nodes.append(node)
 
         self._generate_consideration_queue_indices()
 
