@@ -9,6 +9,31 @@ import pytest
 logger = logging.getLogger(__name__)
 
 
+class TestConditionSet:
+    # maintain through v1.x
+    class TestConstructorInterface:
+        @pytest.fixture
+        def conds(self):
+            return {
+                'A': gs.Never(),
+                'B': gs.EveryNCalls('A', 1),
+                'C': gs.And(
+                    gs.Or(
+                        gs.TimeInterval(repeat=1), gs.Always()
+                    ),
+                    gs.JustRan('B')
+                )
+            }
+
+        def test_positional_arg(self, conds):
+            cond_set = gs.ConditionSet(conds)
+            assert cond_set.conditions == conds
+
+        def test_keyword_arg(self, conds):
+            cond_set = gs.ConditionSet(conditions=conds)
+            assert cond_set.conditions == conds
+
+
 class TestCondition:
 
     def test_invalid_input_WhenFinished(self):
