@@ -901,7 +901,10 @@ class Scheduler:
             if cond.is_absolute
         }
 
-    def get_clock(self, execution_id):
+    def get_clock(self, execution_id=NotImplemented):
+        if execution_id is NotImplemented:
+            execution_id = self.default_execution_id
+
         try:
             return self.clocks[execution_id.default_execution_id]
         except AttributeError:
