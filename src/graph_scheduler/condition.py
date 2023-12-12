@@ -399,6 +399,10 @@ class ConditionSet(object):
     Arguments
     ---------
 
+    *condition_sets
+        each item is a dict or ConditionSet mapping nodes to conditions
+        to be added via `ConditionSet.add_condition_set`
+
     conditions : Dict[node: `Condition`]
         specifies an iterable collection of nodes and the `Conditions <Condition>` associated
         with each.
@@ -412,8 +416,13 @@ class ConditionSet(object):
         ConditionSet using the ConditionSet's `add_condition` method.
 
     """
-    def __init__(self, conditions=None):
+    def __init__(self, *condition_sets, conditions=None):
         self.conditions = {}
+
+        for cset in condition_sets:
+            if cset is None:
+                continue
+            self.add_condition_set(cset)
 
         if conditions is not None:
             self.add_condition_set(conditions)
