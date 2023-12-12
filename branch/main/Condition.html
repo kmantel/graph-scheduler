@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Condition &mdash; Graph Scheduler 1.1.2+26.g89c3677 documentation</title>
+  <title>Condition &mdash; Graph Scheduler 1.1.2+27.g73c5011 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
 
@@ -38,7 +38,7 @@
             Graph Scheduler
           </a>
               <div class="version">
-                1.1.2+26
+                1.1.2+27
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -2234,12 +2234,16 @@ unsatisfaction of this Condition or those it contains</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="graph_scheduler.condition.ConditionSet">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">ConditionSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conditions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.ConditionSet" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">graph_scheduler.condition.</span></span><span class="sig-name descname"><span class="pre">ConditionSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">condition_sets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conditions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#graph_scheduler.condition.ConditionSet" title="Permalink to this definition"></a></dt>
 <dd><p>Used in conjunction with a <a class="reference internal" href="Scheduler.html#graph_scheduler.scheduler.Scheduler" title="graph_scheduler.scheduler.Scheduler"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Scheduler</span></code></a> to store the <a class="reference internal" href="#"><span class="doc">Conditions</span></a> associated with a node.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>conditions</strong> (Dict[node: <a class="reference internal" href="#"><span class="doc">Condition</span></a>]) – specifies an iterable collection of nodes and the <a class="reference internal" href="#"><span class="doc">Conditions</span></a> associated
-with each.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>*condition_sets</strong> – each item is a dict or ConditionSet mapping nodes to conditions
+to be added via <a class="reference internal" href="#graph_scheduler.condition.ConditionSet.add_condition_set" title="graph_scheduler.condition.ConditionSet.add_condition_set"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">ConditionSet.add_condition_set</span></code></a></p></li>
+<li><p><strong>conditions</strong> (Dict[node: <a class="reference internal" href="#"><span class="doc">Condition</span></a>]) – specifies an iterable collection of nodes and the <a class="reference internal" href="#"><span class="doc">Conditions</span></a> associated
+with each.</p></li>
+</ul>
 </dd>
 </dl>
 <dl class="py attribute">
