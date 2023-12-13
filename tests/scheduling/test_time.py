@@ -1,7 +1,8 @@
-import psyneulink as pnl
 import pytest
 
 import graph_scheduler as gs
+
+SimpleTestNode = pytest.helpers.get_test_node()
 
 
 class TestTime:
@@ -34,21 +35,22 @@ class TestTime:
         base._increment_by_time_scale(increment_time_scale)
         assert base == expected
 
-    @pytest.mark.psyneulink
     def test_multiple_runs(self):
-        t1 = pnl.TransferMechanism()
-        t2 = pnl.TransferMechanism()
+        t1 = SimpleTestNode('t1')
+        t2 = SimpleTestNode('t2')
 
-        C = pnl.Composition(pathways=[t1, t2])
+        sched = gs.Scheduler(graph={t1: set(), t2: {t1}})
 
-        C.run(inputs={t1: [[1.0], [2.0], [3.0]]})
-        assert C.scheduler.get_clock(C).time == pnl.Time(run=1, trial=0, pass_=0, time_step=0)
+        sched.run()
+        sched.end_environment_sequence()
+        assert sched.get_clock().time == gs.Time(environment_sequence=1, environment_state_update=0, pass_=0, consideration_set_execution=0)
 
-        C.run(inputs={t1: [[4.0], [5.0], [6.0]]})
-        assert C.scheduler.get_clock(C).time == pnl.Time(run=2, trial=0, pass_=0, time_step=0)
+        sched.run()
+        sched.end_environment_sequence()
+        assert sched.get_clock().time == gs.Time(environment_sequence=2, environment_state_update=0, pass_=0, consideration_set_execution=0)
 
     def test_get_set_item_time(self):
-        t = gs.Time(run=1, trial=2, pass_=3, time_step=4)
+        t = gs.Time(environment_sequence=1, environment_state_update=2, pass_=3, consideration_set_execution=4)
         st = gs.SimpleTime(t)
 
         assert t[0] == 4
@@ -116,8 +118,8 @@ class TestTimeHistoryTree:
 class TestAliasTimeScale:
     @pytest.fixture(scope='class', autouse=True)
     def setup_alias(cls):
-        # must save and replace psyneulink aliases as long as tests still
-        # depend on psyneulink
+        # save and replace other aliases in case integration packages
+        # apply them (psyneulink does)
         existing_aliases = gs.time._time_scale_aliases.copy()
         for ts, alias in existing_aliases.items():
             gs.remove_time_scale_alias(alias)

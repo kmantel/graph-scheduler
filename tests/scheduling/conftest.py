@@ -1,7 +1,26 @@
 import types
 
-import psyneulink as pnl
 import pytest
+
+import graph_scheduler as gs
+
+
+class SimpleTestNode(types.SimpleNamespace):
+    def __init__(self, name=None, is_finished_flag=True, value=0):
+        super().__init__(name=name, is_finished_flag=is_finished_flag, value=value)
+
+    def __hash__(self):
+        return id(self)
+
+    def __repr__(self):
+        return str(self.name)
+
+    def is_finished(self, execution_id):
+        return self.is_finished_flag
+
+    def add(self, n=1):
+        self.value += n
+        return self.value
 
 
 def pytest_assertrepr_compare(op, left, right):
@@ -11,19 +30,6 @@ def pytest_assertrepr_compare(op, left, right):
             'Actual output:', str(left),
             'Expected output:', str(right)
         ]
-
-
-@pytest.helpers.register
-def setify_expected_output(expected_output):
-    type_set = type(set())
-    for i in range(len(expected_output)):
-        if type(expected_output[i]) is not type_set:
-            try:
-                iter(expected_output[i])
-                expected_output[i] = set(expected_output[i])
-            except TypeError:
-                expected_output[i] = set([expected_output[i]])
-    return expected_output
 
 
 @pytest.helpers.register
@@ -50,12 +56,25 @@ def create_node(function=lambda x: x):
 
 
 @pytest.fixture
-def three_node_linear_composition():
-    A = pnl.TransferMechanism(name='A')
-    B = pnl.TransferMechanism(name='B')
-    C = pnl.TransferMechanism(name='C')
+def three_node_linear_scheduler():
+    A = SimpleTestNode('A')
+    B = SimpleTestNode('B')
+    C = SimpleTestNode('C')
 
-    comp = pnl.Composition()
-    comp.add_linear_processing_pathway([A, B, C])
+    sched = gs.Scheduler(graph=create_graph_from_pathways([A, B, C]))
 
-    return comp.nodes, comp
+    return sched.nodes, sched
+
+
+@pytest.helpers.register
+def get_test_node():
+    return SimpleTestNode
+
+
+@pytest.helpers.register
+def run_scheduler(scheduler, func=lambda test_node: test_node, **run_kwargs):
+    for execution_set in scheduler.run(**run_kwargs):
+        for node in execution_set:
+            func(node)
+
+    return [node.value for node in scheduler.nodes]
