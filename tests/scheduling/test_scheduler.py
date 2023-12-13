@@ -501,9 +501,9 @@ class TestLinear:
         termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(2)
         termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNCalls(C, 3)
         comp.run(
-                inputs={A: [[0], [1], [2], [3], [4], [5]]},
-                scheduler=sched,
-                termination_processing=termination_conds
+            inputs={A: [[0], [1], [2], [3], [4], [5]]},
+            scheduler=sched,
+            termination_processing=termination_conds
         )
         output = sched.execution_list[comp.default_execution_id]
 
@@ -1335,7 +1335,7 @@ class TestBranching:
             function=pnl.Linear(slope=2.0),
         )
 
-        c = pnl.Composition(pathways=[[A,B],[A,C]])
+        c = pnl.Composition(pathways=[[A, B], [A, C]])
 
         term_conds = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.AfterNCalls(C, 1)}
         stim_list = {A: [[1]]}
@@ -1384,7 +1384,7 @@ class TestBranching:
             function=pnl.Linear(slope=2.0),
         )
 
-        c = pnl.Composition(pathways=[[A,B],[A,C]])
+        c = pnl.Composition(pathways=[[A, B], [A, C]])
 
         term_conds = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.AfterNCalls(C, 1)}
         stim_list = {A: [[1]]}
@@ -1431,7 +1431,7 @@ class TestBranching:
             function=pnl.Linear(slope=2.0),
         )
 
-        c = pnl.Composition(pathways=[[A,B],[A,C]])
+        c = pnl.Composition(pathways=[[A, B], [A, C]])
 
         term_conds = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.AfterNCalls(C, 2)}
         stim_list = {A: [[1]]}
@@ -1483,7 +1483,7 @@ class TestBranching:
             function=pnl.Linear(slope=2.0),
         )
 
-        c = pnl.Composition(pathways=[[A,C],[B,C]])
+        c = pnl.Composition(pathways=[[A, C], [B, C]])
 
         term_conds = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.AfterNCalls(C, 1)}
         stim_list = {A: [[1]], B: [[2]]}
@@ -1531,7 +1531,7 @@ class TestBranching:
             function=pnl.Linear(slope=2.0),
         )
 
-        c = pnl.Composition(pathways=[[A,C],[B,C]])
+        c = pnl.Composition(pathways=[[A, C], [B, C]])
 
         term_conds = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.AfterNCalls(C, 2)}
         stim_list = {A: [[1]], B: [[2]]}
@@ -1581,7 +1581,7 @@ class TestBranching:
             )
         )
 
-        c = pnl.Composition(pathways=[[A,C],[B,C]])
+        c = pnl.Composition(pathways=[[A, C], [B, C]])
 
         term_conds = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.AfterNCalls(C, 2)}
         stim_list = {A: [[1]], B: [[1]]}
@@ -1642,7 +1642,7 @@ class TestBranching:
             function=pnl.Linear(slope=1.0),
         )
 
-        c = pnl.Composition(pathways=[[A,B,D],[A,C,D]])
+        c = pnl.Composition(pathways=[[A, B, D], [A, C, D]])
 
         term_conds = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.AfterNCalls(D, 1)}
         stim_list = {A: [[1]]}
@@ -1702,7 +1702,7 @@ class TestBranching:
             )
         )
 
-        c = pnl.Composition(pathways=[[A,C],[A,D],[B,C],[B,D]])
+        c = pnl.Composition(pathways=[[A, C], [A, D], [B, C], [B, D]])
 
         term_conds = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.All(pnl.AfterNCalls(C, 1), pnl.AfterNCalls(D, 1))}
         stim_list = {A: [[1]], B: [[1]]}
@@ -1771,7 +1771,7 @@ class TestBranching:
             function=pnl.Linear(slope=2.0),
         )
 
-        c = pnl.Composition(pathways=[[A,C,D],[B,C,E]])
+        c = pnl.Composition(pathways=[[A, C, D], [B, C, E]])
 
         term_conds = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.AfterNCalls(E, 1)}
         stim_list = {A: [[1]], B: [[2]]}
@@ -1857,7 +1857,7 @@ class TestBranching:
             )
         )
 
-        c = pnl.Composition(pathways=[[A,C,E],[A,C,F],[A,D,E],[A,D,F],[B,C,E],[B,C,F],[B,D,E],[B,D,F]])
+        c = pnl.Composition(pathways=[[A, C, E], [A, C, F], [A, D, E], [A, D, F], [B, C, E], [B, C, F], [B, D, E], [B, D, F]])
 
         term_conds = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.All(pnl.AfterNCalls(E, 1), pnl.AfterNCalls(F, 1))}
         stim_list = {A: [[1]], B: [[1]]}
@@ -1990,7 +1990,7 @@ class TestTermination:
             function=pnl.Linear(slope=2.0),
         )
 
-        c = pnl.Composition(pathways=[[A,B]])
+        c = pnl.Composition(pathways=[[A, B]])
 
         term_conds = {pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.AfterNCalls(B, 2)}
         stim_list = {A: [[1]]}
@@ -2026,22 +2026,28 @@ class TestTermination:
         for i in range(len(expected_output)):
             np.testing.assert_allclose(expected_output[i], terminal_mech.get_output_values(c)[i])
 
-    @pytest.mark.parametrize('timescale, expected',
-                             [(pnl.TimeScale.CONSIDERATION_SET_EXECUTION, [[0.5], [0.4375]]),
-                              (pnl.TimeScale.PASS, [[0.5], [0.4375]]),
-                              (pnl.TimeScale.ENVIRONMENT_STATE_UPDATE, [[1.5], [0.4375]]),
-                              (pnl.TimeScale.ENVIRONMENT_SEQUENCE, [[1.5], [0.4375]])],
-                              ids=lambda x: x if isinstance(x, pnl.TimeScale) else "")
+    @pytest.mark.parametrize(
+        'timescale, expected',
+        [
+            (pnl.TimeScale.CONSIDERATION_SET_EXECUTION, [[0.5], [0.4375]]),
+            (pnl.TimeScale.PASS, [[0.5], [0.4375]]),
+            (pnl.TimeScale.ENVIRONMENT_STATE_UPDATE, [[1.5], [0.4375]]),
+            (pnl.TimeScale.ENVIRONMENT_SEQUENCE, [[1.5], [0.4375]])
+        ],
+        ids=lambda x: x if isinstance(x, pnl.TimeScale) else ""
+    )
     # 'LLVM' mode is not supported, because synchronization of compiler and
     # python values during execution is not implemented.
     @pytest.mark.usefixtures("comp_mode_no_llvm")
     def test_time_termination_measures(self, comp_mode, timescale, expected):
         in_one_pass = timescale in {pnl.TimeScale.CONSIDERATION_SET_EXECUTION, pnl.TimeScale.PASS}
-        attention = pnl.TransferMechanism(name='Attention',
-                                 integrator_mode=True,
-                                 termination_threshold=3,
-                                 termination_measure=timescale,
-                                 execute_until_finished=in_one_pass)
+        attention = pnl.TransferMechanism(
+            name='Attention',
+            integrator_mode=True,
+            termination_threshold=3,
+            termination_measure=timescale,
+            execute_until_finished=in_one_pass
+        )
         counter = pnl.IntegratorMechanism(
             function=pnl.AdaptiveIntegrator(rate=0.0, offset=1.0))
 
@@ -2061,39 +2067,43 @@ class TestTermination:
             assert response.execution_count == 1
         assert np.allclose(result, expected)
 
-    @pytest.mark.parametrize("condition,scale,expected_result",
-                             [(pnl.BeforeNCalls, pnl.TimeScale.ENVIRONMENT_STATE_UPDATE, [[.05, .05]]),
-                              (pnl.BeforeNCalls, pnl.TimeScale.PASS, [[.05, .05]]),
-                              (pnl.EveryNCalls, None, [[0.05, .05]]),
-                              (pnl.AtNCalls, pnl.TimeScale.ENVIRONMENT_STATE_UPDATE, [[.25, .25]]),
-                              (pnl.AtNCalls, pnl.TimeScale.ENVIRONMENT_SEQUENCE, [[.25, .25]]),
-                              (pnl.AfterNCalls, pnl.TimeScale.ENVIRONMENT_STATE_UPDATE, [[.25, .25]]),
-                              (pnl.AfterNCalls, pnl.TimeScale.PASS, [[.05, .05]]),
-                              (pnl.WhenFinished, None, [[1.0, 1.0]]),
-                              (pnl.WhenFinishedAny, None, [[1.0, 1.0]]),
-                              (pnl.WhenFinishedAll, None, [[1.0, 1.0]]),
-                              (pnl.All, None, [[1.0, 1.0]]),
-                              (pnl.Any, None, [[1.0, 1.0]]),
-                              (pnl.Not, None, [[.05, .05]]),
-                              (pnl.AllHaveRun, None, [[.05, .05]]),
-                              (pnl.Always, None, [[0.05, 0.05]]),
-                              (pnl.AtPass, None, [[.3, .3]]),
-                              (pnl.AtTrial, None, [[0.05, 0.05]]),
-                              #(pnl.Never), #TODO: Find a good test case for this!
-                            ])
+    @pytest.mark.parametrize(
+        "condition,scale,expected_result",
+        [
+            (pnl.BeforeNCalls, pnl.TimeScale.ENVIRONMENT_STATE_UPDATE, [[.05, .05]]),
+            (pnl.BeforeNCalls, pnl.TimeScale.PASS, [[.05, .05]]),
+            (pnl.EveryNCalls, None, [[0.05, .05]]),
+            (pnl.AtNCalls, pnl.TimeScale.ENVIRONMENT_STATE_UPDATE, [[.25, .25]]),
+            (pnl.AtNCalls, pnl.TimeScale.ENVIRONMENT_SEQUENCE, [[.25, .25]]),
+            (pnl.AfterNCalls, pnl.TimeScale.ENVIRONMENT_STATE_UPDATE, [[.25, .25]]),
+            (pnl.AfterNCalls, pnl.TimeScale.PASS, [[.05, .05]]),
+            (pnl.WhenFinished, None, [[1.0, 1.0]]),
+            (pnl.WhenFinishedAny, None, [[1.0, 1.0]]),
+            (pnl.WhenFinishedAll, None, [[1.0, 1.0]]),
+            (pnl.All, None, [[1.0, 1.0]]),
+            (pnl.Any, None, [[1.0, 1.0]]),
+            (pnl.Not, None, [[.05, .05]]),
+            (pnl.AllHaveRun, None, [[.05, .05]]),
+            (pnl.Always, None, [[0.05, 0.05]]),
+            (pnl.AtPass, None, [[.3, .3]]),
+            (pnl.AtTrial, None, [[0.05, 0.05]]),
+            # (pnl.Never), #TODO: Find a good test case for this!
+        ]
+    )
     # 'LLVM' mode is not supported, because synchronization of compiler and
     # python values during execution is not implemented.
     @pytest.mark.usefixtures("comp_mode_no_llvm")
     def test_scheduler_conditions(self, comp_mode, condition, scale, expected_result):
         decisionMaker = pnl.DDM(
-                        function=pnl.DriftDiffusionIntegrator(starting_value=0,
-                                                              threshold=1,
-                                                              noise=0.0,
-                                                              time_step_size=1.0),
-                        reset_stateful_function_when=pnl.AtTrialStart(),
-                        execute_until_finished=False,
-                        output_ports=[pnl.DECISION_VARIABLE, pnl.RESPONSE_TIME],
-                        name='pnl.DDM')
+            function=pnl.DriftDiffusionIntegrator(starting_value=0,
+                                                  threshold=1,
+                                                  noise=0.0,
+                                                  time_step_size=1.0),
+            reset_stateful_function_when=pnl.AtTrialStart(),
+            execute_until_finished=False,
+            output_ports=[pnl.DECISION_VARIABLE, pnl.RESPONSE_TIME],
+            name='pnl.DDM'
+        )
 
         response = pnl.ProcessingMechanism(size=2, name="GATE")
 
@@ -2136,19 +2146,24 @@ class TestTermination:
             comp.scheduler.add_condition(response, condition(0))
 
         result = comp.run([0.05], execution_mode=comp_mode)
-        #HACK: The result is an object dtype in Python mode for some reason?
+        # HACK: The result is an object dtype in Python mode for some reason?
         if comp_mode is pnl.ExecutionMode.Python:
             result = np.asfarray(result[0])
         assert np.allclose(result, expected_result)
 
-
-    @pytest.mark.parametrize("mode", [pnl.ExecutionMode.Python,
-                                      pytest.param(pnl.ExecutionMode.LLVMRun, marks=pytest.mark.llvm),
-                                      pytest.param(pnl.ExecutionMode.PTXRun, marks=[pytest.mark.llvm, pytest.mark.cuda]),
-                                     ])
-    @pytest.mark.parametrize("condition,scale,expected_result",
-                             [(pnl.AtTrial, None, [[[1.0]], [[2.0]]]),
-                             ])
+    @pytest.mark.parametrize(
+        "mode", [
+            pnl.ExecutionMode.Python,
+            pytest.param(pnl.ExecutionMode.LLVMRun, marks=pytest.mark.llvm),
+            pytest.param(pnl.ExecutionMode.PTXRun, marks=[pytest.mark.llvm, pytest.mark.cuda]),
+        ]
+    )
+    @pytest.mark.parametrize(
+        "condition,scale,expected_result",
+        [
+            (pnl.AtTrial, None, [[[1.0]], [[2.0]]]),
+        ]
+    )
     def test_run_term_conditions(self, mode, condition, scale, expected_result):
         incrementing_mechanism = pnl.ProcessingMechanism(
             function=pnl.SimpleIntegrator

@@ -1,14 +1,15 @@
 import doctest
-import pytest
 
+import pytest
 from psyneulink.core import llvm as pnlvm
 
 
 def pytest_runtest_setup(item):
     if 'cuda' in item.keywords and not pnlvm.ptx_enabled:
-            pytest.skip('PTX engine not enabled/available')
+        pytest.skip('PTX engine not enabled/available')
 
     doctest.ELLIPSIS_MARKER = "[...]"
+
 
 def pytest_generate_tests(metafunc):
     if "comp_mode_no_llvm" in metafunc.fixturenames:
@@ -23,20 +24,23 @@ def pytest_generate_tests(metafunc):
 def pytest_runtest_teardown(item):
     pnlvm.cleanup()
 
+
 @pytest.fixture
 def comp_mode_no_llvm():
     # dummy fixture to allow 'comp_mode' filtering
     pass
 
+
 @pytest.helpers.register
 def get_comp_execution_modes():
-    return [pytest.param(pnlvm.ExecutionMode.Python),
-            pytest.param(pnlvm.ExecutionMode.LLVM, marks=pytest.mark.llvm),
-            pytest.param(pnlvm.ExecutionMode.LLVMExec, marks=pytest.mark.llvm),
-            pytest.param(pnlvm.ExecutionMode.LLVMRun, marks=pytest.mark.llvm),
-            pytest.param(pnlvm.ExecutionMode.PTXExec, marks=[pytest.mark.llvm, pytest.mark.cuda]),
-            pytest.param(pnlvm.ExecutionMode.PTXRun, marks=[pytest.mark.llvm,  pytest.mark.cuda])
-           ]
+    return [
+        pytest.param(pnlvm.ExecutionMode.Python),
+        pytest.param(pnlvm.ExecutionMode.LLVM, marks=pytest.mark.llvm),
+        pytest.param(pnlvm.ExecutionMode.LLVMExec, marks=pytest.mark.llvm),
+        pytest.param(pnlvm.ExecutionMode.LLVMRun, marks=pytest.mark.llvm),
+        pytest.param(pnlvm.ExecutionMode.PTXExec, marks=[pytest.mark.llvm, pytest.mark.cuda]),
+        pytest.param(pnlvm.ExecutionMode.PTXRun, marks=[pytest.mark.llvm, pytest.mark.cuda])
+    ]
 
 
 # TODO: remove this helper when tests no longer use psyneulink
