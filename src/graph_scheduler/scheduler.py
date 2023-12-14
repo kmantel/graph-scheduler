@@ -33,6 +33,11 @@ Conditions can be added to a Scheduler when it is created by specifying a `Condi
 ConditionSets can also be added after the Scheduler has been created, using its `add_condition` and
 `add_condition_set` methods, respectively.
 
+`Graph structure Conditions <Condition_Graph_Structure_Intro>` are
+applied to the Scheduler's graph in the order in which they are `added
+<Scheduler.add_condition>`.
+
+
 .. _Scheduler_Algorithm:
 
 Algorithm
@@ -41,8 +46,12 @@ Algorithm
 .. _Consideration_Set:
 
 When a Scheduler is created, it constructs a `consideration_queue`:  a list of ``consideration sets``
-that defines the order in which nodes are eligible to be executed.  This is based on the dependencies specified in the graph
-specification provided in the Scheduler's constructor.  Each ``consideration_set``
+that defines the order in which nodes are eligible to be executed. This
+is determined by the topological ordering of the `graph
+<Scheduler.graph>` provided to the `Scheduler's constructor
+<Scheduler>`, which is then modified by any `graph structure conditions
+<Condition_Graph_Structure_Intro>` that are `added
+<Scheduler.add_condition>` to the Scheduler. Each ``consideration_set``
 is a set of nodes that are eligible to execute at the same time/`CONSIDERATION_SET_EXECUTION` (i.e.,
 that appear at the same "depth" in a sequence of dependencies, and among which there are no dependencies).  The first
 ``consideration_set`` consists of only origin nodes. The second consists of all nodes
@@ -153,11 +162,13 @@ for a particular node or set of nodes is met).
 *Termination Conditions*
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Termination conditions are `Conditions <Condition>` that specify when the open-ended units of time - `ENVIRONMENT_STATE_UPDATE
+Termination conditions are basic `Conditions <Condition>` that specify
+when the open-ended units of time - `ENVIRONMENT_STATE_UPDATE
 <TimeScale.ENVIRONMENT_STATE_UPDATE>` and `ENVIRONMENT_SEQUENCE` - have ended.  By default, the termination condition for an `ENVIRONMENT_STATE_UPDATE <TimeScale.ENVIRONMENT_STATE_UPDATE>` is
 `AllHaveRun`, which is satisfied when all nodes have run at least once within the environment state update, and the termination
 condition for an `ENVIRONMENT_SEQUENCE` is when all of its constituent environment state updates have terminated.
-
+`Graph structure conditions <Condition_Graph_Structure_Intro>` cannot
+be used as termination conditions.
 
 .. _Scheduler_Absolute_Time:
 
@@ -302,20 +313,25 @@ import datetime
 import enum
 import fractions
 import logging
-from typing import Union
+import warnings
+from typing import Dict, Hashable, Iterable, List, Set, Union
 
 import networkx as nx
 import numpy as np
 import pint
-from toposort import toposort
+from toposort import CircularDependencyError, toposort
 
 from graph_scheduler import _unit_registry
 from graph_scheduler.condition import (
-    All, AllHaveRun, Always, Condition, ConditionSet, EveryNCalls, Never,
-    _parse_absolute_unit, _quantity_as_integer,
+    AddEdgeTo, All, AllHaveRun, Always, Condition, ConditionSet, EveryNCalls,
+    Never, RemoveEdgeFrom, _parse_absolute_unit,
+    _quantity_as_integer, typing_condition_base,
 )
 from graph_scheduler.time import _get_pint_unit, Clock, TimeScale
-from graph_scheduler.utilities import clone_graph, networkx_digraph_to_dependency_dict
+from graph_scheduler.utilities import (
+    cached_graph_function, clone_graph, networkx_digraph_to_dependency_dict,
+    typing_graph_dependency_dict,
+)
 
 __all__ = [
     'Scheduler', 'SchedulerError', 'SchedulingMode',
@@ -340,6 +356,29 @@ class SchedulingMode(enum.Enum):
     """
     STANDARD = enum.auto()
     EXACT_TIME = enum.auto()
+
+
+@cached_graph_function
+def _build_consideration_queue(
+    graph: typing_graph_dependency_dict
+) -> List[Set[Hashable]]:
+    return list(toposort(graph))
+
+
+def _generate_consideration_queue_indices(
+    consideration_queue: Iterable[Set[Hashable]]
+) -> Dict[Hashable, int]:
+    """
+    Returns:
+        A dictionary mapping nodes to their indices in
+        **consideration_queue**
+    """
+    consideration_queue_indices = {}
+    for i, cs in enumerate(consideration_queue):
+        consideration_queue_indices.update({
+            n: i for n in cs
+        })
+    return consideration_queue_indices
 
 
 class SchedulerError(Exception):
@@ -433,11 +472,13 @@ class Scheduler:
         :param self:
         :param conditions: (ConditionSet) - a :keyword:`ConditionSet` to be scheduled
         """
-        self.conditions = ConditionSet(conditions)
+        self.conditions = ConditionSet()
+        self._last_handled_structural_condition_order = None
 
-        # the consideration queue is the ordered list of sets of nodes in the graph, by the
-        # order in which they should be checked to ensure that all parents have a chance to run before their children
-        self.consideration_queue = []
+        self._graphs = []
+        self._consideration_queues = []
+        self._consideration_queue_indices = []
+
         if termination_conds is None:
             termination_conds = default_termination_conds.copy()
         else:
@@ -450,25 +491,25 @@ class Scheduler:
         self.default_absolute_time_unit = _parse_absolute_unit(default_absolute_time_unit)
 
         if isinstance(graph, nx.DiGraph):
-            self.dependency_dict = networkx_digraph_to_dependency_dict(graph)
+            base_graph = networkx_digraph_to_dependency_dict(graph)
         elif graph is None or isinstance(graph, nx.Graph):
             raise SchedulerError(
                 'Must instantiate a Scheduler with a graph dependency dict or a networkx.DiGraph'
             )
         else:
             # add empty dependency set for senders that aren't present
-            self.dependency_dict = {
+            base_graph = {
                 **{n: set() for n in set().union(*graph.values())},
                 **clone_graph(graph)
             }
 
-        self.consideration_queue = list(toposort(self.dependency_dict))
-        self.nodes = []
-        for consideration_set in self.consideration_queue:
-            for node in consideration_set:
-                self.nodes.append(node)
+        self._push_graph(base_graph)
 
-        self._generate_consideration_queue_indices()
+        self.nodes = list(base_graph.keys())
+
+        # add conditions after initial graph to deal with structural
+        if conditions is not None:
+            self.add_condition_set(conditions)
 
         self.default_execution_id = default_execution_id
         # stores the in order list of self.run's yielded outputs
@@ -480,13 +521,6 @@ class Scheduler:
         self._init_counts(execution_id=self.default_execution_id)
         self.date_creation = datetime.datetime.now()
         self.date_last_run_end = None
-
-    def _generate_consideration_queue_indices(self):
-        self.consideration_queue_indices = {}
-        for i, cs in enumerate(self.consideration_queue):
-            self.consideration_queue_indices.update({
-                n: i for n in cs
-            })
 
     def _init_counts(self, execution_id, base_execution_id=NotImplemented):
         """
@@ -594,8 +628,14 @@ class Scheduler:
 
     @staticmethod
     def _parse_termination_conditions(termination_conds):
+        err_msg = (
+            "Termination conditions must be a dictionary of the form"
+            " {TimeScale: Condition, ...} and cannot include"
+            " GraphStructureCondition."
+        )
+
         # parse string representation of TimeScale
-        parsed_conds = {}
+        parsed_conds = termination_conds
         delkeys = set()
         for scale in termination_conds:
             try:
@@ -604,21 +644,26 @@ class Scheduler:
             except (AttributeError, TypeError):
                 pass
 
-        termination_conds.update(parsed_conds)
-
         try:
-            termination_conds = {
-                k: termination_conds[k] for k in termination_conds
+            parsed_conds = {
+                k: parsed_conds[k]
+                for k in parsed_conds
                 if (
                     isinstance(k, TimeScale)
-                    and isinstance(termination_conds[k], Condition)
+                    and isinstance(parsed_conds[k], Condition)
                     and k not in delkeys
                 )
             }
         except TypeError:
-            raise TypeError('termination_conditions must be a dictionary of the form {TimeScale: Condition, ...}')
+            raise TypeError(err_msg)
         else:
-            return termination_conds
+            invalid_conds = {
+                k: termination_conds[k]
+                for k in termination_conds.keys() - parsed_conds.keys() - delkeys
+            }
+            if len(invalid_conds) > 0:
+                raise SchedulerError(f"{err_msg} Invalid: {invalid_conds}")
+            return parsed_conds
 
     def end_environment_sequence(self, execution_id=NotImplemented):
         """Signals that an `ENVIRONMENT_SEQUENCE` has completed
@@ -631,6 +676,40 @@ class Scheduler:
 
         self._increment_time(TimeScale.ENVIRONMENT_SEQUENCE, execution_id)
 
+    def add_graph_edge(self, sender: Hashable, receiver: Hashable) -> AddEdgeTo:
+        """
+        Adds an edge to the `graph <Scheduler.graph>` from **sender** to
+        **receiver**. Equivalent to ``add_condition(sender,
+        AddEdgeTo(receiver))``.
+
+        Args:
+            sender (Hashable): sender of the new edge
+            receiver (Hashable): receiver of the new edge
+
+        Returns:
+            AddEdgeTo: the new condition added to implement the edge
+        """
+        cond = AddEdgeTo(receiver)
+        self.add_condition(sender, cond)
+        return cond
+
+    def remove_graph_edge(self, sender: Hashable, receiver: Hashable) -> RemoveEdgeFrom:
+        """
+        Removes an edge from the `graph <Scheduler.graph>` from
+        **sender** to **receiver** if it exists. Equivalent to
+        ``add_condition(receiver, RemoveEdgeFrom(sender))``.
+
+        Args:
+            sender (Hashable): sender of the edge to be removed
+            receiver (Hashable): receiver of the edge to be removed
+
+        Returns:
+            RemoveEdgeFrom: the new condition added to implement the edge
+        """
+        cond = RemoveEdgeFrom(sender)
+        self.add_condition(receiver, cond)
+        return cond
+
     ################################################################################
     # Wrapper methods
     #   to allow the user to ignore the ConditionSet internals
@@ -638,11 +717,21 @@ class Scheduler:
     def __contains__(self, item):
         return self.conditions.__contains__(item)
 
-    def add_condition(self, owner, condition):
+    def add_condition(
+        self, owner: Hashable, condition: typing_condition_base
+    ):
         """
-        Adds a `Condition` to the Scheduler. If **owner** already has a Condition, it is overwritten
-        with the new one. If you want to add multiple conditions to a single owner, use the
-        `composite Conditions <Conditions_Composite>` to accurately specify the desired behavior.
+        Adds a `basic <Condition>` or `graph structure
+        <GraphStructureCondition>` Condition to the Scheduler.
+
+        If **condition** is basic, it will overwrite the current basic
+        Condition for **owner**, if present. If you want to add multiple
+        basic Conditions to a single owner, instead add a single
+        `Composite Condition <Conditions_Composite>` to accurately
+        specify the desired behavior.
+
+        If **condition** is structural, it will be applied on top of
+        `Scheduler.graph` in the order it is added.
 
         Arguments
         ---------
@@ -651,17 +740,27 @@ class Scheduler:
             specifies the node with which the **condition** should be associated. **condition**
             will govern the execution behavior of **owner**
 
-        condition : Condition
+        condition : ConditionBase
             specifies the Condition, associated with the **owner** to be added to the ConditionSet.
         """
         self.conditions.add_condition(owner, condition)
+        self._handle_modified_structural_conditions()
 
     def add_condition_set(self, conditions):
         """
-        Adds a set of `Conditions <Condition>` (in the form of a dict or another ConditionSet) to the Scheduler.
-        Any Condition added here will overwrite an existing Condition for a given owner.
-        If you want to add multiple conditions to a single owner, add a single `Composite Condition <Conditions_Composite>`
-        to accurately specify the desired behavior.
+        Adds a set of `basic <Condition>` or `graph structure
+        <GraphStructureCondition>` Conditions (in the form of a dict or
+        another ConditionSet) to the Scheduler.
+
+        Any basic Condition added here will overwrite the current basic
+        Condition for a given owner, if present. If you want to add
+        multiple basic Conditions to a single owner, instead add a
+        single `Composite Condition <Conditions_Composite>` to
+        accurately specify the desired behavior.
+
+        Any structural Condition added here will be applied on top of
+        `Scheduler.graph` in the order they are returned by iteration
+        over **conditions**.
 
         Arguments
         ---------
@@ -675,19 +774,57 @@ class Scheduler:
 
         """
         self.conditions.add_condition_set(conditions)
+        self._handle_modified_structural_conditions()
+
+    def remove_condition(
+        self, owner_or_condition: Union[Hashable, typing_condition_base]
+    ) -> Union[typing_condition_base, None]:
+        """
+        Removes the condition specified as or owned by
+        **owner_or_condition**.
+
+        Args:
+            owner_or_condition (Union[Hashable, `ConditionBase`]):
+                Either a condition or the owner of a condition
+
+        Returns:
+            The condition removed, or None if no condition removed
+
+        Raises:
+            ConditionError:
+                - when **owner_or_condition** is an owner and it owns
+                  multiple conditions
+                - when **owner_or_condition** is a condition and its
+                  owner is None
+        """
+        return self.conditions.remove_condition(owner_or_condition)
 
     ################################################################################
     # Validation methods
     #   to provide the user with info if they do something odd
     ################################################################################
     def _validate_run_state(self):
+        try:
+            _build_consideration_queue(self.graph)
+        except CircularDependencyError as e:
+            raise SchedulerError(
+                f'Cannot run on a graph that contains a cycle: {e}'
+            ) from e
+
+        if (
+            self.consideration_queue == 1
+            and self.consideration_queue[0] == set()
+            and len(self.graph) != 0
+        ):
+            raise SchedulerError('Unexpected empty consideration queue')
+
         self._validate_conditions()
 
     def _validate_conditions(self):
         unspecified_nodes = []
         for node in self.nodes:
-            if node not in self.conditions:
-                dependencies = list(self.dependency_dict[node])
+            if node not in self.conditions.conditions_basic:
+                dependencies = list(self.graph[node])
                 if len(dependencies) == 0:
                     cond = Always()
                 elif len(dependencies) == 1:
@@ -700,8 +837,17 @@ class Scheduler:
         if len(unspecified_nodes) > 0:
             logger.info(
                 'These nodes have no Conditions specified, and will be scheduled with conditions: {0}'.format(
-                    {node: self.conditions[node] for node in unspecified_nodes}
+                    {node: self.conditions.conditions_basic[node] for node in unspecified_nodes}
                 )
+            )
+
+        if (
+            self.mode is SchedulingMode.EXACT_TIME
+            and len(self.conditions.conditions_structural) > 0
+        ):
+            warnings.warn(
+                'In exact time mode, graph structure conditions will have no'
+                f' effect: {self.conditions.conditions_structural}'
             )
 
     ################################################################################
@@ -723,11 +869,6 @@ class Scheduler:
                terminate the execution of the specified `TimeScale`
         """
         self._validate_run_state()
-
-        if self.mode is SchedulingMode.EXACT_TIME:
-            effective_consideration_queue = [set(self.nodes)]
-        else:
-            effective_consideration_queue = self.consideration_queue
 
         if termination_conds is None:
             termination_conds = self.termination_conds
@@ -778,14 +919,14 @@ class Scheduler:
             cur_index_consideration_queue = 0
 
             while (
-                cur_index_consideration_queue < len(effective_consideration_queue)
+                cur_index_consideration_queue < len(self.consideration_queue)
                 and not termination_conds[TimeScale.ENVIRONMENT_STATE_UPDATE].is_satisfied(**is_satisfied_kwargs)
                 and not termination_conds[TimeScale.ENVIRONMENT_SEQUENCE].is_satisfied(**is_satisfied_kwargs)
             ):
                 # all nodes to be added during this consideration set execution
                 cur_consideration_set_execution_exec = set()
                 # the current "layer/group" of nodes that MIGHT be added during this consideration set execution
-                cur_consideration_set = effective_consideration_queue[cur_index_consideration_queue]
+                cur_consideration_set = self.consideration_queue[cur_index_consideration_queue]
 
                 try:
                     iter(cur_consideration_set)
@@ -801,7 +942,7 @@ class Scheduler:
                         # only add each node once during a single consideration set execution, this also serves
                         # to prevent infinitely cascading adds
                         if current_node not in cur_consideration_set_execution_exec:
-                            if self.conditions.conditions[current_node].is_satisfied(**is_satisfied_kwargs):
+                            if self.conditions.conditions_basic[current_node].is_satisfied(**is_satisfied_kwargs):
                                 cur_consideration_set_execution_exec.add(current_node)
                                 execution_list_has_changed = True
                                 cur_consideration_set_has_changed = True
@@ -897,7 +1038,7 @@ class Scheduler:
         return {
             owner: cond
             for owner, cond
-            in [*self.conditions.conditions.items(), *termination_conds.items()]
+            in [*self.conditions.conditions_basic.items(), *termination_conds.items()]
             if cond.is_absolute
         }
 
@@ -942,3 +1083,98 @@ class Scheduler:
     @property
     def _in_exact_time_mode(self):
         return self.mode is SchedulingMode.EXACT_TIME or len(self.consideration_queue) == 1
+
+    def _handle_modified_structural_conditions(self):
+        if self._last_handled_structural_condition_order != self.conditions.structural_condition_order:
+            common_index = -1
+            for i, cond in enumerate(self.conditions.structural_condition_order):
+                try:
+                    if self._last_handled_structural_condition_order[i] == cond:
+                        common_index = i
+                    else:
+                        break
+                except (IndexError, TypeError):
+                    break
+
+            # remove scheduler dependency dicts down to the common
+            # structural condition
+            if self._last_handled_structural_condition_order is not None:
+                # if anything must be done with the popped structures
+                # and cond, the iteration order should be reversed
+                for cond in self._last_handled_structural_condition_order[common_index + 1:]:
+                    self._pop_graph()
+
+            # add dependency dicts for new structural conditions
+            cur_graph = self._graphs[-1]
+            for cond in self.conditions.structural_condition_order[common_index + 1:]:
+                cur_graph = cond.modify_graph(cur_graph)
+                self._push_graph(cur_graph)
+
+            self._last_handled_structural_condition_order = copy.copy(
+                self.conditions.structural_condition_order
+            )
+
+    def _push_graph(self, graph):
+        try:
+            consideration_queue = _build_consideration_queue(graph)
+        except CircularDependencyError as e:
+            consideration_queue = [set()]
+            try:
+                cond = self.conditions.structural_condition_order[-1]
+            except IndexError:
+                cond_str = 'Base graph'
+            else:
+                cond_str = f'Condition {cond} for {cond.owner} creates a cycle: {e}'
+            warnings.warn(cond_str)
+
+        self._graphs.append(graph)
+        self._consideration_queues.append(consideration_queue)
+        self._consideration_queue_indices.append(
+            _generate_consideration_queue_indices(consideration_queue)
+        )
+
+    def _pop_graph(self):
+        return (
+            self._graphs.pop(),
+            self._consideration_queues.pop(),
+            self._consideration_queue_indices.pop(),
+        )
+
+    @property
+    def graph(self) -> typing_graph_dependency_dict:
+        """
+        The current graph used by this Scheduler, which is modified by
+        any `graph structure conditions
+        <Condition_Graph_Structure_Intro>` added
+        """
+        self._handle_modified_structural_conditions()
+        return self._graphs[-1]
+
+    # Maintain backwards compatibility for v1.x
+    @property
+    def dependency_dict(self) -> typing_graph_dependency_dict:
+        return self.graph
+
+    @property
+    def consideration_queue(self) -> List[Set[Hashable]]:
+        """
+        The ordered list of sets of nodes in the graph, by the order in
+        which they will be checked to ensure that all senders have a
+        chance to run before their receivers
+        """
+        self._handle_modified_structural_conditions()
+
+        if self.mode is SchedulingMode.EXACT_TIME:
+            return [set(self.graph.keys())]
+        else:
+            return self._consideration_queues[-1]
+
+    @property
+    def consideration_queue_indices(self) -> Dict[Hashable, int]:
+        """
+        A dictionary mapping the graph's nodes to their position in the
+        original consideration queue. This is the same as the
+        consideration queue when not using SchedulingMode.EXACT_TIME.
+        """
+        self._handle_modified_structural_conditions()
+        return self._consideration_queue_indices[-1]

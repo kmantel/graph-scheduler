@@ -1,4 +1,6 @@
 networkx
 numpy >=1.19.0
+pandas
 pint
+scipy
 toposort
