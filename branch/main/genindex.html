@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; Graph Scheduler 1.1.2+39.g51676e5 documentation</title>
+  <title>Index &mdash; Graph Scheduler 1.1.2+45.g23d1f69 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
 
@@ -35,7 +35,7 @@
             Graph Scheduler
           </a>
               <div class="version">
-                1.1.2+39
+                1.1.2+45
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -89,6 +89,7 @@
  | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
  | <a href="#J"><strong>J</strong></a>
+ | <a href="#K"><strong>K</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
@@ -308,6 +309,10 @@
         <li><a href="Scheduler.html#graph_scheduler.scheduler.Scheduler.add_condition_set">(graph_scheduler.scheduler.Scheduler method)</a>
 </li>
       </ul></li>
+      <li><a href="Scheduler.html#graph_scheduler.scheduler.Scheduler.add_graph_edge">add_graph_edge() (graph_scheduler.scheduler.Scheduler method)</a>
+</li>
+      <li><a href="Condition.html#graph_scheduler.condition.AddEdgeTo">AddEdgeTo (class in graph_scheduler.condition)</a>
+</li>
       <li><a href="Condition.html#graph_scheduler.condition.AfterCall">AfterCall (class in graph_scheduler.condition)</a>
 </li>
       <li><a href="Condition.html#graph_scheduler.condition.AfterConsiderationSetExecution">AfterConsiderationSetExecution (class in graph_scheduler.condition)</a>
@@ -325,6 +330,10 @@
       <li><a href="Condition.html#graph_scheduler.condition.AfterNEnvironmentSequences">AfterNEnvironmentSequences (class in graph_scheduler.condition)</a>
 </li>
       <li><a href="Condition.html#graph_scheduler.condition.AfterNEnvironmentStateUpdates">AfterNEnvironmentStateUpdates (class in graph_scheduler.condition)</a>
+</li>
+      <li><a href="Condition.html#graph_scheduler.condition.AfterNode">AfterNode (class in graph_scheduler.condition)</a>
+</li>
+      <li><a href="Condition.html#graph_scheduler.condition.AfterNodes">AfterNodes (class in graph_scheduler.condition)</a>
 </li>
       <li><a href="Condition.html#graph_scheduler.condition.AfterNPasses">AfterNPasses (class in graph_scheduler.condition)</a>
 </li>
@@ -370,9 +379,13 @@
 </li>
       <li><a href="Condition.html#graph_scheduler.condition.BeforeEnvironmentStateUpdate">BeforeEnvironmentStateUpdate (class in graph_scheduler.condition)</a>
 </li>
+      <li><a href="Condition.html#graph_scheduler.condition.BeforeNCalls">BeforeNCalls (class in graph_scheduler.condition)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="Condition.html#graph_scheduler.condition.BeforeNCalls">BeforeNCalls (class in graph_scheduler.condition)</a>
+      <li><a href="Condition.html#graph_scheduler.condition.BeforeNode">BeforeNode (class in graph_scheduler.condition)</a>
+</li>
+      <li><a href="Condition.html#graph_scheduler.condition.BeforeNodes">BeforeNodes (class in graph_scheduler.condition)</a>
 </li>
       <li><a href="Condition.html#graph_scheduler.condition.BeforePass">BeforePass (class in graph_scheduler.condition)</a>
 </li>
@@ -394,20 +407,36 @@
 </li>
       <li><a href="Condition.html#graph_scheduler.condition.Condition">Condition (class in graph_scheduler.condition)</a>
 </li>
+      <li><a href="Condition.html#graph_scheduler.condition.ConditionBase">ConditionBase (class in graph_scheduler.condition)</a>
+</li>
       <li><a href="Condition.html#graph_scheduler.condition.ConditionSet.conditions">conditions (graph_scheduler.condition.ConditionSet attribute)</a>
 
       <ul>
+        <li><a href="Condition.html#id0">(graph_scheduler.condition.ConditionSet property)</a>
+</li>
         <li><a href="Scheduler.html#graph_scheduler.scheduler.Scheduler.conditions">(graph_scheduler.scheduler.Scheduler attribute)</a>
 </li>
       </ul></li>
+      <li><a href="Condition.html#graph_scheduler.condition.ConditionSet.conditions_basic">conditions_basic (graph_scheduler.condition.ConditionSet attribute)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Condition.html#graph_scheduler.condition.ConditionSet.conditions_structural">conditions_structural (graph_scheduler.condition.ConditionSet attribute)</a>
+</li>
       <li><a href="Condition.html#graph_scheduler.condition.ConditionSet">ConditionSet (class in graph_scheduler.condition)</a>
 </li>
       <li><a href="Scheduler.html#graph_scheduler.scheduler.Scheduler.consideration_queue">consideration_queue (graph_scheduler.scheduler.Scheduler attribute)</a>
+
+      <ul>
+        <li><a href="Scheduler.html#id0">(graph_scheduler.scheduler.Scheduler property)</a>
 </li>
+      </ul></li>
       <li><a href="Scheduler.html#graph_scheduler.scheduler.Scheduler.consideration_queue_indices">consideration_queue_indices (graph_scheduler.scheduler.Scheduler attribute)</a>
+
+      <ul>
+        <li><a href="Scheduler.html#id1">(graph_scheduler.scheduler.Scheduler property)</a>
 </li>
+      </ul></li>
       <li><a href="Time.html#graph_scheduler.time.Time.consideration_set_execution">consideration_set_execution (graph_scheduler.time.Time attribute)</a>
 </li>
       <li><a href="Time.html#graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION">CONSIDERATION_SET_EXECUTION (graph_scheduler.time.TimeScale attribute)</a>
@@ -418,6 +447,8 @@
 </li>
       <li><a href="Condition.html#graph_scheduler.condition.Threshold.custom_parameter_validator">custom_parameter_validator (graph_scheduler.condition.Threshold attribute)</a>
 </li>
+      <li><a href="Condition.html#graph_scheduler.condition.CustomGraphStructureCondition">CustomGraphStructureCondition (class in graph_scheduler.condition)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -426,11 +457,15 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Scheduler.html#graph_scheduler.scheduler.Scheduler.default_absolute_time_unit">default_absolute_time_unit (graph_scheduler.scheduler.Scheduler attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Scheduler.html#graph_scheduler.scheduler.Scheduler.default_execution_id">default_execution_id (graph_scheduler.scheduler.Scheduler attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Condition.html#graph_scheduler.condition.Threshold.dependency">dependency (graph_scheduler.condition.Threshold attribute)</a>
+</li>
+      <li><a href="Condition.html#graph_scheduler.condition.Operation.DIFFERENCE">DIFFERENCE (graph_scheduler.condition.Operation attribute)</a>
+</li>
+      <li><a href="Condition.html#graph_scheduler.condition.Operation.DISCARD">DISCARD (graph_scheduler.condition.Operation attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -480,6 +515,8 @@
         <li><a href="Time.html#graph_scheduler.time.TimeHistoryTree.get_total_times_relative">(graph_scheduler.time.TimeHistoryTree method)</a>
 </li>
       </ul></li>
+      <li><a href="Scheduler.html#graph_scheduler.scheduler.Scheduler.graph">graph (graph_scheduler.scheduler.Scheduler property)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li>
@@ -503,6 +540,8 @@
         <li><a href="Time.html#module-graph_scheduler.time">module</a>
 </li>
       </ul></li>
+      <li><a href="Condition.html#graph_scheduler.condition.GraphStructureCondition">GraphStructureCondition (class in graph_scheduler.condition)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -522,6 +561,10 @@
       <li><a href="Time.html#graph_scheduler.time.TimeHistoryTree.index">index (graph_scheduler.time.TimeHistoryTree attribute)</a>
 </li>
       <li><a href="Condition.html#graph_scheduler.condition.Threshold.indices">indices (graph_scheduler.condition.Threshold attribute)</a>
+</li>
+      <li><a href="Condition.html#graph_scheduler.condition.Operation.INTERSECTION">INTERSECTION (graph_scheduler.condition.Operation attribute)</a>
+</li>
+      <li><a href="Condition.html#graph_scheduler.condition.Operation.INVERSE_DIFFERENCE">INVERSE_DIFFERENCE (graph_scheduler.condition.Operation attribute)</a>
 </li>
       <li><a href="Condition.html#graph_scheduler.condition.AbsoluteCondition.is_satisfied">is_satisfied() (graph_scheduler.condition.AbsoluteCondition method)</a>
 
@@ -624,6 +667,14 @@
   </ul></td>
 </tr></table>
 
+<h2 id="K">K</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Condition.html#graph_scheduler.condition.Operation.KEEP">KEEP (graph_scheduler.condition.Operation attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -641,8 +692,32 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Time.html#graph_scheduler.time.TimeHistoryTree.max_depth">max_depth (graph_scheduler.time.TimeHistoryTree attribute)</a>
 </li>
+      <li><a href="Condition.html#graph_scheduler.condition.Operation.MERGE">MERGE (graph_scheduler.condition.Operation attribute)</a>
+</li>
       <li><a href="Scheduler.html#graph_scheduler.scheduler.Scheduler.mode">mode (graph_scheduler.scheduler.Scheduler attribute)</a>
 </li>
+      <li><a href="Condition.html#graph_scheduler.condition.AddEdgeTo.modify_graph">modify_graph() (graph_scheduler.condition.AddEdgeTo method)</a>
+
+      <ul>
+        <li><a href="Condition.html#graph_scheduler.condition.AfterNode.modify_graph">(graph_scheduler.condition.AfterNode method)</a>
+</li>
+        <li><a href="Condition.html#graph_scheduler.condition.AfterNodes.modify_graph">(graph_scheduler.condition.AfterNodes method)</a>
+</li>
+        <li><a href="Condition.html#graph_scheduler.condition.BeforeNode.modify_graph">(graph_scheduler.condition.BeforeNode method)</a>
+</li>
+        <li><a href="Condition.html#graph_scheduler.condition.BeforeNodes.modify_graph">(graph_scheduler.condition.BeforeNodes method)</a>
+</li>
+        <li><a href="Condition.html#graph_scheduler.condition.CustomGraphStructureCondition.modify_graph">(graph_scheduler.condition.CustomGraphStructureCondition method)</a>
+</li>
+        <li><a href="Condition.html#graph_scheduler.condition.GraphStructureCondition.modify_graph">(graph_scheduler.condition.GraphStructureCondition method)</a>
+</li>
+        <li><a href="Condition.html#graph_scheduler.condition.RemoveEdgeFrom.modify_graph">(graph_scheduler.condition.RemoveEdgeFrom method)</a>
+</li>
+        <li><a href="Condition.html#graph_scheduler.condition.WithNode.modify_graph">(graph_scheduler.condition.WithNode method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     module
 
@@ -662,8 +737,32 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Condition.html#graph_scheduler.condition.Never">Never (class in graph_scheduler.condition)</a>
 </li>
+      <li><a href="Condition.html#graph_scheduler.condition.AddEdgeTo.node">node (graph_scheduler.condition.AddEdgeTo attribute)</a>
+
+      <ul>
+        <li><a href="Condition.html#graph_scheduler.condition.AfterNode.node">(graph_scheduler.condition.AfterNode attribute)</a>
+</li>
+        <li><a href="Condition.html#graph_scheduler.condition.BeforeNode.node">(graph_scheduler.condition.BeforeNode attribute)</a>
+</li>
+        <li><a href="Condition.html#graph_scheduler.condition.RemoveEdgeFrom.node">(graph_scheduler.condition.RemoveEdgeFrom attribute)</a>
+</li>
+        <li><a href="Condition.html#graph_scheduler.condition.WithNode.node">(graph_scheduler.condition.WithNode attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Condition.html#graph_scheduler.condition.AfterNode.nodes">nodes (graph_scheduler.condition.AfterNode attribute)</a>
+
+      <ul>
+        <li><a href="Condition.html#graph_scheduler.condition.AfterNodes.nodes">(graph_scheduler.condition.AfterNodes attribute)</a>
+</li>
+        <li><a href="Condition.html#graph_scheduler.condition.BeforeNode.nodes">(graph_scheduler.condition.BeforeNode attribute)</a>
+</li>
+        <li><a href="Condition.html#graph_scheduler.condition.BeforeNodes.nodes">(graph_scheduler.condition.BeforeNodes attribute)</a>
+</li>
+        <li><a href="Condition.html#graph_scheduler.condition.WithNode.nodes">(graph_scheduler.condition.WithNode attribute)</a>
+</li>
+      </ul></li>
       <li><a href="Condition.html#graph_scheduler.condition.Not">Not (class in graph_scheduler.condition)</a>
 </li>
       <li><a href="Condition.html#graph_scheduler.condition.NWhen">NWhen (class in graph_scheduler.condition)</a>
@@ -674,11 +773,13 @@
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="Condition.html#graph_scheduler.condition.Or">Or (in module graph_scheduler.condition)</a>
+      <li><a href="Condition.html#graph_scheduler.condition.Operation">Operation (class in graph_scheduler.condition)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="Condition.html#graph_scheduler.condition.Condition.owner">owner (graph_scheduler.condition.Condition attribute)</a>
+      <li><a href="Condition.html#graph_scheduler.condition.Or">Or (in module graph_scheduler.condition)</a>
+</li>
+      <li><a href="Condition.html#graph_scheduler.condition.ConditionBase.owner">owner (graph_scheduler.condition.ConditionBase attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -708,12 +809,24 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="Time.html#graph_scheduler.time.remove_time_scale_alias">remove_time_scale_alias() (in module graph_scheduler.time)</a>
+      <li><a href="Condition.html#graph_scheduler.condition.ConditionSet.remove_condition">remove_condition() (graph_scheduler.condition.ConditionSet method)</a>
+
+      <ul>
+        <li><a href="Scheduler.html#graph_scheduler.scheduler.Scheduler.remove_condition">(graph_scheduler.scheduler.Scheduler method)</a>
 </li>
-      <li><a href="Condition.html#graph_scheduler.condition.TimeInterval.repeat">repeat (graph_scheduler.condition.TimeInterval attribute)</a>
+      </ul></li>
+      <li><a href="Scheduler.html#graph_scheduler.scheduler.Scheduler.remove_graph_edge">remove_graph_edge() (graph_scheduler.scheduler.Scheduler method)</a>
+</li>
+      <li><a href="Time.html#graph_scheduler.time.remove_time_scale_alias">remove_time_scale_alias() (in module graph_scheduler.time)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Condition.html#graph_scheduler.condition.RemoveEdgeFrom">RemoveEdgeFrom (class in graph_scheduler.condition)</a>
+</li>
+      <li><a href="Condition.html#graph_scheduler.condition.TimeInterval.repeat">repeat (graph_scheduler.condition.TimeInterval attribute)</a>
+</li>
+      <li><a href="Condition.html#graph_scheduler.condition.Operation.REPLACE">REPLACE (graph_scheduler.condition.Operation attribute)</a>
+</li>
       <li><a href="Condition.html#graph_scheduler.condition.Threshold.rtol">rtol (graph_scheduler.condition.Threshold attribute)</a>
 </li>
       <li><a href="Scheduler.html#graph_scheduler.scheduler.Scheduler.run">run() (graph_scheduler.scheduler.Scheduler method)</a>
@@ -732,10 +845,10 @@
 </li>
       <li><a href="Time.html#graph_scheduler.time.Clock.simple_time">simple_time (graph_scheduler.time.Clock attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Time.html#graph_scheduler.time.SimpleTime">SimpleTime (class in graph_scheduler.time)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Scheduler.html#graph_scheduler.scheduler.SchedulingMode.STANDARD">STANDARD (graph_scheduler.scheduler.SchedulingMode attribute)</a>
 </li>
       <li><a href="Condition.html#graph_scheduler.condition.TimeInterval.start">start (graph_scheduler.condition.TimeInterval attribute)</a>
@@ -746,6 +859,10 @@
         <li><a href="Condition.html#graph_scheduler.condition.TimeTermination.start_inclusive">(graph_scheduler.condition.TimeTermination attribute)</a>
 </li>
       </ul></li>
+      <li><a href="Condition.html#graph_scheduler.condition.ConditionSet.structural_condition_order">structural_condition_order (graph_scheduler.condition.ConditionSet attribute)</a>
+</li>
+      <li><a href="Condition.html#graph_scheduler.condition.Operation.SYMMETRIC_DIFFERENCE">SYMMETRIC_DIFFERENCE (graph_scheduler.condition.Operation attribute)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -784,6 +901,10 @@
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Condition.html#graph_scheduler.condition.Operation.UNION">UNION (graph_scheduler.condition.Operation attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Condition.html#graph_scheduler.condition.TimeInterval.unit">unit (graph_scheduler.condition.TimeInterval attribute)</a>
 
       <ul>
@@ -800,13 +921,15 @@
 </li>
       <li><a href="Condition.html#graph_scheduler.condition.WhenFinishedAll">WhenFinishedAll (class in graph_scheduler.condition)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Condition.html#graph_scheduler.condition.WhenFinishedAny">WhenFinishedAny (class in graph_scheduler.condition)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Condition.html#graph_scheduler.condition.While">While (in module graph_scheduler.condition)</a>
 </li>
       <li><a href="Condition.html#graph_scheduler.condition.WhileNot">WhileNot (class in graph_scheduler.condition)</a>
+</li>
+      <li><a href="Condition.html#graph_scheduler.condition.WithNode">WithNode (class in graph_scheduler.condition)</a>
 </li>
   </ul></td>
 </tr></table>

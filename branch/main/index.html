@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Graph Scheduler &mdash; Graph Scheduler 1.1.2+39.g51676e5 documentation</title>
+  <title>Graph Scheduler &mdash; Graph Scheduler 1.1.2+45.g23d1f69 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
 
@@ -37,7 +37,7 @@
             Graph Scheduler
           </a>
               <div class="version">
-                1.1.2+39
+                1.1.2+45
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -147,7 +147,9 @@ supported.</p>
 <li class="toctree-l2"><a class="reference internal" href="Condition.html#structure">Structure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Condition.html#execution">Execution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Condition.html#class-reference">Class Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.Operation"><code class="docutils literal notranslate"><span class="pre">Operation</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.ConditionSet"><code class="docutils literal notranslate"><span class="pre">ConditionSet</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.ConditionBase"><code class="docutils literal notranslate"><span class="pre">ConditionBase</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.Condition"><code class="docutils literal notranslate"><span class="pre">Condition</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.AbsoluteCondition"><code class="docutils literal notranslate"><span class="pre">AbsoluteCondition</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.While"><code class="docutils literal notranslate"><span class="pre">While</span></code></a></li>
@@ -195,6 +197,15 @@ supported.</p>
 <li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.AtEnvironmentSequenceStart"><code class="docutils literal notranslate"><span class="pre">AtEnvironmentSequenceStart</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.AtEnvironmentSequenceNStart"><code class="docutils literal notranslate"><span class="pre">AtEnvironmentSequenceNStart</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.Threshold"><code class="docutils literal notranslate"><span class="pre">Threshold</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.GraphStructureCondition"><code class="docutils literal notranslate"><span class="pre">GraphStructureCondition</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.CustomGraphStructureCondition"><code class="docutils literal notranslate"><span class="pre">CustomGraphStructureCondition</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.BeforeNodes"><code class="docutils literal notranslate"><span class="pre">BeforeNodes</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.BeforeNode"><code class="docutils literal notranslate"><span class="pre">BeforeNode</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.WithNode"><code class="docutils literal notranslate"><span class="pre">WithNode</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.AfterNodes"><code class="docutils literal notranslate"><span class="pre">AfterNodes</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.AfterNode"><code class="docutils literal notranslate"><span class="pre">AfterNode</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.AddEdgeTo"><code class="docutils literal notranslate"><span class="pre">AddEdgeTo</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Condition.html#graph_scheduler.condition.RemoveEdgeFrom"><code class="docutils literal notranslate"><span class="pre">RemoveEdgeFrom</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="Time.html">Time</a><ul>
