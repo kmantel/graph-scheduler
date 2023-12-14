@@ -379,6 +379,30 @@ def _parse_absolute_unit(n, unit=None):
     return _reduce_quantity_to_integer(_get_quantity(n, unit))
 
 
+def _format_arg(value, key=None):
+    if isinstance(value, str):
+        value = f"'{value}'"
+    else:
+        value = str(value)
+
+    if key is not None:
+        return f'{key}={value}'
+    else:
+        return value
+
+
+def _get_condition_args_str(*args):
+    args_str = []
+    for a in args:
+        if len(a) > 0:
+            if isinstance(a, dict):
+                a_str = [_format_arg(v, k) for k, v in a.items()]
+            else:
+                a_str = [_format_arg(v) for v in a]
+            args_str.append(', '.join(a_str))
+    return ', '.join(args_str)
+
+
 class ConditionError(Exception):
     def __init__(self, error_value):
         self.error_value = error_value
@@ -425,12 +449,12 @@ class ConditionSet(object):
         return item in self.conditions
 
     def __repr__(self):
-        condition_str = '\n\t'.join([f'{owner}: {condition}' for owner, condition in self.conditions.items()])
+        condition_str = '\n\t'.join([f'{repr(owner)}: {condition}' for owner, condition in self.conditions.items()])
         return '{0}({1}{2}{3})'.format(
             self.__class__.__name__,
-            '\n\t' if len(condition_str) > 0 else '',
+            '{\n\t' if len(condition_str) > 0 else '',
             condition_str,
-            '\n' if len(condition_str) > 0 else ''
+            '\n}' if len(condition_str) > 0 else '',
         )
 
     def __iter__(self):
@@ -524,10 +548,8 @@ class Condition:
             setattr(self, k, kwargs[k])
 
     def __str__(self):
-        return '{0}({1}{2})'.format(
-            self.__class__.__name__,
-            ', '.join([str(arg) for arg in self.args]) if len(self.args) > 0 else '',
-            ', {0}'.format(self.kwargs) if len(self.kwargs) > 0 else ''
+        return '{0}({1})'.format(
+            type(self).__name__, _get_condition_args_str(self.args, self.kwargs)
         )
 
     @property
