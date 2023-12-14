@@ -100,7 +100,7 @@ jobs:
       run: git fetch origin +refs/tags/*:refs/tags/*
 
     - name: Download branch docs
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: Documentation-${{ matrix.os }}-${{ matrix.python-version }}-x64
         path: _built_docs/${{ github.ref }}
@@ -115,7 +115,7 @@ jobs:
       if: github.ref == 'refs/heads/main'
 
     - name: Download main docs
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: Documentation-${{ matrix.os }}-${{ matrix.python-version }}-x64
         path: _built_docs/${{ github.ref }}
