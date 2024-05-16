@@ -3,7 +3,7 @@ import functools
 import inspect
 import logging
 import weakref
-from typing import Dict, Hashable, List, Set, Union
+from typing import Callable, Dict, Hashable, List, Set, Union
 
 import networkx as nx
 
@@ -262,18 +262,19 @@ def output_graph_image(
     print(f'graph_scheduler.output_graph_image: wrote {format} to {filename}')
 
 
+@functools.lru_cache()
+def cached_hashable_graph_function(func: Callable, graph: HashableDict):
+    return func(graph)
+
+
 def cached_graph_function(func):
     """
     Decorator that can be applied to cache the results of a function
     that takes a graph dependency dict
     """
-    @functools.lru_cache()
-    def cached_orig_func(graph: HashableDict):
-        return func(graph)
-
     @functools.wraps(func)
     def graph_function_wrapper(graph: typing_graph_dependency_dict):
-        return cached_orig_func(HashableDict(graph))
+        return cached_hashable_graph_function(func, HashableDict(graph))
 
     return graph_function_wrapper
 
