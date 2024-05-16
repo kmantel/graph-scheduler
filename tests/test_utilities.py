@@ -4,6 +4,7 @@ import types
 
 import networkx as nx
 import pytest
+from pkg_resources import packaging
 
 import graph_scheduler as gs
 
@@ -34,6 +35,17 @@ nx_digraph_types = [
     t for t in nx.__dict__.values()
     if inspect.isclass(t) and issubclass(t, nx.DiGraph)
 ]
+
+
+def check_compatibility_PlanarEmbedding(nx_graph_type):
+    if (
+        packaging.version.parse(nx.__version__) >= packaging.version.parse('3.3')
+        and issubclass(nx_graph_type, nx.PlanarEmbedding)
+    ):
+        pytest.xfail(
+            'PlanarEmbedding interface is not directly compatible with other'
+            ' DiGraphs since networkx 3.3'
+        )
 
 
 def graph_as_nx_graph(graph, typ=nx.DiGraph):
@@ -116,6 +128,8 @@ def test_debug_helpers(clean_logging, request, disable_level):
 @pytest.mark.parametrize('graph', test_graphs)
 @pytest.mark.parametrize('nx_type', nx_digraph_types)
 def test_convert_from_dependency_dict(graph, nx_type):
+    check_compatibility_PlanarEmbedding(nx_type)
+
     res = gs.networkx_digraph_to_dependency_dict(
         gs.dependency_dict_to_networkx_digraph(graph, nx_type)
     )
@@ -125,6 +139,8 @@ def test_convert_from_dependency_dict(graph, nx_type):
 @pytest.mark.parametrize('graph', test_graphs)
 @pytest.mark.parametrize('nx_type', nx_digraph_types)
 def test_convert_from_nx_graph(graph, nx_type):
+    check_compatibility_PlanarEmbedding(nx_type)
+
     nx_graph = graph_as_nx_graph(graph, nx_type)
 
     res = gs.dependency_dict_to_networkx_digraph(
@@ -138,6 +154,8 @@ def test_convert_from_nx_graph(graph, nx_type):
 @pytest.mark.parametrize('nx_type', nx_digraph_types)
 @pytest.mark.parametrize('format', ['png', 'jpg', 'svg'])
 def test_output_graph_image(graph, nx_type, format, tmp_path):
+    check_compatibility_PlanarEmbedding(nx_type)
+
     fname = f'{tmp_path}_fig.{format}'
     nx_graph = graph_as_nx_graph(graph, nx_type)
 
