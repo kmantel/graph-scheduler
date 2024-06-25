@@ -160,7 +160,8 @@ Condition, it is assigned a Condition that causes it to be executed whenever it 
 and all its structural parents have been executed at least once since the node's last execution.
 Condition subclasses (`listed below <Condition_Pre-Specified_List>`)
 provide a standard set of Conditions that can be implemented simply by specifying their parameter(s).
-Along with graph structure Conditions, there are six types of basic Conditions:
+Along with `graph structure Conditions <Conditions_Graph_Structure>`,
+there are six types of basic Conditions:
 
   * `Generic <Conditions_Generic>` - satisfied when a `user-specified function and set of arguments <Condition_Custom>`
     evaluates to `True`;
