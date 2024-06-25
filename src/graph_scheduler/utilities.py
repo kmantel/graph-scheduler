@@ -2,6 +2,7 @@ import collections
 import functools
 import inspect
 import logging
+import os
 import weakref
 from typing import Callable, Dict, Hashable, List, Set, Union
 
@@ -230,7 +231,7 @@ def output_graph_image(
         - Python pydot: pip install pydot
     """
     if filename is None:
-        filename = f'graph-scheduler-figure-{id(graph)}.{format}'
+        filename = f'graph-scheduler-figure-{id(graph)}{os.path.extsep}{format}'
 
     if not isinstance(graph, nx.Graph):
         graph = dependency_dict_to_networkx_digraph(graph)
