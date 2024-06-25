@@ -329,7 +329,7 @@ from graph_scheduler.condition import (
 )
 from graph_scheduler.time import _get_pint_unit, Clock, TimeScale
 from graph_scheduler.utilities import (
-    cached_graph_function, clone_graph, networkx_digraph_to_dependency_dict,
+    cached_graph_function, clone_graph, networkx_digraph_to_dependency_dict, output_graph_image,
     typing_graph_dependency_dict,
 )
 
@@ -1178,3 +1178,25 @@ class Scheduler:
         """
         self._handle_modified_structural_conditions()
         return self._consideration_queue_indices[-1]
+
+    def output_graph_image(self, filename: str = None, format: str = 'png'):
+        """
+        See `graph_scheduler.utilities.output_graph_image`.
+        Writes an image representation of self.graph to file **filename**.
+
+        Args:
+            filename (str, optional): full path of image to write. Defaults
+                to 'graph-scheduler-figure-<graph id>.<format>' in the current
+                directory.
+            format (str, optional): image format. Many common formats
+                supported. Pass None to display supported formats. Defaults
+                to png unless specified by **filename** extension.
+
+        Returns:
+            name of file containing written image
+
+        Requires:
+            - system graphviz: https://graphviz.org/download
+            - Python pydot: pip install pydot
+        """
+        return output_graph_image(self.graph, filename, format)
