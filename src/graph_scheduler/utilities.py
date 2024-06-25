@@ -224,7 +224,7 @@ def output_graph_image(
             directory.
         format (str, optional): image format. Many common formats
             supported. Pass None to display supported formats. Defaults
-            to png.
+            to png unless specified by **filename** extension.
 
     Returns:
         name of file containing written image
@@ -235,6 +235,10 @@ def output_graph_image(
     """
     if filename is None:
         filename = f'graph-scheduler-figure-{id(graph)}{os.path.extsep}{format}'
+    else:
+        filename_split = filename.split(os.path.extsep)
+        if len(filename_split) > 1:
+            format = filename_split[-1]
 
     if not isinstance(graph, nx.Graph):
         graph = dependency_dict_to_networkx_digraph(graph)
