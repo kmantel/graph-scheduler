@@ -213,7 +213,7 @@ def output_graph_image(
     graph: Union[typing_graph_dependency_dict, nx.Graph],
     filename: str = None,
     format: str = 'png',
-):
+) -> str:
     """
     Writes an image representation of **graph** to file **filename**.
 
@@ -225,6 +225,9 @@ def output_graph_image(
         format (str, optional): image format. Many common formats
             supported. Pass None to display supported formats. Defaults
             to png.
+
+    Returns:
+        name of file containing written image
 
     Requires:
         - system graphviz: https://graphviz.org/download
@@ -261,6 +264,7 @@ def output_graph_image(
             raise
 
     print(f'graph_scheduler.output_graph_image: wrote {format} to {filename}')
+    return filename
 
 
 @functools.lru_cache()
