@@ -3244,7 +3244,7 @@ class _GSCReposition(_GSCUsingNodes):
                     self,
                     self.owner,
                     self._already_valid_message,
-                    ','.join(already_valid),
+                    ','.join([str(n) for n in already_valid]),
                     graph,
                     ignored_message,
                 )

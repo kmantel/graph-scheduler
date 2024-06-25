@@ -15,6 +15,7 @@ SimpleTestNode = pytest.helpers.get_test_node()
 
 test_graphs = {
     'five_node_hub': {'A': set(), 'B': set(), 'C': {'A', 'B'}, 'D': {'C'}, 'E': {'C'}},
+    'five_node_hub_ints': {1: set(), 2: set(), 3: {1, 2}, 4: {3}, 5: {3}},
     'nine_node_multi': {
         'A': set(),
         'B': set(),
@@ -2010,6 +2011,10 @@ class TestGraphStructureCondition:
         (
             'five_node_hub', 'C', ['D'], r'.*C is already before D.*Condition is ignored.',
             {'A': set(), 'B': set(), 'C': {'A', 'B'}, 'D': {'C'}, 'E': {'C'}},
+        ),
+        (
+            'five_node_hub_ints', 3, [4], r'.*3 is already before 4.*Condition is ignored.',
+            {1: set(), 2: set(), 3: {1, 2}, 4: {3}, 5: {3}},
         ),
         pytest.param(
             'five_node_hub', 'C', ['B', 'D'], r'.*C is already before D.*(?<!ignored.)$',
