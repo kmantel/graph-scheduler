@@ -153,10 +153,13 @@ def test_convert_from_nx_graph(graph, nx_type):
 @pytest.mark.parametrize('graph', test_graphs)
 @pytest.mark.parametrize('nx_type', nx_digraph_types)
 @pytest.mark.parametrize('format', ['png', 'jpg', 'svg'])
-def test_output_graph_image(graph, nx_type, format, tmp_path):
+@pytest.mark.parametrize('include_fname_format', [True, False])
+def test_output_graph_image(graph, nx_type, format, tmp_path, include_fname_format):
     check_compatibility_PlanarEmbedding(nx_type)
 
-    fname = f'{tmp_path}_fig.{format}'
+    fname = f'{tmp_path}_fig'
+    if include_fname_format:
+        fname = f'{fname}.{format}'
     nx_graph = graph_as_nx_graph(graph, nx_type)
 
     gs.output_graph_image(graph, fname, format)
