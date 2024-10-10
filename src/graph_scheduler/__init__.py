@@ -12,6 +12,7 @@ Documentation: https://kmantel.github.io/graph-scheduler/
 """
 
 import inspect
+
 import pint
 
 _unit_registry = pint.get_application_registry()
@@ -22,7 +23,6 @@ from . import condition  # noqa: E402
 from . import scheduler  # noqa: E402
 from . import time  # noqa: E402
 from . import utilities  # noqa: E402
-
 
 condition.__all__ = []
 for k, v in condition.__dict__.items():
@@ -51,6 +51,7 @@ __all__.extend([
 ])
 
 from . import _version  # noqa: E402
+
 __version__ = _version.get_versions()['version']
 
 del inspect

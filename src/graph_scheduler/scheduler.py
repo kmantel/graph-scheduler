@@ -321,15 +321,25 @@ import numpy as np
 import pint
 from toposort import CircularDependencyError, toposort
 
-from graph_scheduler import _unit_registry
 from graph_scheduler.condition import (
-    AddEdgeTo, All, AllHaveRun, Always, Condition, ConditionSet, EveryNCalls,
-    Never, RemoveEdgeFrom, _parse_absolute_unit,
-    _quantity_as_integer, typing_condition_base,
+    AddEdgeTo,
+    All,
+    AllHaveRun,
+    Always,
+    Condition,
+    ConditionSet,
+    EveryNCalls,
+    Never,
+    RemoveEdgeFrom,
+    _parse_absolute_unit,
+    _quantity_as_integer,
+    typing_condition_base,
 )
-from graph_scheduler.time import _get_pint_unit, Clock, TimeScale
+from graph_scheduler.time import Clock, TimeScale, _get_pint_unit
 from graph_scheduler.utilities import (
-    cached_graph_function, clone_graph, networkx_digraph_to_dependency_dict,
+    cached_graph_function,
+    clone_graph,
+    networkx_digraph_to_dependency_dict,
     typing_graph_dependency_dict,
 )
 

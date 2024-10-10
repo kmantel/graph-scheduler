@@ -422,8 +422,13 @@ import pint
 from graph_scheduler import _unit_registry
 from graph_scheduler.time import TimeScale
 from graph_scheduler.utilities import (
-    call_with_pruned_args, clone_graph, get_ancestors, get_descendants,
-    get_receivers, get_simple_cycles, typing_graph_dependency_dict,
+    call_with_pruned_args,
+    clone_graph,
+    get_ancestors,
+    get_descendants,
+    get_receivers,
+    get_simple_cycles,
+    typing_graph_dependency_dict,
 )
 
 _additional__all__ = ['ConditionError', 'ConditionSet', 'Operation']
