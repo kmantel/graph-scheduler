@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 _unused_args_sig_cache = weakref.WeakKeyDictionary()
 
-typing_graph_dependency_dict = Dict[Hashable, Set[Hashable]]
+GraphDependencyDict = Dict[Hashable, Set[Hashable]]
 
 
 class HashableDict(dict):
@@ -103,7 +103,7 @@ def call_with_pruned_args(func, *args, **kwargs):
     return func(*args, **kwargs)
 
 
-def clone_graph(graph: typing_graph_dependency_dict) -> typing_graph_dependency_dict:
+def clone_graph(graph: GraphDependencyDict) -> GraphDependencyDict:
     """
     Returns a copy of dependency-dict-formatted **graph** where the
     nodes within are copied as references
@@ -165,7 +165,7 @@ def disable_debug_logging(level: int = logging.WARNING):
 
 
 def dependency_dict_to_networkx_digraph(
-    graph: typing_graph_dependency_dict, nx_type=nx.DiGraph
+    graph: GraphDependencyDict, nx_type=nx.DiGraph
 ) -> nx.DiGraph:
     """
     Converts a graph in dependency dict form to a networkx DiGraph of type
@@ -185,7 +185,7 @@ def dependency_dict_to_networkx_digraph(
 
 def networkx_digraph_to_dependency_dict(
     graph: nx.DiGraph, add_missing=True
-) -> typing_graph_dependency_dict:
+) -> GraphDependencyDict:
     """
     Converts a networkx DiGraph to a graph in dependency dict form
 
@@ -209,7 +209,7 @@ def networkx_digraph_to_dependency_dict(
 
 
 def output_graph_image(
-    graph: Union[typing_graph_dependency_dict, nx.Graph],
+    graph: Union[GraphDependencyDict, nx.Graph],
     filename: str = None,
     format: str = 'png',
 ):
@@ -273,14 +273,14 @@ def cached_graph_function(func):
     that takes a graph dependency dict
     """
     @functools.wraps(func)
-    def graph_function_wrapper(graph: typing_graph_dependency_dict):
+    def graph_function_wrapper(graph: GraphDependencyDict):
         return cached_hashable_graph_function(func, HashableDict(graph))
 
     return graph_function_wrapper
 
 
 @cached_graph_function
-def get_ancestors(graph: typing_graph_dependency_dict) -> Dict[Hashable, Set[Hashable]]:
+def get_ancestors(graph: GraphDependencyDict) -> Dict[Hashable, Set[Hashable]]:
     """
     Returns a dict containing the ancestors of each node in dependency
     dictionary **graph**
@@ -293,7 +293,7 @@ def get_ancestors(graph: typing_graph_dependency_dict) -> Dict[Hashable, Set[Has
 
 
 @cached_graph_function
-def get_descendants(graph: typing_graph_dependency_dict) -> Dict[Hashable, Set[Hashable]]:
+def get_descendants(graph: GraphDependencyDict) -> Dict[Hashable, Set[Hashable]]:
     """
     Returns a dict containing the descendants of each node in dependency
     dictionary **graph**
@@ -306,7 +306,7 @@ def get_descendants(graph: typing_graph_dependency_dict) -> Dict[Hashable, Set[H
 
 
 @cached_graph_function
-def get_receivers(graph: typing_graph_dependency_dict) -> Dict[Hashable, Set[Hashable]]:
+def get_receivers(graph: GraphDependencyDict) -> Dict[Hashable, Set[Hashable]]:
     """
     Returns a dict containing the receivers of each node in dependency
     dictionary **graph**
@@ -325,7 +325,7 @@ def get_receivers(graph: typing_graph_dependency_dict) -> Dict[Hashable, Set[Has
 
 
 @cached_graph_function
-def get_simple_cycles(graph: typing_graph_dependency_dict) -> List[List[Hashable]]:
+def get_simple_cycles(graph: GraphDependencyDict) -> List[List[Hashable]]:
     """
     Returns a list containing the simple cycles of each node in
     dependency dictionary **graph**
