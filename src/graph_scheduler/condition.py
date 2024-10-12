@@ -2131,20 +2131,6 @@ class EveryNCalls(_DependencyValidation, Condition):
         - the node specified in **dependency** has executed at least n times since the last time the
           Condition's owner executed.
 
-        COMMENT:
-            JDC: IS THE FOLLOWING TRUE OF ALL OF THE ABOVE AS WELL??
-            K: No, EveryNCalls is tricky in how it needs to be implemented, because it's in a sense
-                tracking the relative frequency of calls between two objects. So the idea is that the scheduler
-                tracks how many executions of a node are "useable" by other nodes for EveryNCalls conditions.
-                So, suppose you had something like add_condition(B, All(AfterNCalls(A, 10), EveryNCalls(A, 2))). You
-                would want the AAB pattern to start happening after A has run 10 times. Useable counts allows B to see
-                whether A has run enough times for it to run, and then B spends its "useable executions" of A. Then,
-                A must run two more times for B to run again. If you didn't reset the counts of A useable by B
-                to 0 (question below) when B runs, then in the
-                above case B would continue to run every pass for the next 4 passes, because it would see an additional
-                8 executions of A it could spend to execute.
-            JDC: IS THIS A FORM OF MODULO?  IF SO, WOULD IT BE EASIER TO EXPLAIN IN THAT FORM?
-        COMMENT
 
     Notes:
 
