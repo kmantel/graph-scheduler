@@ -1950,7 +1950,7 @@ class BeforeNCalls(_DependencyValidation, Condition):
 
     Parameters:
 
-        dependency(node):  the node on which the Condition depends
+        dependency (node):  the node on which the Condition depends
 
         n(int): the number of executions of **dependency** before which the Condition is satisfied
 
@@ -1988,7 +1988,7 @@ class AtNCalls(_DependencyValidation, Condition):
 
     Parameters:
 
-        dependency(node):  the node on which the Condition depends
+        dependency (node):  the node on which the Condition depends
 
         n(int): the number of executions of **dependency** at which the Condition is satisfied
 
@@ -2020,7 +2020,7 @@ class AfterCall(_DependencyValidation, Condition):
 
     Parameters:
 
-        dependency(node):  the node on which the Condition depends
+        dependency (node):  the node on which the Condition depends
 
         n(int): the number of executions of **dependency** after which the Condition is satisfied
 
@@ -2050,7 +2050,7 @@ class AfterNCalls(_DependencyValidation, Condition):
 
     Parameters:
 
-        dependency(node):  the node on which the Condition depends
+        dependency (node):  the node on which the Condition depends
 
         n(int): the number of executions of **dependency** after which the Condition is satisfied
 
@@ -2082,7 +2082,7 @@ class AfterNCallsCombined(_DependencyValidation, Condition):
 
     Parameters:
 
-        *nodes(nodes):  one or more nodes on which the Condition depends
+        *dependencies (node):  one or more nodes on which the Condition depends
 
         n(int): the number of combined executions of all nodes specified in **dependencies** after which the
         Condition is satisfied (default: None)
@@ -2121,7 +2121,7 @@ class EveryNCalls(_DependencyValidation, Condition):
 
     Parameters:
 
-        dependency(node):  the node on which the Condition depends
+        dependency (node):  the node on which the Condition depends
 
         n(int): the frequency of executions of **dependency** at which the Condition is satisfied
 
@@ -2155,7 +2155,7 @@ class JustRan(_DependencyValidation, Condition):
 
     Parameters:
 
-        dependency(node):  the node on which the Condition depends
+        dependency (node):  the node on which the Condition depends
 
     Satisfied when:
 
@@ -2183,7 +2183,7 @@ class AllHaveRun(_DependencyValidation, Condition):
 
     Parameters:
 
-        *nodes(nodes):  an iterable of nodes on which the Condition depends
+        *dependencies (node):  an iterable of nodes on which the Condition depends
 
         time_scale(TimeScale): the TimeScale used as basis for counting executions of **dependency**
         (default: TimeScale.ENVIRONMENT_STATE_UPDATE)
@@ -2219,7 +2219,7 @@ class WhenFinished(_DependencyValidation, Condition):
 
     Parameters:
 
-        dependency(node):  the node on which the Condition depends
+        dependency (node):  the node on which the Condition depends
 
     Satisfied when:
 
@@ -2250,7 +2250,7 @@ class WhenFinishedAny(_DependencyValidation, Condition):
 
     Parameters:
 
-        *nodes(nodes):  zero or more nodes on which the Condition depends
+        *dependencies (node):  zero or more nodes on which the Condition depends
 
     Satisfied when:
 
@@ -2290,7 +2290,7 @@ class WhenFinishedAll(_DependencyValidation, Condition):
 
     Parameters:
 
-        *nodes(nodes):  zero or more nodes on which the Condition depends
+        *dependencies (node):  zero or more nodes on which the Condition depends
 
     Satisfied when:
 
