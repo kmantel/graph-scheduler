@@ -404,6 +404,8 @@ Class Reference
 
 """
 
+from __future__ import annotations
+
 import abc
 import collections
 import copy
@@ -422,8 +424,13 @@ import pint
 from graph_scheduler import _unit_registry
 from graph_scheduler.time import TimeScale
 from graph_scheduler.utilities import (
-    call_with_pruned_args, clone_graph, get_ancestors, get_descendants,
-    get_receivers, get_simple_cycles, typing_graph_dependency_dict,
+    GraphDependencyDict,
+    call_with_pruned_args,
+    clone_graph,
+    get_ancestors,
+    get_descendants,
+    get_receivers,
+    get_simple_cycles,
 )
 
 _additional__all__ = ['ConditionError', 'ConditionSet', 'Operation']
@@ -448,9 +455,8 @@ comparison_operators = {
 }
 
 
-typing_subject_operation = Union['Operation', str, Dict[Hashable, Union['Operation', str]]]
-typing_condition_base = 'ConditionBase'
-typing_dict_condition_set = Dict[Hashable, Union[typing_condition_base, Iterable[typing_condition_base]]]
+SubjectOperation = Union['Operation', str, Dict[Hashable, Union['Operation', str]]]
+ConditionSetDict = Dict[Hashable, Union['ConditionBase', Iterable['ConditionBase']]]
 
 
 def _quantity_as_integer(q):
@@ -659,8 +665,8 @@ class ConditionSet(object):
     """
     def __init__(
         self,
-        *condition_sets: typing_dict_condition_set,
-        conditions: typing_dict_condition_set = None
+        *condition_sets: ConditionSetDict,
+        conditions: ConditionSetDict = None
     ):
         self._conditions = {}
         self.conditions_basic = {}
@@ -710,7 +716,7 @@ class ConditionSet(object):
 
         self.add_condition(key, value)
 
-    def add_condition(self, owner: Hashable, condition: typing_condition_base):
+    def add_condition(self, owner: Hashable, condition: 'ConditionBase'):
         """
         Adds a `basic <graph_scheduler.condition.Condition>` or `graph
         structure <GraphStructureCondition>` Condition to the
@@ -754,8 +760,8 @@ class ConditionSet(object):
         self._rebuild_conditions = True
 
     def remove_condition(
-        self, owner_or_condition: Union[Hashable, typing_condition_base]
-    ) -> Union[typing_condition_base, None]:
+        self, owner_or_condition: Union[Hashable, 'ConditionBase']
+    ) -> Union['ConditionBase', None]:
         """
         Removes the condition specified as or owned by
         **owner_or_condition**.
@@ -848,7 +854,7 @@ class ConditionSet(object):
         return condition
 
     def add_condition_set(
-        self, conditions: Union['ConditionSet', typing_dict_condition_set]
+        self, conditions: Union['ConditionSet', ConditionSetDict]
     ):
         """
         Adds a set of `basic <graph_scheduler.condition.Condition>` or
@@ -883,7 +889,7 @@ class ConditionSet(object):
 
     # Maintain backwards compatibility for v1.x
     @property
-    def conditions(self) -> Union[typing_condition_base, List[typing_condition_base]]:
+    def conditions(self) -> Union['ConditionBase', List['ConditionBase']]:
         """
         Returns the Conditions contained within this ConditionSet
 
@@ -1945,7 +1951,7 @@ class BeforeNCalls(_DependencyValidation, Condition):
 
     Parameters:
 
-        dependency(node):  the node on which the Condition depends
+        dependency (node):  the node on which the Condition depends
 
         n(int): the number of executions of **dependency** before which the Condition is satisfied
 
@@ -1983,7 +1989,7 @@ class AtNCalls(_DependencyValidation, Condition):
 
     Parameters:
 
-        dependency(node):  the node on which the Condition depends
+        dependency (node):  the node on which the Condition depends
 
         n(int): the number of executions of **dependency** at which the Condition is satisfied
 
@@ -2015,7 +2021,7 @@ class AfterCall(_DependencyValidation, Condition):
 
     Parameters:
 
-        dependency(node):  the node on which the Condition depends
+        dependency (node):  the node on which the Condition depends
 
         n(int): the number of executions of **dependency** after which the Condition is satisfied
 
@@ -2045,7 +2051,7 @@ class AfterNCalls(_DependencyValidation, Condition):
 
     Parameters:
 
-        dependency(node):  the node on which the Condition depends
+        dependency (node):  the node on which the Condition depends
 
         n(int): the number of executions of **dependency** after which the Condition is satisfied
 
@@ -2077,7 +2083,7 @@ class AfterNCallsCombined(_DependencyValidation, Condition):
 
     Parameters:
 
-        *nodes(nodes):  one or more nodes on which the Condition depends
+        *dependencies (node):  one or more nodes on which the Condition depends
 
         n(int): the number of combined executions of all nodes specified in **dependencies** after which the
         Condition is satisfied (default: None)
@@ -2116,7 +2122,7 @@ class EveryNCalls(_DependencyValidation, Condition):
 
     Parameters:
 
-        dependency(node):  the node on which the Condition depends
+        dependency (node):  the node on which the Condition depends
 
         n(int): the frequency of executions of **dependency** at which the Condition is satisfied
 
@@ -2126,20 +2132,6 @@ class EveryNCalls(_DependencyValidation, Condition):
         - the node specified in **dependency** has executed at least n times since the last time the
           Condition's owner executed.
 
-        COMMENT:
-            JDC: IS THE FOLLOWING TRUE OF ALL OF THE ABOVE AS WELL??
-            K: No, EveryNCalls is tricky in how it needs to be implemented, because it's in a sense
-                tracking the relative frequency of calls between two objects. So the idea is that the scheduler
-                tracks how many executions of a node are "useable" by other nodes for EveryNCalls conditions.
-                So, suppose you had something like add_condition(B, All(AfterNCalls(A, 10), EveryNCalls(A, 2))). You
-                would want the AAB pattern to start happening after A has run 10 times. Useable counts allows B to see
-                whether A has run enough times for it to run, and then B spends its "useable executions" of A. Then,
-                A must run two more times for B to run again. If you didn't reset the counts of A useable by B
-                to 0 (question below) when B runs, then in the
-                above case B would continue to run every pass for the next 4 passes, because it would see an additional
-                8 executions of A it could spend to execute.
-            JDC: IS THIS A FORM OF MODULO?  IF SO, WOULD IT BE EASIER TO EXPLAIN IN THAT FORM?
-        COMMENT
 
     Notes:
 
@@ -2164,7 +2156,7 @@ class JustRan(_DependencyValidation, Condition):
 
     Parameters:
 
-        dependency(node):  the node on which the Condition depends
+        dependency (node):  the node on which the Condition depends
 
     Satisfied when:
 
@@ -2192,7 +2184,7 @@ class AllHaveRun(_DependencyValidation, Condition):
 
     Parameters:
 
-        *nodes(nodes):  an iterable of nodes on which the Condition depends
+        *dependencies (node):  an iterable of nodes on which the Condition depends
 
         time_scale(TimeScale): the TimeScale used as basis for counting executions of **dependency**
         (default: TimeScale.ENVIRONMENT_STATE_UPDATE)
@@ -2228,7 +2220,7 @@ class WhenFinished(_DependencyValidation, Condition):
 
     Parameters:
 
-        dependency(node):  the node on which the Condition depends
+        dependency (node):  the node on which the Condition depends
 
     Satisfied when:
 
@@ -2259,7 +2251,7 @@ class WhenFinishedAny(_DependencyValidation, Condition):
 
     Parameters:
 
-        *nodes(nodes):  zero or more nodes on which the Condition depends
+        *dependencies (node):  zero or more nodes on which the Condition depends
 
     Satisfied when:
 
@@ -2299,7 +2291,7 @@ class WhenFinishedAll(_DependencyValidation, Condition):
 
     Parameters:
 
-        *nodes(nodes):  zero or more nodes on which the Condition depends
+        *dependencies (node):  zero or more nodes on which the Condition depends
 
     Satisfied when:
 
@@ -2606,8 +2598,8 @@ class GraphStructureCondition(ConditionBase, metaclass=abc.ABCMeta):
         return graph
 
     def modify_graph(
-        self, graph: typing_graph_dependency_dict
-    ) -> typing_graph_dependency_dict:
+        self, graph: GraphDependencyDict
+    ) -> GraphDependencyDict:
         """
         Modifies **graph** based on the transformation specified by this
         condition
@@ -2808,8 +2800,8 @@ class _GSCWithOperations(_GSCUsingNodes):
         *nodes: Hashable,
         owner_senders: Union[Operation, str] = Operation.KEEP,
         owner_receivers: Union[Operation, str] = Operation.KEEP,
-        subject_senders: typing_subject_operation = Operation.KEEP,
-        subject_receivers: typing_subject_operation = Operation.KEEP,
+        subject_senders: SubjectOperation = Operation.KEEP,
+        subject_receivers: SubjectOperation = Operation.KEEP,
         reconnect_non_subject_receivers: bool = True,
         remove_new_self_referential_edges: bool = True,
         prune_cycles: bool = True,
@@ -3178,7 +3170,7 @@ class _GSCWithOperations(_GSCUsingNodes):
 
     def _handle_subject_arg(
         self,
-        subject: typing_subject_operation,
+        subject: SubjectOperation,
         nodes: Iterable[Hashable],
         is_senders: bool,
     ):
@@ -3280,8 +3272,8 @@ class BeforeNodes(_GSCReposition, _GSCWithOperations):
         *nodes,
         owner_senders: Union[Operation, str] = Operation.MERGE,
         owner_receivers: Union[Operation, str] = Operation.KEEP,
-        subject_senders: typing_subject_operation = Operation.KEEP,
-        subject_receivers: typing_subject_operation = Operation.KEEP,
+        subject_senders: SubjectOperation = Operation.KEEP,
+        subject_receivers: SubjectOperation = Operation.KEEP,
         reconnect_non_subject_receivers: bool = True,
         remove_new_self_referential_edges: bool = True,
         prune_cycles: bool = True,
@@ -3338,7 +3330,7 @@ class WithNode(_GSCReposition, _GSCWithOperations, _GSCSingleNode):
         self,
         node,
         owner_receivers: Union[Operation, str] = Operation.KEEP,
-        subject_receivers: typing_subject_operation = Operation.KEEP,
+        subject_receivers: SubjectOperation = Operation.KEEP,
         reconnect_non_subject_receivers: bool = True,
         remove_new_self_referential_edges: bool = True,
         prune_cycles: bool = True,
@@ -3386,8 +3378,8 @@ class AfterNodes(_GSCReposition, _GSCWithOperations):
         *nodes,
         owner_senders: Union[Operation, str] = Operation.KEEP,
         owner_receivers: Union[Operation, str] = Operation.MERGE,
-        subject_senders: typing_subject_operation = Operation.MERGE,
-        subject_receivers: typing_subject_operation = Operation.KEEP,
+        subject_senders: SubjectOperation = Operation.MERGE,
+        subject_receivers: SubjectOperation = Operation.KEEP,
         reconnect_non_subject_receivers: bool = True,
         remove_new_self_referential_edges: bool = True,
         prune_cycles: bool = True,

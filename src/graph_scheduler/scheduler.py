@@ -321,16 +321,27 @@ import numpy as np
 import pint
 from toposort import CircularDependencyError, toposort
 
-from graph_scheduler import _unit_registry
 from graph_scheduler.condition import (
-    AddEdgeTo, All, AllHaveRun, Always, Condition, ConditionSet, EveryNCalls,
-    Never, RemoveEdgeFrom, _parse_absolute_unit,
-    _quantity_as_integer, typing_condition_base,
+    AddEdgeTo,
+    All,
+    AllHaveRun,
+    Always,
+    Condition,
+    ConditionBase,
+    ConditionSet,
+    EveryNCalls,
+    Never,
+    RemoveEdgeFrom,
+    _parse_absolute_unit,
+    _quantity_as_integer,
 )
-from graph_scheduler.time import _get_pint_unit, Clock, TimeScale
+from graph_scheduler.time import Clock, TimeScale, _get_pint_unit
 from graph_scheduler.utilities import (
-    cached_graph_function, clone_graph, networkx_digraph_to_dependency_dict,
-    typing_graph_dependency_dict,
+    GraphDependencyDict,
+    cached_graph_function,
+    clone_graph,
+    networkx_digraph_to_dependency_dict,
+    output_graph_image,
 )
 
 __all__ = [
@@ -360,7 +371,7 @@ class SchedulingMode(enum.Enum):
 
 @cached_graph_function
 def _build_consideration_queue(
-    graph: typing_graph_dependency_dict
+    graph: GraphDependencyDict
 ) -> List[Set[Hashable]]:
     return list(toposort(graph))
 
@@ -718,7 +729,7 @@ class Scheduler:
         return self.conditions.__contains__(item)
 
     def add_condition(
-        self, owner: Hashable, condition: typing_condition_base
+        self, owner: Hashable, condition: ConditionBase
     ):
         """
         Adds a `basic <Condition>` or `graph structure
@@ -777,8 +788,8 @@ class Scheduler:
         self._handle_modified_structural_conditions()
 
     def remove_condition(
-        self, owner_or_condition: Union[Hashable, typing_condition_base]
-    ) -> Union[typing_condition_base, None]:
+        self, owner_or_condition: Union[Hashable, ConditionBase]
+    ) -> Union[ConditionBase, None]:
         """
         Removes the condition specified as or owned by
         **owner_or_condition**.
@@ -1141,7 +1152,7 @@ class Scheduler:
         )
 
     @property
-    def graph(self) -> typing_graph_dependency_dict:
+    def graph(self) -> GraphDependencyDict:
         """
         The current graph used by this Scheduler, which is modified by
         any `graph structure conditions
@@ -1152,7 +1163,7 @@ class Scheduler:
 
     # Maintain backwards compatibility for v1.x
     @property
-    def dependency_dict(self) -> typing_graph_dependency_dict:
+    def dependency_dict(self) -> GraphDependencyDict:
         return self.graph
 
     @property
