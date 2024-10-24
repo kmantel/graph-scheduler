@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Scheduler &mdash; Graph Scheduler 1.2.1+3.g1fb65c5 documentation</title>
+  <title>Scheduler &mdash; Graph Scheduler 1.2.2+5.g9dc92a2 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
 
@@ -38,7 +38,7 @@
             Graph Scheduler
           </a>
               <div class="version">
-                1.2.1+3
+                1.2.2+5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -403,14 +403,14 @@ specification dictionary, possibly determined by a set of <a class="reference in
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>graph</strong> (Dict[object: set(object)], <a class="reference external" href="https://networkx.org/documentation/stable/reference/classes/digraph.html#networkx.DiGraph" title="(in NetworkX v3.3)"><code class="xref any docutils literal notranslate"><span class="pre">networkx.DiGraph</span></code></a>) – <dl>
+<li><p><strong>graph</strong> (Dict[object: set(object)], <a class="reference external" href="https://networkx.org/documentation/stable/reference/classes/digraph.html#networkx.DiGraph" title="(in NetworkX v3.4.2)"><code class="xref any docutils literal notranslate"><span class="pre">networkx.DiGraph</span></code></a>) – <dl>
 <dt>a directed acyclic graph (DAG). Specified as either:</dt><dd><ul>
 <li><p>a graph specification dictionary: each entry of the</p></li>
 </ul>
 <p>dictionary must be an object, and the value of each entry
 must be a set of zero or more objects that project directly
 to the key.
-- a <a class="reference external" href="https://networkx.org/documentation/stable/reference/classes/digraph.html#networkx.DiGraph" title="(in NetworkX v3.3)"><code class="xref any docutils literal notranslate"><span class="pre">networkx.DiGraph</span></code></a></p>
+- a <a class="reference external" href="https://networkx.org/documentation/stable/reference/classes/digraph.html#networkx.DiGraph" title="(in NetworkX v3.4.2)"><code class="xref any docutils literal notranslate"><span class="pre">networkx.DiGraph</span></code></a></p>
 </dd>
 </dl>
 </p></li>
@@ -418,7 +418,7 @@ to the key.
 execute and any dependencies among them.</p></li>
 <li><p><strong>mode</strong> (<a class="reference internal" href="#graph_scheduler.scheduler.SchedulingMode" title="graph_scheduler.scheduler.SchedulingMode"><em>SchedulingMode</em></a><em>[</em><em>STANDARD</em><em>|</em><em>EXACT_TIME</em><em>] </em><em>: SchedulingMode.STANDARD</em>) – sets the mode of scheduling: <a class="reference internal" href="#scheduler-execution"><span class="std std-ref">standard</span></a> or
 <a class="reference internal" href="#scheduler-exact-time"><span class="std std-ref">exact time</span></a></p></li>
-<li><p><strong>default_absolute_time_unit</strong> (<a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.1.dev52+g4c2cacc)"><code class="xref any docutils literal notranslate"><span class="pre">pint.Quantity</span></code></a> : <code class="docutils literal notranslate"><span class="pre">1ms</span></code>) – if not otherwise determined by any absolute <strong>conditions</strong>,
+<li><p><strong>default_absolute_time_unit</strong> (<a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.24.3.dev1+g79e636c)"><code class="xref any docutils literal notranslate"><span class="pre">pint.Quantity</span></code></a> : <code class="docutils literal notranslate"><span class="pre">1ms</span></code>) – if not otherwise determined by any absolute <strong>conditions</strong>,
 specifies the absolute duration of a <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION" title="graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">CONSIDERATION_SET_EXECUTION</span></code></a></p></li>
 </ul>
 </dd>
@@ -516,7 +516,7 @@ of the specified <a class="reference internal" href="Time.html#graph_scheduler.t
 specifies the absolute duration of a <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION" title="graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">CONSIDERATION_SET_EXECUTION</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.1.dev52+g4c2cacc)"><code class="xref any docutils literal notranslate"><span class="pre">pint.Quantity</span></code></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.24.3.dev1+g79e636c)"><code class="xref any docutils literal notranslate"><span class="pre">pint.Quantity</span></code></a></p>
 </dd>
 <dt class="field-even">Default<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">1ms</span></code></p>
