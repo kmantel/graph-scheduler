@@ -63,7 +63,7 @@ jobs:
       run: pytest --junit-xml=tests_out.xml --verbosity=0 -n auto --no-cov tests/integration/psyneulink/
 
     - name: Upload test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: test-results-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.python-architecture }}
         path: tests_out.xml
