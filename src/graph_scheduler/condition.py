@@ -2669,6 +2669,25 @@ class CustomGraphStructureCondition(GraphStructureCondition):
             return self.process_graph_function(graph)
 
 
+class CompositeGraphStructureCondition(GraphStructureCondition):
+
+    def __init__(self, *conditions):
+        super().__init__(conditions=conditions)
+
+    @GraphStructureCondition.owner.setter
+    def owner(self, value):
+        super().owner.__set__(self, value)
+        for cond in self.conditions:
+            if cond.owner is None:
+                cond.owner = value
+
+    def _modify_graph(self, graph):
+        for cond in self.conditions:
+            graph = cond._modify_graph(graph)
+
+        return graph
+
+
 class _GSCUsingNodes(GraphStructureCondition):
     """
     Attributes:
