@@ -2215,3 +2215,10 @@ class TestGraphStructureCondition:
         TestGraphStructureCondition._single_condition_test_helper(
             gs.AfterNode, graph_name, owner, nodes, warning_pat, expected_graph
         )
+
+    def test_OrderNodes(self):
+        s = gs.Scheduler({1: {}, 2: {}, 3: {}, 4: {}})
+        c = gs.OrderNodes(1, {4, 3}, 2)
+        s.add_condition(s, c)
+
+        assert s.consideration_queue == [{1}, {3, 4}, {2}]

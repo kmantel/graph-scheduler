@@ -2674,12 +2674,19 @@ class CompositeGraphStructureCondition(GraphStructureCondition):
     def __init__(self, *conditions):
         super().__init__(conditions=conditions)
 
-    @GraphStructureCondition.owner.setter
-    def owner(self, value):
-        super().owner.__set__(self, value)
-        for cond in self.conditions:
-            if cond.owner is None:
-                cond.owner = value
+    # TODO: examine this for the case of NO OWNER it may just be None
+    # like a GSC "Collection" rather than Composite
+    # @GraphStructureCondition.owner.setter
+    # def owner(self, value):
+        # pass
+        # super().owner.__set__(self, value)
+        # for cond in self.conditions:
+        #     if cond.owner is None:
+        #         cond.owner = value
+
+    # TODO: rethink this design - unneeded here
+    def _process(self, graph):
+        return graph
 
     def _modify_graph(self, graph):
         for cond in self.conditions:
@@ -2914,6 +2921,9 @@ class _GSCWithOperations(_GSCUsingNodes):
             comparisons = sorted(comparisons)
         except TypeError:
             pass
+
+        sources = [str(_) for _ in sources]
+        comparisons = [str(_) for _ in comparisons]
 
         sources_str = ','.join(sources) if len(sources) else '{}'
         comparisons_str = ','.join(comparisons) if len(comparisons) else '{}'
@@ -3467,3 +3477,36 @@ class RemoveEdgeFrom(_GSCSingleNode):
                 f'{self}: there was no edge from {self.node} to {self.owner}: {e}'
             )
         return graph
+
+
+class OrderNodes(CompositeGraphStructureCondition):
+    # for docs: NOTE: this uses default values for optional parameters
+    # of AfterNodes. to change, make the conditions manually
+
+    # assumes non-str iterables are nodes if they are hashable, or iterables of nodes if they are not hashable
+    def __init__(self, *node_order):
+        conditions = []
+        for i in range(1, len(node_order)):
+            prev = node_order[i - 1]
+            cur = node_order[i]
+
+            if getattr(prev, '__hash__', None) is not None:
+                prev = [prev]
+            if getattr(cur, '__hash__', None) is not None:
+                cur = [cur]
+
+            if len(prev) > 1 and len(cur) > 1:
+                raise ValueError('cannot have subsequent multi-node sets')
+            elif len(prev) > 1:
+                logger.debug(f'Making cond for {cur[0]} BeforeNodes({prev})')
+                cond = AfterNodes(*prev)
+                cond.owner = cur[0]
+            else:
+                # for c in cur:
+                #     logger.debug(f'Making cond for {c} AfterNodes({prev})')
+                logger.debug(f'Making cond for {prev[0]} AfterNodes({cur})')
+                cond = BeforeNodes(*cur)
+                cond.owner = prev[0]
+            conditions.append(cond)
+
+        super().__init__(*conditions)
