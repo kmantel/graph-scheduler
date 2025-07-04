@@ -58,10 +58,6 @@ jobs:
     - name: Install package
       run: python -m pip install -r dev_requirements.txt && python -m pip install -e .
 
-    - name: Install coverage helper
-      if: ${{ matrix.python-version == 3.9 }}
-      run: python -m pip install coveragepy-lcov "coverage<7.0.0"
-
     - name: Install Graphviz
       uses: tlylt/install-graphviz@v1
 
@@ -88,15 +84,14 @@ jobs:
 
     - name: Convert coverage file
       if: ${{ matrix.python-version == 3.9 && matrix.os == 'ubuntu-latest' }}
-      run: |
-        coveragepy-lcov --data_file_path .coverage --output_file_path lcov.info
+      run: coverage lcov
 
     - name: Upload to Coveralls
       if: ${{ matrix.python-version == 3.9 && matrix.os == 'ubuntu-latest' }}
       uses: coverallsapp/github-action@master
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        path-to-lcov: lcov.info
+        path-to-lcov: coverage.lcov
 
     - name: Build dist
       run: |
