@@ -1022,6 +1022,53 @@ class TestTermination:
         expected_output = [A, A, B, A, A, B]
         assert output == pytest.helpers.setify_expected_output(expected_output)
 
+    @pytest.mark.parametrize(
+        'env_seq',
+        [
+            gs.TimeScale.ENVIRONMENT_SEQUENCE,
+            'ENVIRONMENT_SEQUENCE',
+            'environment_sequence',
+            None,
+        ]
+    )
+    @pytest.mark.parametrize(
+        'env_state_update',
+        [
+            gs.TimeScale.ENVIRONMENT_STATE_UPDATE,
+            'ENVIRONMENT_STATE_UPDATE',
+            'environment_state_update',
+            None,
+        ]
+    )
+    def test_set_termination_conds(self, env_seq, env_state_update):
+        from graph_scheduler.scheduler import default_termination_conds
+
+        term_conds = {}
+
+        env_seq_cond = gs.Condition(lambda: True)
+        env_state_update_cond = gs.Condition(lambda: False)
+
+        if env_seq is not None:
+            term_conds[env_seq] = env_seq_cond
+        if env_state_update is not None:
+            term_conds[env_state_update] = env_state_update_cond
+
+        sched = gs.Scheduler(graph={})
+        sched.termination_conds = term_conds
+
+        actual_env_seq_cond = sched.termination_conds[gs.TimeScale.ENVIRONMENT_SEQUENCE]
+        actual_env_state_update_cond = sched.termination_conds[gs.TimeScale.ENVIRONMENT_STATE_UPDATE]
+
+        if env_seq is not None:
+            assert actual_env_seq_cond is env_seq_cond
+        else:
+            assert actual_env_seq_cond is default_termination_conds[gs.TimeScale.ENVIRONMENT_SEQUENCE]
+
+        if env_state_update is not None:
+            assert actual_env_state_update_cond is env_state_update_cond
+        else:
+            assert actual_env_state_update_cond is default_termination_conds[gs.TimeScale.ENVIRONMENT_STATE_UPDATE]
+
 
 class TestAbsoluteTime:
 

@@ -646,7 +646,7 @@ class Scheduler:
         )
 
         # parse string representation of TimeScale
-        parsed_conds = termination_conds
+        parsed_conds = copy.copy(termination_conds)
         delkeys = set()
         for scale in termination_conds:
             try:
