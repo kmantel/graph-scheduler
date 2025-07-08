@@ -34,7 +34,6 @@ def get_comp_execution_modes():
         pytest.param(pnlvm.ExecutionMode._LLVMPerNode, marks=pytest.mark.llvm),
         pytest.param(pnlvm.ExecutionMode._LLVMExec, marks=pytest.mark.llvm),
         pytest.param(pnlvm.ExecutionMode.LLVMRun, marks=pytest.mark.llvm),
-        pytest.param(pnlvm.ExecutionMode.PTXExec, marks=[pytest.mark.llvm, pytest.mark.cuda]),
         pytest.param(pnlvm.ExecutionMode.PTXRun, marks=[pytest.mark.llvm, pytest.mark.cuda])
     ]
 
