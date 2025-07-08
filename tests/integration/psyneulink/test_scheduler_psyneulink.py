@@ -962,41 +962,41 @@ class TestFeedback:
         assert np.allclose(result, expected)
 
     @pytest.mark.parametrize(
-        "condition,scale,expected_result",
+        "condition,condition_params,expected_result",
         [
-            (pnl.BeforeNCalls, pnl.TimeScale.ENVIRONMENT_STATE_UPDATE, [[.05, .05]]),
-            (pnl.BeforeNCalls, pnl.TimeScale.PASS, [[.05, .05]]),
-            (pnl.EveryNCalls, None, [[0.05, .05]]),
-            (pnl.AtNCalls, pnl.TimeScale.ENVIRONMENT_STATE_UPDATE, [[.25, .25]]),
-            (pnl.AtNCalls, pnl.TimeScale.ENVIRONMENT_SEQUENCE, [[.25, .25]]),
-            (pnl.AfterNCalls, pnl.TimeScale.ENVIRONMENT_STATE_UPDATE, [[.25, .25]]),
-            (pnl.AfterNCalls, pnl.TimeScale.PASS, [[.05, .05]]),
-            (pnl.WhenFinished, None, [[1.0, 1.0]]),
-            (pnl.WhenFinishedAny, None, [[1.0, 1.0]]),
-            (pnl.WhenFinishedAll, None, [[1.0, 1.0]]),
-            (pnl.All, None, [[1.0, 1.0]]),
-            (pnl.Any, None, [[1.0, 1.0]]),
-            (pnl.Not, None, [[.05, .05]]),
-            (pnl.AllHaveRun, None, [[.05, .05]]),
-            (pnl.Always, None, [[0.05, 0.05]]),
-            (pnl.AtPass, None, [[.3, .3]]),
-            (pnl.AtTrial, None, [[0.05, 0.05]]),
+            (pnl.BeforeNCalls, {"time_scale": pnl.TimeScale.TRIAL, "n": 5}, [[0.05, 0.05]]),
+            (pnl.BeforeNCalls, {"time_scale": pnl.TimeScale.PASS, "n": 5}, [[0.05, 0.05]]),
+            (pnl.EveryNCalls, {"n": 1}, [[0.05, 0.05]]),
+            (pnl.AtNCalls, {"time_scale": pnl.TimeScale.TRIAL, "n": 5}, [[0.25, 0.25]]),
+            (pnl.AtNCalls, {"time_scale": pnl.TimeScale.RUN, "n": 5}, [[0.25, 0.25]]),
+            (pnl.AfterNCalls, {"time_scale": pnl.TimeScale.TRIAL, "n": 5}, [[0.25, 0.25]]),
+            # Mechanisms run only once per PASS unless they are in 'run_until_finished' mode.
+            (pnl.AfterNCalls, {"time_scale": pnl.TimeScale.PASS, "n": 1}, [[0.05, 0.05]]),
+            (pnl.WhenFinished, {}, [[1.0, 1.0]]),
+            (pnl.WhenFinishedAny, {}, [[1.0, 1.0]]),
+            (pnl.WhenFinishedAll, {}, [[1.0, 1.0]]),
+            (pnl.All, {}, [[1.0, 1.0]]),
+            (pnl.Any, {}, [[1.0, 1.0]]),
+            (pnl.Not, {}, [[0.05, 0.05]]),
+            (pnl.AllHaveRun, {}, [[0.05, 0.05]]),
+            (pnl.Always, {}, [[0.05, 0.05]]),
+            (pnl.AtPass, {"n": 5}, [[0.3, 0.3]]),
+            (pnl.AtTrial, {"n": 0}, [[0.05, 0.05]]),
             # (pnl.Never), #TODO: Find a good test case for this!
-        ]
+        ],
     )
-    # 'LLVM' mode is not supported, because synchronization of compiler and
-    # python values during execution is not implemented.
-    @pytest.mark.usefixtures("comp_mode_no_per_node")
-    def test_scheduler_conditions(self, comp_mode, condition, scale, expected_result):
+    def test_scheduler_conditions(
+        self, comp_mode, condition, condition_params, expected_result
+    ):
         decisionMaker = pnl.DDM(
-            function=pnl.DriftDiffusionIntegrator(starting_value=0,
-                                                  threshold=1,
-                                                  noise=0.0,
-                                                  time_step_size=1.0),
+            function=pnl.DriftDiffusionIntegrator(
+                starting_value=0, threshold=1, noise=0.0, time_step_size=1.0
+            ),
             reset_stateful_function_when=pnl.AtTrialStart(),
             execute_until_finished=False,
+            # Use only the decision variable in this test
             output_ports=[pnl.DECISION_VARIABLE],
-            name='pnl.DDM'
+            name="DDM",
         )
 
         response = pnl.ProcessingMechanism(input_shapes=2, name="GATE")
@@ -1004,43 +1004,19 @@ class TestFeedback:
         comp = pnl.Composition()
         comp.add_linear_processing_pathway([decisionMaker, response])
 
-        if condition is pnl.BeforeNCalls:
-            comp.scheduler.add_condition(response, condition(decisionMaker, 5,
-                                                             time_scale=scale))
-        elif condition is pnl.AtNCalls:
-            comp.scheduler.add_condition(response, condition(decisionMaker, 5,
-                                                             time_scale=scale))
-        elif condition is pnl.AfterNCalls:
-            # Mechanisms run only once per PASS unless they are in
-            # 'run_until_finished' mode.
-            c = 1 if scale is pnl.TimeScale.PASS else 5
-            comp.scheduler.add_condition(response, condition(decisionMaker, c,
-                                                             time_scale=scale))
-        elif condition is pnl.EveryNCalls:
-            comp.scheduler.add_condition(response, condition(decisionMaker, 1))
-        elif condition is pnl.WhenFinished:
-            comp.scheduler.add_condition(response, condition(decisionMaker))
-        elif condition is pnl.WhenFinishedAny:
-            comp.scheduler.add_condition(response, condition(decisionMaker))
-        elif condition is pnl.WhenFinishedAll:
-            comp.scheduler.add_condition(response, condition(decisionMaker))
-        elif condition is pnl.All:
-            comp.scheduler.add_condition(response, condition(pnl.WhenFinished(decisionMaker)))
-        elif condition is pnl.Any:
-            comp.scheduler.add_condition(response, condition(pnl.WhenFinished(decisionMaker)))
-        elif condition is pnl.Not:
-            comp.scheduler.add_condition(response, condition(pnl.WhenFinished(decisionMaker)))
-        elif condition is pnl.AllHaveRun:
-            comp.scheduler.add_condition(response, condition(decisionMaker))
-        elif condition is pnl.Always:
-            comp.scheduler.add_condition(response, condition())
-        elif condition is pnl.AtPass:
-            comp.scheduler.add_condition(response, condition(5))
-        elif condition is pnl.AtTrial:
-            comp.scheduler.add_condition(response, condition(0))
+        if condition in {pnl.All, pnl.Any, pnl.Not}:
+            comp.scheduler.add_condition(
+                response, condition(pnl.WhenFinished(decisionMaker))
+            )
+        elif condition in {pnl.Always, pnl.Never, pnl.AtPass, pnl.AtTrial}:
+            comp.scheduler.add_condition(response, condition(**condition_params))
+        else:
+            comp.scheduler.add_condition(
+                response, condition(decisionMaker, **condition_params)
+            )
 
         result = comp.run([0.05], execution_mode=comp_mode)
-        assert np.allclose(result, expected_result)
+        np.testing.assert_allclose(result, expected_result)
 
     @pytest.mark.parametrize(
         "mode", [
