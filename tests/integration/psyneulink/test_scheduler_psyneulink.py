@@ -1,6 +1,10 @@
 import numpy as np
 import psyneulink as pnl
 import pytest
+from psyneulink.core.scheduling.condition import (
+    AfterNEnvironmentStateUpdates,
+    AtConsiderationSetExecution,
+)
 
 
 @pytest.mark.psyneulink
@@ -17,7 +21,7 @@ class TestScheduler:
         sched.add_condition(A, pnl.BeforeNCalls(A, 5, time_scale=pnl.TimeScale.LIFE))
 
         termination_conds = {}
-        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(6)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(6)
         termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNPasses(1)
         comp1.run(
             inputs={A: [[0], [1], [2], [3], [4], [5]]},
@@ -55,7 +59,7 @@ class TestScheduler:
         sched.add_condition(A, pnl.BeforeNCalls(A, 5, time_scale=pnl.TimeScale.LIFE))
 
         termination_conds = {}
-        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(6)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(6)
         termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNPasses(1)
         eid = 'eid'
         comp.run(
@@ -128,7 +132,7 @@ class TestScheduler:
         C.run(inputs={D: [[1.0], [2.0]]},
               # termination_processing={pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.WhenFinished(D)},
               call_after_trial=change_termination_processing,
-              reset_stateful_functions_when=pnl.AtConsiderationSetExecution(0),
+              reset_stateful_functions_when=AtConsiderationSetExecution(0),
               num_trials=4)
         # EnvironmentStateUpdate 0:
         # input = 1.0, termination condition = pnl.WhenFinished
