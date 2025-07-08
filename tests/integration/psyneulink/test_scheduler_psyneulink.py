@@ -995,7 +995,7 @@ class TestFeedback:
             name='pnl.DDM'
         )
 
-        response = pnl.ProcessingMechanism(size=2, name="GATE")
+        response = pnl.ProcessingMechanism(input_shapes=2, name="GATE")
 
         comp = pnl.Composition()
         comp.add_linear_processing_pathway([decisionMaker, response])
