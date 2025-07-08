@@ -8,9 +8,9 @@ def pytest_runtest_setup(item):
 
 
 def pytest_generate_tests(metafunc):
-    if "comp_mode_no_llvm" in metafunc.fixturenames:
+    if "comp_mode_no_per_node" in metafunc.fixturenames:
         modes = [m for m in get_comp_execution_modes()
-                 if m.values[0] is not pnlvm.ExecutionMode.LLVM]
+                 if m.values[0] is not pnlvm.ExecutionMode._LLVMPerNode]
         metafunc.parametrize("comp_mode", modes)
 
     elif "comp_mode" in metafunc.fixturenames:
@@ -22,7 +22,7 @@ def pytest_runtest_teardown(item):
 
 
 @pytest.fixture
-def comp_mode_no_llvm():
+def comp_mode_no_per_node():
     # dummy fixture to allow 'comp_mode' filtering
     pass
 
@@ -31,8 +31,8 @@ def comp_mode_no_llvm():
 def get_comp_execution_modes():
     return [
         pytest.param(pnlvm.ExecutionMode.Python),
-        pytest.param(pnlvm.ExecutionMode.LLVM, marks=pytest.mark.llvm),
-        pytest.param(pnlvm.ExecutionMode.LLVMExec, marks=pytest.mark.llvm),
+        pytest.param(pnlvm.ExecutionMode._LLVMPerNode, marks=pytest.mark.llvm),
+        pytest.param(pnlvm.ExecutionMode._LLVMExec, marks=pytest.mark.llvm),
         pytest.param(pnlvm.ExecutionMode.LLVMRun, marks=pytest.mark.llvm),
         pytest.param(pnlvm.ExecutionMode.PTXExec, marks=[pytest.mark.llvm, pytest.mark.cuda]),
         pytest.param(pnlvm.ExecutionMode.PTXRun, marks=[pytest.mark.llvm, pytest.mark.cuda])
