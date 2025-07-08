@@ -928,7 +928,7 @@ class TestFeedback:
     )
     # 'LLVM' mode is not supported, because synchronization of compiler and
     # python values during execution is not implemented.
-    @pytest.mark.usefixtures("comp_mode_no_llvm")
+    @pytest.mark.usefixtures("comp_mode_no_per_node")
     def test_time_termination_measures(self, comp_mode, timescale, expected):
         in_one_pass = timescale in {pnl.TimeScale.CONSIDERATION_SET_EXECUTION, pnl.TimeScale.PASS}
         attention = pnl.TransferMechanism(
@@ -982,7 +982,7 @@ class TestFeedback:
     )
     # 'LLVM' mode is not supported, because synchronization of compiler and
     # python values during execution is not implemented.
-    @pytest.mark.usefixtures("comp_mode_no_llvm")
+    @pytest.mark.usefixtures("comp_mode_no_per_node")
     def test_scheduler_conditions(self, comp_mode, condition, scale, expected_result):
         decisionMaker = pnl.DDM(
             function=pnl.DriftDiffusionIntegrator(starting_value=0,
