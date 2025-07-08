@@ -144,7 +144,7 @@ class TestScheduler:
                             [np.array([2.]), np.array([1.])],
                             [np.array([10.]), np.array([10.])],
                             [np.array([2.]), np.array([1.])]]
-        assert np.allclose(expected_results, np.asfarray(C.results))
+        assert np.allclose(expected_results, np.asarray(C.results))
 
 
 @pytest.mark.psyneulink
@@ -995,7 +995,7 @@ class TestFeedback:
                                                   time_step_size=1.0),
             reset_stateful_function_when=pnl.AtTrialStart(),
             execute_until_finished=False,
-            output_ports=[pnl.DECISION_VARIABLE, pnl.RESPONSE_TIME],
+            output_ports=[pnl.DECISION_VARIABLE],
             name='pnl.DDM'
         )
 
@@ -1045,9 +1045,6 @@ class TestFeedback:
             comp.scheduler.add_condition(response, condition(0))
 
         result = comp.run([0.05], execution_mode=comp_mode)
-        # HACK: The result is an object dtype in Python mode for some reason?
-        if comp_mode is pnl.ExecutionMode.Python:
-            result = np.asfarray(result[0])
         assert np.allclose(result, expected_result)
 
     @pytest.mark.parametrize(
