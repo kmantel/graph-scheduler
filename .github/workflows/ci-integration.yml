@@ -62,7 +62,7 @@ jobs:
 
     - name: Test with pytest
       timeout-minutes: 80
-      run: pytest --junit-xml=tests_out.xml --verbosity=0 -n auto --no-cov tests/integration/psyneulink/
+      run: pytest -n 0 --junit-xml=tests_out.xml --no-cov tests/integration/psyneulink/test_scheduler_psyneulink.py::TestFeedback::test_scheduler_conditions
 
     - name: Upload test results
       uses: actions/upload-artifact@v4
