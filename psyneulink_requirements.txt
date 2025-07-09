@@ -1,1 +1,1 @@
-psyneulink >=0.9.1.0
+psyneulink @ git+https://github.com/kmantel/PsyNeuLink.git@devel
