@@ -1,6 +1,8 @@
 name: CI Integration
 
 on:
+  schedule:
+    - cron: "0 5 * * *"
   push:
     branches-ignore:
       - 'dependabot/**'
@@ -20,16 +22,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.7, 3.8, 3.9, '3.10', 3.11]
+        python-version: [3.8, 3.9, '3.10', 3.11]
         os: [ubuntu-latest, macos-latest, windows-latest]
-        exclude:
-          # 3.7 is dropped on macos 14 runners
+        include:
+          # 3.7 is dropped on ubuntu 24.04 and macos 14 runners
           - python-version: '3.7'
-            os: macos-latest
+            os: windows-latest
 
     steps:
     - name: Checkout sources
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         # need history and tags for versioneer
         fetch-depth: 0
@@ -49,7 +51,7 @@ jobs:
         echo ::set-output name=pip_cache_dir::$(python -m pip cache dir)
 
     - name: Wheels cache
-      uses: actions/cache@v3.3.1
+      uses: actions/cache@v4
       with:
         path: ${{ steps.pip_cache.outputs.pip_cache_dir }}/wheels
         key: ${{ runner.os }}-python-${{ matrix.python-version }}-${{ matrix.python-architecture }}-pip-wheels-v2-${{ github.sha }}
@@ -63,7 +65,7 @@ jobs:
       run: pytest --junit-xml=tests_out.xml --verbosity=0 -n auto --no-cov tests/integration/psyneulink/
 
     - name: Upload test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: test-results-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.python-architecture }}
         path: tests_out.xml

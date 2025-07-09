@@ -1,6 +1,8 @@
 name: Docs CI
 
 on:
+  schedule:
+    - cron: "0 5 * * *"
   push:
     branches-ignore:
       - 'dependabot/**'
@@ -17,7 +19,7 @@ jobs:
       # The entire matrix is set up and 'base' builds are pruned based
       # on event name and final configuration (ubuntu, python3.7).
       matrix:
-        python-version: [3.7, 3.8, 3.9, '3.10', 3.11]
+        python-version: [3.8, 3.9, '3.10', 3.11]
         python-architecture: ['x64']
         os: [ubuntu-latest]
         event:
@@ -28,7 +30,7 @@ jobs:
 
     steps:
     - name: Checkout sources
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         # need history and tags for versioneer
         fetch-depth: 0
@@ -48,7 +50,7 @@ jobs:
         echo ::set-output name=pip_cache_dir::$(python -m pip cache dir)
 
     - name: Wheels cache
-      uses: actions/cache@v3.3.1
+      uses: actions/cache@v4
       with:
         path: ${{ steps.pip_cache.outputs.pip_cache_dir }}/wheels
         key: ${{ runner.os }}-python-${{ matrix.python-version }}-${{ matrix.python-architecture }}-pip-wheels-v2-${{ github.sha }}
@@ -63,7 +65,7 @@ jobs:
       run: make -C docs html
 
     - name: Upload Documentation
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Documentation-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.python-architecture }}
         retention-days: 1
@@ -80,7 +82,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.7]
+        python-version: [3.11]
         os: [ubuntu-latest]
 
     runs-on: ${{ matrix.os }}
@@ -92,7 +94,7 @@ jobs:
 
     steps:
     - name: Checkout docs
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         ref: gh-pages
 
@@ -100,7 +102,7 @@ jobs:
       run: git fetch origin +refs/tags/*:refs/tags/*
 
     - name: Download branch docs
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: Documentation-${{ matrix.os }}-${{ matrix.python-version }}-x64
         path: _built_docs/${{ github.ref }}
@@ -115,7 +117,7 @@ jobs:
       if: github.ref == 'refs/heads/main'
 
     - name: Download main docs
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: Documentation-${{ matrix.os }}-${{ matrix.python-version }}-x64
         path: _built_docs/${{ github.ref }}
