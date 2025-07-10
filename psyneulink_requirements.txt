@@ -1,1 +1,1 @@
-psyneulink @ git+https://github.com/kmantel/PsyNeuLink.git@gs-debug
+psyneulink @ git+https://github.com/kmantel/PsyNeuLink.git@879f12a0e0
