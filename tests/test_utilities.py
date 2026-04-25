@@ -4,7 +4,7 @@ import types
 
 import networkx as nx
 import pytest
-from pkg_resources import packaging
+from packaging.version import parse as version_parse
 
 import graph_scheduler as gs
 
@@ -39,7 +39,7 @@ nx_digraph_types = [
 
 def check_compatibility_PlanarEmbedding(nx_graph_type):
     if (
-        packaging.version.parse(nx.__version__) >= packaging.version.parse('3.3')
+        version_parse(nx.__version__) >= version_parse('3.3')
         and issubclass(nx_graph_type, nx.PlanarEmbedding)
     ):
         pytest.xfail(
