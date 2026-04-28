@@ -1,0 +1,18 @@
+name: Enable All Workflows
+
+on:
+  schedule:
+    # arbitrary time weekly
+    # anything less than 60 days should work though
+    - cron: "17 0 * * 2"
+  workflow_dispatch:
+
+jobs:
+  enable_workflows:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run github-keepalive.sh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        shell: bash
+        run: bash -x ./bin/github-keepalive.sh
