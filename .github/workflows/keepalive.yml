@@ -11,8 +11,10 @@ jobs:
   enable_workflows:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v5
       - name: Run github-keepalive.sh
         env:
           GITHUB_TOKEN: ${{ github.token }}
         shell: bash
-        run: bash -x ./bin/github-keepalive.sh
+        working-directory: ./bin
+        run: pwd && ls -la && ls -la .. && bash -x github-keepalive.sh
