@@ -1,5 +1,5 @@
 pydot
-pytest
+pytest <9.1
 pytest-cov
 pytest-helpers-namespace
 pytest-pycodestyle
