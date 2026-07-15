@@ -1,11 +1,14 @@
 import collections
+import enum
 import functools
 import inspect
 import logging
+import platform
 import weakref
 from typing import Callable, Dict, Hashable, List, Set, Union
 
 import networkx as nx
+import packaging.version as version
 
 __all__ = [
     'clone_graph', 'dependency_dict_to_networkx_digraph',
@@ -335,3 +338,12 @@ def get_simple_cycles(graph: GraphDependencyDict) -> List[List[Hashable]]:
     """
     nx_graph = dependency_dict_to_networkx_digraph(graph)
     return list(nx.simple_cycles(nx_graph))
+
+
+def _make_enum_function_member(func: Callable):
+    func = functools.partial(func)
+
+    if version.parse(platform.python_version()) >= version.parse('3.13'):
+        func = enum.member(func)
+
+    return func

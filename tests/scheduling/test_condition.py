@@ -103,6 +103,28 @@ def basic_Condition(*args):
     return gs.Condition(lambda: None, *args)
 
 
+@pytest.mark.parametrize(
+    'operation_arg, expected_arg_value',
+    [
+        ('KEEP', gs.Operation.KEEP),
+        ('INTERSECTION', gs.Operation.INTERSECTION),
+        ('UNION', gs.Operation.UNION),
+        ('MERGE', gs.Operation.MERGE),
+        ('REPLACE', gs.Operation.REPLACE),
+        ('DISCARD', gs.Operation.DISCARD),
+        ('DIFFERENCE', gs.Operation.DIFFERENCE),
+        ('SYMMETRIC_DIFFERENCE', gs.Operation.SYMMETRIC_DIFFERENCE),
+        ('INVERSE_DIFFERENCE', gs.Operation.INVERSE_DIFFERENCE),
+    ]
+)
+def test_operation_members(operation_arg, expected_arg_value):
+    # NOTE: this doesn't test that members are called correctly, but
+    # that is tested extensively in graph structure condition tests below
+    op = gs.Operation[operation_arg]
+    assert op is expected_arg_value
+    assert op in gs.Operation
+
+
 class TestConditionSet:
     # maintain through v1.x
     class TestConstructorInterface:
