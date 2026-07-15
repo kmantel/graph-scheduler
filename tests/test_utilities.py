@@ -4,9 +4,16 @@ import types
 
 import networkx as nx
 import pytest
-from pkg_resources import packaging
 
 import graph_scheduler as gs
+
+try:
+    import packaging
+except ImportError:
+    # packaging is removed from pkg_resources in python 3.12+, but may
+    # be available when packaging module is not
+    from pkg_resources import packaging
+
 
 root_logger = logging.getLogger()
 gs_logger = logging.getLogger(gs.__name__)
