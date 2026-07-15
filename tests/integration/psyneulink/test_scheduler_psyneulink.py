@@ -1,6 +1,10 @@
 import numpy as np
 import psyneulink as pnl
 import pytest
+from psyneulink.core.scheduling.condition import (
+    AfterNEnvironmentStateUpdates,
+    AtConsiderationSetExecution,
+)
 
 
 @pytest.mark.psyneulink
@@ -17,7 +21,7 @@ class TestScheduler:
         sched.add_condition(A, pnl.BeforeNCalls(A, 5, time_scale=pnl.TimeScale.LIFE))
 
         termination_conds = {}
-        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(6)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(6)
         termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNPasses(1)
         comp1.run(
             inputs={A: [[0], [1], [2], [3], [4], [5]]},
@@ -55,7 +59,7 @@ class TestScheduler:
         sched.add_condition(A, pnl.BeforeNCalls(A, 5, time_scale=pnl.TimeScale.LIFE))
 
         termination_conds = {}
-        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = pnl.AfterNEnvironmentStateUpdates(6)
+        termination_conds[pnl.TimeScale.ENVIRONMENT_SEQUENCE] = AfterNEnvironmentStateUpdates(6)
         termination_conds[pnl.TimeScale.ENVIRONMENT_STATE_UPDATE] = pnl.AfterNPasses(1)
         eid = 'eid'
         comp.run(
@@ -128,7 +132,7 @@ class TestScheduler:
         C.run(inputs={D: [[1.0], [2.0]]},
               # termination_processing={pnl.TimeScale.ENVIRONMENT_STATE_UPDATE: pnl.WhenFinished(D)},
               call_after_trial=change_termination_processing,
-              reset_stateful_functions_when=pnl.AtConsiderationSetExecution(0),
+              reset_stateful_functions_when=AtConsiderationSetExecution(0),
               num_trials=4)
         # EnvironmentStateUpdate 0:
         # input = 1.0, termination condition = pnl.WhenFinished
@@ -140,7 +144,7 @@ class TestScheduler:
                             [np.array([2.]), np.array([1.])],
                             [np.array([10.]), np.array([10.])],
                             [np.array([2.]), np.array([1.])]]
-        assert np.allclose(expected_results, np.asfarray(C.results))
+        assert np.allclose(expected_results, np.asarray(C.results))
 
 
 @pytest.mark.psyneulink
@@ -991,11 +995,16 @@ class TestFeedback:
                                                   time_step_size=1.0),
             reset_stateful_function_when=pnl.AtTrialStart(),
             execute_until_finished=False,
-            output_ports=[pnl.DECISION_VARIABLE, pnl.RESPONSE_TIME],
+            output_ports=[pnl.DECISION_VARIABLE],
             name='pnl.DDM'
         )
 
-        response = pnl.ProcessingMechanism(size=2, name="GATE")
+        try:
+            response = pnl.ProcessingMechanism(input_shapes=2, name="GATE")
+        except pnl.ComponentError as e:
+            if "'size' is deprecated" not in str(e):
+                raise
+            response = pnl.ProcessingMechanism(size=2, name="GATE")
 
         comp = pnl.Composition()
         comp.add_linear_processing_pathway([decisionMaker, response])
@@ -1036,9 +1045,6 @@ class TestFeedback:
             comp.scheduler.add_condition(response, condition(0))
 
         result = comp.run([0.05], execution_mode=comp_mode)
-        # HACK: The result is an object dtype in Python mode for some reason?
-        if comp_mode is pnl.ExecutionMode.Python:
-            result = np.asfarray(result[0])
         assert np.allclose(result, expected_result)
 
     @pytest.mark.parametrize(
