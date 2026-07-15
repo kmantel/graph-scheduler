@@ -410,7 +410,6 @@ import abc
 import collections
 import copy
 import enum
-import functools
 import inspect
 import itertools
 import logging
@@ -425,6 +424,7 @@ from graph_scheduler import _unit_registry
 from graph_scheduler.time import TimeScale
 from graph_scheduler.utilities import (
     GraphDependencyDict,
+    _make_enum_function_member,
     call_with_pruned_args,
     clone_graph,
     get_ancestors,
@@ -585,15 +585,15 @@ class Operation(enum.Enum):
     def _inverse_difference(s, c):
         return c.difference(s)
 
-    KEEP = functools.partial(_keep)
-    REPLACE = functools.partial(_replace)
-    DISCARD = functools.partial(_discard)
-    INTERSECTION = functools.partial(set.intersection)
-    UNION = functools.partial(set.union)
-    MERGE = functools.partial(set.union)
-    DIFFERENCE = functools.partial(set.difference)
-    INVERSE_DIFFERENCE = functools.partial(_inverse_difference)
-    SYMMETRIC_DIFFERENCE = functools.partial(set.symmetric_difference)
+    KEEP = _make_enum_function_member(_keep)
+    REPLACE = _make_enum_function_member(_replace)
+    DISCARD = _make_enum_function_member(_discard)
+    INTERSECTION = _make_enum_function_member(set.intersection)
+    UNION = _make_enum_function_member(set.union)
+    MERGE = _make_enum_function_member(set.union)
+    DIFFERENCE = _make_enum_function_member(set.difference)
+    INVERSE_DIFFERENCE = _make_enum_function_member(_inverse_difference)
+    SYMMETRIC_DIFFERENCE = _make_enum_function_member(set.symmetric_difference)
 
     @classmethod
     def _str_max_length(cls):
