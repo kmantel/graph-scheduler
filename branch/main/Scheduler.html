@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Scheduler &mdash; Graph Scheduler 1.2.2+19.g8e548e2 documentation</title>
+  <title>Scheduler &mdash; Graph Scheduler 1.2.2+20.g323d47f documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
 
@@ -274,11 +274,11 @@ the time specified. The simplest example of this situation involves a
 linear graph with two nodes:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">graph_scheduler</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">graph</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="nb">set</span><span class="p">(),</span> <span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;A&#39;</span><span class="p">}}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">graph</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'A'</span><span class="p">:</span> <span class="nb">set</span><span class="p">(),</span> <span class="s1">'B'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'A'</span><span class="p">}}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span> <span class="o">=</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">Scheduler</span><span class="p">(</span><span class="n">graph</span><span class="o">=</span><span class="n">graph</span><span class="p">)</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">TimeInterval</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">TimeInterval</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span><span class="s1">'A'</span><span class="p">,</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">TimeInterval</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span><span class="s1">'B'</span><span class="p">,</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">TimeInterval</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>In standard mode, <strong>A</strong> and <strong>B</strong> are in different consideration sets,
@@ -319,67 +319,67 @@ Additionally, non-absolute conditions like
 <li><p>Basic phasing in a linear process:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">graph_scheduler</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">graph</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="nb">set</span><span class="p">(),</span> <span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;A&#39;</span><span class="p">},</span> <span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;B&#39;</span><span class="p">}}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">graph</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'A'</span><span class="p">:</span> <span class="nb">set</span><span class="p">(),</span> <span class="s1">'B'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'A'</span><span class="p">},</span> <span class="s1">'C'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'B'</span><span class="p">}}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span> <span class="o">=</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">Scheduler</span><span class="p">(</span><span class="n">graph</span><span class="o">=</span><span class="n">graph</span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># implicit condition of Always for A</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">EveryNCalls</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">EveryNCalls</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span><span class="s1">'B'</span><span class="p">,</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">EveryNCalls</span><span class="p">(</span><span class="s1">'A'</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span><span class="s1">'C'</span><span class="p">,</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">EveryNCalls</span><span class="p">(</span><span class="s1">'B'</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># implicit AllHaveRun Termination condition</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">execution_sequence</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">scheduler</span><span class="o">.</span><span class="n">run</span><span class="p">())</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">execution_sequence</span>
-<span class="go">[{&#39;A&#39;}, {&#39;A&#39;}, {&#39;B&#39;}, {&#39;A&#39;}, {&#39;A&#39;}, {&#39;B&#39;}, {&#39;A&#39;}, {&#39;A&#39;}, {&#39;B&#39;}, {&#39;C&#39;}]</span>
+<span class="go">[{'A'}, {'A'}, {'B'}, {'A'}, {'A'}, {'B'}, {'A'}, {'A'}, {'B'}, {'C'}]</span>
 </pre></div>
 </div>
 </li>
 <li><p>Alternate basic phasing in a linear process:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">graph</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="nb">set</span><span class="p">(),</span> <span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;A&#39;</span><span class="p">}}</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">graph</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'A'</span><span class="p">:</span> <span class="nb">set</span><span class="p">(),</span> <span class="s1">'B'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'A'</span><span class="p">}}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span> <span class="o">=</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">Scheduler</span><span class="p">(</span><span class="n">graph</span><span class="o">=</span><span class="n">graph</span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="s1">&#39;A&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s1">'A'</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">Any</span><span class="p">(</span>
 <span class="gp">... </span>        <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">AtPass</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
-<span class="gp">... </span>        <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">EveryNCalls</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="gp">... </span>        <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">EveryNCalls</span><span class="p">(</span><span class="s1">'B'</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="p">)</span>
 <span class="gp">... </span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="s1">&#39;B&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s1">'B'</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">Any</span><span class="p">(</span>
-<span class="gp">... </span>        <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">EveryNCalls</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-<span class="gp">... </span>        <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">EveryNCalls</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">... </span>        <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">EveryNCalls</span><span class="p">(</span><span class="s1">'A'</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+<span class="gp">... </span>        <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">EveryNCalls</span><span class="p">(</span><span class="s1">'B'</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="p">)</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">termination_conds</span> <span class="o">=</span> <span class="p">{</span>
-<span class="gp">... </span>    <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">TimeScale</span><span class="o">.</span><span class="n">ENVIRONMENT_STATE_UPDATE</span><span class="p">:</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">AfterNCalls</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">time_scale</span><span class="o">=</span><span class="n">graph_scheduler</span><span class="o">.</span><span class="n">TimeScale</span><span class="o">.</span><span class="n">ENVIRONMENT_STATE_UPDATE</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">TimeScale</span><span class="o">.</span><span class="n">ENVIRONMENT_STATE_UPDATE</span><span class="p">:</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">AfterNCalls</span><span class="p">(</span><span class="s1">'B'</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">time_scale</span><span class="o">=</span><span class="n">graph_scheduler</span><span class="o">.</span><span class="n">TimeScale</span><span class="o">.</span><span class="n">ENVIRONMENT_STATE_UPDATE</span><span class="p">)</span>
 <span class="gp">... </span><span class="p">}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">execution_sequence</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">scheduler</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">termination_conds</span><span class="o">=</span><span class="n">termination_conds</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">execution_sequence</span>
-<span class="go">[{&#39;A&#39;}, {&#39;B&#39;}, {&#39;B&#39;}, {&#39;A&#39;}, {&#39;B&#39;}, {&#39;B&#39;}]</span>
+<span class="go">[{'A'}, {'B'}, {'B'}, {'A'}, {'B'}, {'B'}]</span>
 </pre></div>
 </div>
 </li>
 <li><p>Basic phasing in two processes:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">graph</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="nb">set</span><span class="p">(),</span> <span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="nb">set</span><span class="p">(),</span> <span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">}}</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">graph</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'A'</span><span class="p">:</span> <span class="nb">set</span><span class="p">(),</span> <span class="s1">'B'</span><span class="p">:</span> <span class="nb">set</span><span class="p">(),</span> <span class="s1">'C'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'A'</span><span class="p">,</span> <span class="s1">'B'</span><span class="p">}}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span> <span class="o">=</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">Scheduler</span><span class="p">(</span><span class="n">graph</span><span class="o">=</span><span class="n">graph</span><span class="p">)</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">EveryNPasses</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">EveryNCalls</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span><span class="s1">'A'</span><span class="p">,</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">EveryNPasses</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span><span class="s1">'B'</span><span class="p">,</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">EveryNCalls</span><span class="p">(</span><span class="s1">'A'</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scheduler</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="s1">&#39;C&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s1">'C'</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">Any</span><span class="p">(</span>
-<span class="gp">... </span>        <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">AfterNCalls</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
-<span class="gp">... </span>        <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">AfterNCalls</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">... </span>        <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">AfterNCalls</span><span class="p">(</span><span class="s1">'A'</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+<span class="gp">... </span>        <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">AfterNCalls</span><span class="p">(</span><span class="s1">'B'</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="p">)</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">termination_conds</span> <span class="o">=</span> <span class="p">{</span>
-<span class="gp">... </span>    <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">TimeScale</span><span class="o">.</span><span class="n">ENVIRONMENT_STATE_UPDATE</span><span class="p">:</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">AfterNCalls</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">time_scale</span><span class="o">=</span><span class="n">graph_scheduler</span><span class="o">.</span><span class="n">TimeScale</span><span class="o">.</span><span class="n">ENVIRONMENT_STATE_UPDATE</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">TimeScale</span><span class="o">.</span><span class="n">ENVIRONMENT_STATE_UPDATE</span><span class="p">:</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">AfterNCalls</span><span class="p">(</span><span class="s1">'C'</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">time_scale</span><span class="o">=</span><span class="n">graph_scheduler</span><span class="o">.</span><span class="n">TimeScale</span><span class="o">.</span><span class="n">ENVIRONMENT_STATE_UPDATE</span><span class="p">)</span>
 <span class="gp">... </span><span class="p">}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">execution_sequence</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">scheduler</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">termination_conds</span><span class="o">=</span><span class="n">termination_conds</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">execution_sequence</span> 
-<span class="go">[{&#39;A&#39;}, {&#39;A&#39;, &#39;B&#39;}, {&#39;A&#39;}, {&#39;C&#39;}, {&#39;A&#39;, &#39;B&#39;}, {&#39;C&#39;}, {&#39;A&#39;}, {&#39;C&#39;}, {&#39;A&#39;, &#39;B&#39;}, {&#39;C&#39;}]</span>
+<span class="go">[{'A'}, {'A', 'B'}, {'A'}, {'C'}, {'A', 'B'}, {'C'}, {'A'}, {'C'}, {'A', 'B'}, {'C'}]</span>
 </pre></div>
 </div>
 </li>
@@ -397,14 +397,14 @@ specification dictionary, possibly determined by a set of <a class="reference in
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>graph</strong> (Dict[object: set(object)], <a class="reference external" href="https://networkx.org/documentation/stable/reference/classes/digraph.html#networkx.DiGraph" title="(in NetworkX v3.6.1)"><code class="xref any docutils literal notranslate"><span class="pre">networkx.DiGraph</span></code></a>) – <dl>
+<li><p><strong>graph</strong> (Dict[object: set(object)], <a class="reference external" href="https://networkx.org/documentation/stable/reference/classes/digraph.html#networkx.DiGraph" title="(in NetworkX v3.7)"><code class="xref any docutils literal notranslate"><span class="pre">networkx.DiGraph</span></code></a>) – <dl>
 <dt>a directed acyclic graph (DAG). Specified as either:</dt><dd><ul>
 <li><p>a graph specification dictionary: each entry of the</p></li>
 </ul>
 <p>dictionary must be an object, and the value of each entry
 must be a set of zero or more objects that project directly
 to the key.
-- a <a class="reference external" href="https://networkx.org/documentation/stable/reference/classes/digraph.html#networkx.DiGraph" title="(in NetworkX v3.6.1)"><code class="xref any docutils literal notranslate"><span class="pre">networkx.DiGraph</span></code></a></p>
+- a <a class="reference external" href="https://networkx.org/documentation/stable/reference/classes/digraph.html#networkx.DiGraph" title="(in NetworkX v3.7)"><code class="xref any docutils literal notranslate"><span class="pre">networkx.DiGraph</span></code></a></p>
 </dd>
 </dl>
 </p></li>
@@ -412,7 +412,7 @@ to the key.
 execute and any dependencies among them.</p></li>
 <li><p><strong>mode</strong> (<a class="reference internal" href="#graph_scheduler.scheduler.SchedulingMode" title="graph_scheduler.scheduler.SchedulingMode"><em>SchedulingMode</em></a><em>[</em><em>STANDARD</em><em>|</em><em>EXACT_TIME</em><em>] </em><em>: SchedulingMode.STANDARD</em>) – sets the mode of scheduling: <a class="reference internal" href="#scheduler-execution"><span class="std std-ref">standard</span></a> or
 <a class="reference internal" href="#scheduler-exact-time"><span class="std std-ref">exact time</span></a></p></li>
-<li><p><strong>default_absolute_time_unit</strong> (<a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.25.3rc1.dev1+g5e79411e1)"><code class="xref any docutils literal notranslate"><span class="pre">pint.Quantity</span></code></a> : <code class="docutils literal notranslate"><span class="pre">1ms</span></code>) – if not otherwise determined by any absolute <strong>conditions</strong>,
+<li><p><strong>default_absolute_time_unit</strong> (<a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.1.dev50+gaf817a609)"><code class="xref any docutils literal notranslate"><span class="pre">pint.Quantity</span></code></a> : <code class="docutils literal notranslate"><span class="pre">1ms</span></code>) – if not otherwise determined by any absolute <strong>conditions</strong>,
 specifies the absolute duration of a <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION" title="graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">CONSIDERATION_SET_EXECUTION</span></code></a></p></li>
 </ul>
 </dd>
@@ -510,7 +510,7 @@ of the specified <a class="reference internal" href="Time.html#graph_scheduler.t
 specifies the absolute duration of a <a class="reference internal" href="Time.html#graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION" title="graph_scheduler.time.TimeScale.CONSIDERATION_SET_EXECUTION"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">CONSIDERATION_SET_EXECUTION</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.25.3rc1.dev1+g5e79411e1)"><code class="xref any docutils literal notranslate"><span class="pre">pint.Quantity</span></code></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity" title="(in pint v0.1.dev50+gaf817a609)"><code class="xref any docutils literal notranslate"><span class="pre">pint.Quantity</span></code></a></p>
 </dd>
 <dt class="field-even">Default<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">1ms</span></code></p>

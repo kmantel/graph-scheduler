@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Graph Scheduler &mdash; Graph Scheduler 1.2.2+19.g8e548e2 documentation</title>
+  <title>Graph Scheduler &mdash; Graph Scheduler 1.2.2+20.g323d47f documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
 
@@ -75,8 +75,8 @@
              
   <section id="graph-scheduler">
 <h1>Graph Scheduler<a class="headerlink" href="#graph-scheduler" title="Permalink to this heading"></a></h1>
-<a class="reference external image-reference" href="https://github.com/kmantel/graph-scheduler/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/kmantel/graph-scheduler/actions/workflows/ci.yml/badge.svg" /></a>
-<a class="reference external image-reference" href="https://coveralls.io/github/kmantel/graph-scheduler"><img alt="Coverage Status" src="https://coveralls.io/repos/github/kmantel/graph-scheduler/badge.svg" /></a>
+<p><a class="reference external" href="https://github.com/kmantel/graph-scheduler/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/kmantel/graph-scheduler/actions/workflows/ci.yml/badge.svg" /></a>
+<a class="reference external" href="https://coveralls.io/github/kmantel/graph-scheduler"><img alt="Coverage Status" src="https://coveralls.io/repos/github/kmantel/graph-scheduler/badge.svg" /></a></p>
 <p>A graph scheduler generates the order in which the nodes of a directed
 acyclic graph (DAG) are executed using the structure of the graph and
 expressive
@@ -107,18 +107,18 @@ supported.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">graph_scheduler</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">graph</span> <span class="o">=</span> <span class="p">{</span>
-<span class="go">    &#39;A&#39;: set(),</span>
-<span class="go">    &#39;B&#39;: {&#39;A&#39;},</span>
-<span class="go">    &#39;C&#39;: {&#39;A&#39;},</span>
-<span class="go">    &#39;D&#39;: {&#39;B&#39;, &#39;C&#39;},</span>
+<span class="go">    'A': set(),</span>
+<span class="go">    'B': {'A'},</span>
+<span class="go">    'C': {'A'},</span>
+<span class="go">    'D': {'B', 'C'},</span>
 <span class="go">}</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sched</span> <span class="o">=</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">Scheduler</span><span class="p">(</span><span class="n">graph</span><span class="o">=</span><span class="n">graph</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sched</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">EveryNCalls</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sched</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">,</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">EveryNCalls</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sched</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span><span class="s1">'C'</span><span class="p">,</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">EveryNCalls</span><span class="p">(</span><span class="s1">'A'</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sched</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span><span class="s1">'D'</span><span class="p">,</span> <span class="n">graph_scheduler</span><span class="o">.</span><span class="n">EveryNCalls</span><span class="p">(</span><span class="s1">'C'</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">sched</span><span class="o">.</span><span class="n">run</span><span class="p">()))</span>
-<span class="go">[{&#39;A&#39;}, {&#39;B&#39;}, {&#39;A&#39;}, {&#39;C&#39;, &#39;B&#39;}, {&#39;A&#39;}, {&#39;B&#39;}, {&#39;A&#39;}, {&#39;C&#39;, &#39;B&#39;}, {&#39;D&#39;}]</span>
+<span class="go">[{'A'}, {'B'}, {'A'}, {'C', 'B'}, {'A'}, {'B'}, {'A'}, {'C', 'B'}, {'D'}]</span>
 </pre></div>
 </div>
 <div class="toctree-wrapper compound">
