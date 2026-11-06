@@ -28,6 +28,15 @@ jobs:
           # 3.7 is dropped on ubuntu 24.04 and macos 14 runners
           - python-version: '3.7'
             os: windows-latest
+          - python-version: '3.8'
+            os: ubuntu-22.04
+          - python-version: '3.9'
+            os: ubuntu-22.04
+        exclude:
+          - python-version: '3.8'
+            os: ubuntu-latest
+          - python-version: '3.9'
+            os: ubuntu-latest
 
     steps:
     - name: Checkout sources
