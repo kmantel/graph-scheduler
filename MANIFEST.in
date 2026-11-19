@@ -2,6 +2,7 @@ include *.py
 include *.txt
 include src/graph_scheduler/_version.py
 include versioneer.py
+recursive-include bin github-keepalive.sh
 recursive-include docs *.py
 recursive-include docs *.rst
 recursive-include docs Makefile
