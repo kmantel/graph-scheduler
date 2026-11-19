@@ -2,8 +2,8 @@ include *.py
 include *.txt
 include src/graph_scheduler/_version.py
 include versioneer.py
-recursive-include docs *.bat
 recursive-include docs *.py
 recursive-include docs *.rst
 recursive-include docs Makefile
+recursive-include docs make.bat
 recursive-include tests *.py
